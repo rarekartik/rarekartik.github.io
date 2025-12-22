@@ -1,2068 +1,648 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>rarekartik - Kartik Chouhan Portfolio</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-/* ========== ENHANCED MINIMALIST PORTFOLIO WITH HI-FI ANIMATIONS ========== */
-
-:root {
-  /* Premium Minimalist Color Palette */
-  --primary: #007AFF;
-  --primary-light: #5AC8FA;
-  --accent: #5856D6;
-  --success: #34C759;
-  --warning: #FF9500;
-  --danger: #FF3B30;
-
-  /* Neutral Palette - Minimalist */
-  --bg-primary: #FAFAFA;
-  --bg-secondary: #FFFFFF;
-  --bg-tertiary: #F5F5F7;
-  --text-primary: #1C1C1E;
-  --text-secondary: #86868B;
-  --text-tertiary: #D1D1D6;
-  --border: #E5E5EA;
-
-  /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-  --gradient-success: linear-gradient(135deg, #34C759 0%, #5AC8FA 100%);
-  --gradient-warning: linear-gradient(135deg, #FF9500 0%, #FF3B30 100%);
-
-  /* Shadows - Premium */
-  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.18);
-
-  /* Ambient Glow & Texture */
-  --ambient-glow: 0 0 40px rgba(0, 122, 255, 0.25);
-  --soft-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-
-  /* Border Radius - Premium Minimalism */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-full: 50%;
-
-  /* Animations */
-  --timing-fast: 0.15s;
-  --timing-normal: 0.3s;
-  --timing-slow: 0.5s;
-  --ease-standard: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-[data-theme="dark"] {
-  --bg-primary: #000000;
-  --bg-secondary: #1C1C1E;
-  --bg-tertiary: #2C2C2E;
-  --text-primary: #F5F5F7;
-  --text-secondary: #A1A1A6;
-  --text-tertiary: #555555;
-  --border: #424245;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-  font-feature-settings: "kern" 1;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  line-height: 1.6;
-  color: var(--text-primary);
-  background: var(--bg-primary);
-  overflow-x: hidden;
-  transition: background-color 0.4s var(--ease-standard), color 0.4s var(--ease-standard);
-  position: relative;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background-image: var(--soft-noise);
-  z-index: 9999;
-}
-
-/* ========== SCROLL PROGRESS ========== */
-.scroll-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 2px;
-  background: var(--gradient-primary);
-  z-index: 1000;
-  width: 0;
-  box-shadow: var(--shadow-sm);
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.3); }
-}
-
-/* ========== CONTAINER ========== */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 var(--space-lg);
-}
-
-@media (max-width: 768px) {
-  .container {
-    padding: 0 var(--space-md);
-  }
-}
-
-/* ========== PREMIUM CARDS ========== */
-.premium-card {
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: all var(--timing-normal) var(--ease-standard);
-  position: relative;
-  overflow: hidden;
-}
-
-.premium-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-  transition: left 0.6s;
-}
-
-.premium-card:hover::before {
-  left: 100%;
-}
-
-.premium-card:hover {
-  border-color: var(--primary);
-  box-shadow: var(--shadow-lg), var(--ambient-glow);
-  transform: translateY(-6px) scale(1.015);
-}
-
-/* ========== HEADER ========== */
-.header {
-  position: fixed;
-  top: var(--space-md);
-  left: var(--space-md);
-  right: var(--space-md);
-  z-index: 100;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  padding: var(--space-lg);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
-  animation: slideDown 0.6s var(--ease-standard);
-}
-
-[data-theme="dark"] .header {
-  background: rgba(28, 28, 30, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
-}
-
-.header-brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-}
-
-.profile-photo {
-  width: 64px;
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-full);
-  background: var(--gradient-primary);
-  position: relative;
-  animation: profilePulse 3s ease-in-out infinite;
-  box-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
-}
-
-@keyframes profilePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-.profile-initials {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: white;
-  animation: fadeInScale 0.8s var(--ease-standard);
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.header-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.header-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 0.5px;
-}
-
-.header-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.header-controls {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-/* ========== PREMIUM BUTTONS ========== */
-.premium-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-sm) var(--space-lg);
-  border: none;
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--timing-normal) var(--ease-standard);
-  position: relative;
-  overflow: hidden;
-  outline: none;
-}
-
-.premium-button::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: rgba(255,255,255,0.15);
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.premium-button:active::after {
-  opacity: 1;
-}
-
-.premium-button.primary {
-  background: var(--gradient-primary);
-  color: white;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-}
-
-.premium-button.primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
-}
-
-.premium-button.secondary {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-
-.premium-button.secondary:hover {
-  background: var(--bg-secondary);
-  border-color: var(--primary);
-}
-
-.premium-button.large {
-  padding: var(--space-md) var(--space-2xl);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-/* ========== NAVIGATION ========== */
-.navigation {
-  margin-top: var(--space-lg);
-}
-
-.nav-list {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xl);
-  flex-wrap: wrap;
-}
-
-.nav-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
-  transition: all var(--timing-normal) var(--ease-standard);
-  position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 50%;
-  width: 0;
-  height: 2px;
-  background: var(--gradient-primary);
-  transition: all var(--timing-normal) var(--ease-standard);
-  transform: translateX(-50%);
-  box-shadow: 0 0 8px rgba(0, 122, 255, 0.3);
-}
-
-.nav-link:hover,
-.nav-link.active {
-  color: var(--primary);
-}
-
-.nav-link:hover::after,
-.nav-link.active::after {
-  width: 100%;
-}
-
-/* ========== MAIN CONTENT ========== */
-.main {
-  padding-top: 180px;
-}
-
-/* ========== SECTIONS ========== */
-.section {
-  padding: var(--space-3xl) 0;
-  position: relative;
-  overflow: hidden;
-}
-
-.section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  opacity: 0;
-  animation: sectionFade 1s var(--ease-standard) forwards;
-}
-
-@keyframes sectionFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.section-title {
-  font-size: clamp(2rem, 6vw, 3.5rem);
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: var(--space-2xl);
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: slideInUp 0.8s var(--ease-standard);
-  letter-spacing: -0.02em;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ========== HERO SECTION ========== */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
-  position: relative;
-  overflow: hidden;
-}
-
-.hero::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(0,122,255,0.08), transparent 100%);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  animation: heroFloat 8s ease-in-out infinite;
-  pointer-events: none;
-}
-
-@keyframes heroFloat {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50% { transform: translate(-50%, -55%) scale(1.1); }
-}
-
-.hero-content {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-content {
-  max-width: 800px;
-  animation: heroFadeIn 1.2s var(--ease-standard);
-}
-
-@keyframes heroFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.hero-title {
-  font-size: clamp(3rem, 10vw, 5.5rem);
-  font-weight: 900;
-  line-height: 1;
-  margin-bottom: var(--space-lg);
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.03em;
-  animation: titleGlow 3s ease-in-out infinite;
-}
+    <title>Kartik Chouhan | RareKartik</title>
     
-@keyframes titleGlow {
-  0%, 100% { filter: drop-shadow(0 0 0px rgba(0, 122, 255, 0)); }
-  50% { filter: drop-shadow(0 0 20px rgba(0, 122, 255, 0.3)); }
-}
-
-.hero-subtitle {
-  font-size: clamp(1rem, 3vw, 1.25rem);
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-2xl);
-  line-height: 1.8;
-  animation: fadeInUp 0.8s var(--ease-standard) 0.2s both;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.hero-cta {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-lg);
-  flex-wrap: wrap;
-  animation: fadeInUp 0.8s var(--ease-standard) 0.4s both;
-}
-
-/* ========== ABOUT SECTION ========== */
-.about {
-  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
-}
-
-.about-content {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.about-card {
-  padding: var(--space-2xl);
-  text-align: center;
-}
-
-.about-text {
-  font-size: 1.2rem;
-  font-weight: 500;
-  line-height: 1.9;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-xl);
-  animation: fadeInUp 0.8s var(--ease-standard);
-}
-
-.about-stats {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-2xl);
-  flex-wrap: wrap;
-}
-
-.stat-item {
-  text-align: center;
-  animation: bounceIn 0.8s var(--ease-bounce) forwards;
-  opacity: 0;
-}
-
-.stat-item:nth-child(1) { animation-delay: 0.2s; }
-.stat-item:nth-child(2) { animation-delay: 0.4s; }
-.stat-item:nth-child(3) { animation-delay: 0.6s; }
-
-@keyframes bounceIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.3) translateY(20px);
-  }
-  70% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.stat-number {
-  font-size: 2.75rem;
-  font-weight: 900;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  display: block;
-  line-height: 1;
-  margin-bottom: var(--space-sm);
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-/* ========== TIMELINE ========== */
-.timeline {
-  position: relative;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--gradient-primary);
-  transform: translateX(-50%);
-}
-
-.timeline-item {
-  position: relative;
-  margin-bottom: var(--space-2xl);
-  animation: fadeInUp 0.8s var(--ease-standard) forwards;
-  opacity: 0;
-}
-
-.timeline-item:nth-child(1) { animation-delay: 0.1s; }
-.timeline-item:nth-child(2) { animation-delay: 0.2s; }
-.timeline-item:nth-child(3) { animation-delay: 0.3s; }
-.timeline-item:nth-child(4) { animation-delay: 0.4s; }
-
-.timeline-item:nth-child(odd) .timeline-content {
-  margin-right: calc(50% + var(--space-xl));
-  text-align: right;
-}
-
-.timeline-item:nth-child(even) .timeline-content {
-  margin-left: calc(50% + var(--space-xl));
-  text-align: left;
-}
-
-.timeline-marker {
-  position: absolute;
-  left: 50%;
-  top: var(--space-lg);
-  width: 20px;
-  height: 20px;
-  background: var(--gradient-primary);
-  border: 4px solid var(--bg-primary);
-  border-radius: var(--radius-full);
-  transform: translateX(-50%);
-  z-index: 2;
-  box-shadow: 0 0 0 6px rgba(0, 122, 255, 0.15);
-  animation: markerPulse 2s ease-in-out infinite;
-}
-
-@keyframes markerPulse {
-  0%, 100% { box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1); }
-  50% { box-shadow: 0 0 0 8px rgba(0, 122, 255, 0.2); }
-}
-
-.timeline-content {
-  padding: var(--space-xl);
-  transition: all var(--timing-normal) var(--ease-standard);
-}
-
-.timeline-content:hover {
-  transform: translateY(-6px);
-}
-
-.timeline-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-sm);
-}
-
-.timeline-institution {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-sm);
-  font-weight: 500;
-}
-
-.timeline-session {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
-  font-weight: 500;
-  font-style: italic;
-}
-
-.timeline-status {
-  display: inline-flex;
-  align-items: center;
-  padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-md);
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.timeline-status.pursuing {
-  background: linear-gradient(135deg, #FF9500, #FF3B30);
-  color: white;
-}
-
-.timeline-status.completed {
-  background: linear-gradient(135deg, #34C759, #5AC8FA);
-  color: white;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-/* ========== SKILLS ========== */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-xl);
-  margin-bottom: var(--space-3xl);
-}
-
-.skill-card {
-  padding: var(--space-xl);
-  animation: slideInUp 0.8s var(--ease-standard) forwards;
-  opacity: 0;
-}
-
-.skill-card:nth-child(1) { animation-delay: 0.1s; }
-.skill-card:nth-child(2) { animation-delay: 0.2s; }
-.skill-card:nth-child(3) { animation-delay: 0.3s; }
-.skill-card:nth-child(4) { animation-delay: 0.4s; }
-
-.skill-card:hover {
-  transform: translateY(-8px) scale(1.02);
-}
-
-.skill-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-md);
-}
-
-.skill-progress {
-  width: 100%;
-  height: 6px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-bottom: var(--space-md);
-  position: relative;
-}
-
-.skill-progress::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-primary);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.8; }
-}
-
-.skill-progress-bar {
-  height: 100%;
-  background: var(--gradient-primary);
-  border-radius: var(--radius-full);
-  width: 0;
-  transition: width 1.5s var(--ease-standard);
-  position: relative;
-  z-index: 1;
-  overflow: hidden;
-}
-
-.skill-progress-bar::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent,
-    rgba(255,255,255,0.5),
-    transparent
-  );
-  transform: translateX(-100%);
-  animation: shimmer 2s infinite;
-}
-
-@keyframes shimmer {
-  to { transform: translateX(100%); }
-}
-
-/* ========== CORE SKILLS ========== */
-.core-skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: var(--space-xl);
-}
-
-.core-skill-card {
-  padding: var(--space-xl);
-  text-align: center;
-  animation: scaleIn 0.8s var(--ease-standard) forwards;
-  opacity: 0;
-}
-
-.core-skill-card:nth-child(1) { animation-delay: 0.1s; }
-.core-skill-card:nth-child(2) { animation-delay: 0.2s; }
-.core-skill-card:nth-child(3) { animation-delay: 0.3s; }
-.core-skill-card:nth-child(4) { animation-delay: 0.4s; }
-.core-skill-card:nth-child(5) { animation-delay: 0.5s; }
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.core-skill-card:hover {
-  transform: translateY(-12px) scale(1.05);
-}
-
-.core-skill-icon {
-  font-size: 3.5rem;
-  margin-bottom: var(--space-lg);
-  display: block;
-  animation: iconBounce 2s ease-in-out infinite;
-}
-
-@keyframes iconBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
-}
-
-.core-skill-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: var(--space-md);
-}
-
-.core-skill-description {
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin-bottom: var(--space-lg);
-  font-size: 0.95rem;
-}
-
-.core-skill-level {
-  font-size: 0.85rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #007AFF, #5856D6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* ========== RESUME SECTION ========== */
-.resume {
-  background: linear-gradient(180deg, var(--bg-tertiary) 0%, var(--bg-primary) 100%);
-}
-
-.resume-content {
-  max-width: 700px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.resume-card {
-  padding: var(--space-2xl);
-}
-
-.resume-card h3 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: var(--space-md);
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.resume-description {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-xl);
-  line-height: 1.8;
-}
-
-.resume-actions {
-  display: flex;
-  justify-content: center;
-}
-
-/* ========== CONTACT ========== */
-.contact {
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-tertiary) 100%);
-}
-
-.contact-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.contact-intro {
-  text-align: center;
-  margin-bottom: var(--space-2xl);
-}
-
-.contact-message {
-  font-size: 1.1rem;
-  color: var(--text-secondary);
-  line-height: 1.8;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-3xl);
-  align-items: start;
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.contact-item {
-  display: flex;
-  align-items: center;
-  gap: var(--space-lg);
-  padding: var(--space-xl);
-  animation: slideInLeft 0.8s var(--ease-standard) forwards;
-  opacity: 0;
-}
-
-.contact-item:nth-child(1) { animation-delay: 0.1s; }
-.contact-item:nth-child(2) { animation-delay: 0.2s; }
-.contact-item:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.contact-item:hover {
-  transform: translateX(8px);
-}
-
-.contact-icon {
-  font-size: 1.5rem;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: var(--radius-md);
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
-    }
-
-        .contact-details h4 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: var(--space-xs);
-}
-
-.contact-details p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
-
-.contact-details a {
-  color: var(--primary);
-  text-decoration: none;
-  transition: all var(--timing-normal) var(--ease-standard);
-  font-weight: 600;
-}
-
-.contact-details a:hover {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
-/* ========== CONTACT FORM ========== */
-.contact-form-container {
-  animation: slideInRight 0.8s var(--ease-standard);
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.form-label {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.form-input,
-.form-textarea {
-  padding: var(--space-md);
-  background: var(--bg-secondary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--text-primary);
-  transition: all var(--timing-normal) var(--ease-standard);
-  outline: none;
-}
-
-.form-input:focus,
-.form-textarea:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 140px;
-}
-
-/* ========== NOTIFICATIONS ========== */
-.notification {
-  position: fixed;
-  top: var(--space-lg);
-  right: var(--space-lg);
-  padding: var(--space-lg);
-  background: var(--bg-secondary);
-  border: 2px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  z-index: 2000;
-  opacity: 0;
-  transform: translateX(120%) scale(0.95);
-  transition:
-    transform var(--timing-normal) var(--ease-standard),
-    opacity var(--timing-normal) var(--ease-standard);
-  min-width: 320px;
-}
-
-.notification.show {
-  opacity: 1;
-  transform: translateX(0) scale(1);
-}
-
-.notification-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-}
-
-.notification-icon {
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.notification-message {
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-/* ========== ANIMATIONS ========== */
-.animate-fade-in {
-  animation: fadeIn 0.8s var(--ease-standard) forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-.animate-on-scroll {
-  opacity: 0;
-  transform: translateY(30px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s cubic-bezier(.16,1,.3,1);
-}
-
-.animate-on-scroll.animated {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ========== RESPONSIVE ========== */
-@media (max-width: 1024px) {
-  .timeline::before {
-    left: var(--space-lg);
-  }
-
-  .timeline-item:nth-child(odd) .timeline-content,
-  .timeline-item:nth-child(even) .timeline-content {
-    margin-left: calc(var(--space-lg) * 2 + 20px);
-    margin-right: 0;
-    text-align: left;
-  }
-
-  .timeline-marker {
-    left: var(--space-lg);
-  }
-}
-
-@media (max-width: 768px) {
-  .main {
-    padding-top: 280px;
-  }
-
-  .header {
-    left: 0;
-    right: 0;
-    top: 0;
-    border-radius: 0;
-  }
-
-  .header-content {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .nav-list {
-    gap: var(--space-md);
-  }
-
-  .contact-grid {
-    grid-template-columns: 1fr;
-    gap: var(--space-2xl);
-  }
-
-  .hero-cta {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 0 var(--space-md);
-  }
-
-  .section {
-    padding: var(--space-2xl) 0;
-  }
-}
-
-/* ========== ACCESSIBILITY ========== */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-::selection {
-  background: rgba(0, 122, 255, 0.2);
-  color: inherit;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-tertiary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--gradient-primary);
-  border-radius: var(--radius-sm);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
-}
-
-@media print {
-  .header, .notification, .scroll-progress {
-    display: none;
-  }
-  .main {
-    padding-top: 0;
-  }
-}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= PREMIUM VARIABLES ================= */
+        :root {
+            --bg: #0a0a0a;
+            --surface: #171717;
+            --surface-hover: #262626;
+            --border: #333333;
+            --text: #ffffff;
+            --text-dim: #a1a1aa;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.4);
+            --radius: 24px;
+            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f4f4f5;
+            --surface: #ffffff;
+            --surface-hover: #e4e4e7;
+            --border: #d4d4d8;
+            --text: #18181b;
+            --text-dim: #71717a;
+            --accent: #2563eb;
+        }
+
+        /* ================= CORE STYLES ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Satoshi', sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================= TYPOGRAPHY ================= */
+        h1 { font-size: clamp(3.5rem, 10vw, 8rem); font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
+        h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; }
+        h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        p { color: var(--text-dim); line-height: 1.7; font-size: 1.1rem; }
+        
+        .text-accent { color: var(--accent); }
+        .text-label { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--text-dim); 
+            font-weight: 700; 
+            margin-bottom: 15px; 
+            display: block; 
+        }
+
+        /* ================= NAVIGATION ISLAND ================= */
+        .nav-island {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(23, 23, 23, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            padding: 8px 10px;
+            border-radius: 50px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: 0.3s;
+        }
+
+        [data-theme="light"] .nav-island { background: rgba(255, 255, 255, 0.9); border-color: #e4e4e7; }
+
+        .nav-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+            border-radius: 40px;
+            transition: 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--bg);
+            background: var(--text);
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: var(--surface-hover);
+            color: var(--text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+        .icon-btn:hover { background: var(--text); color: var(--bg); transform: scale(1.1); }
+
+        /* ================= SECTIONS & GRID ================= */
+        .section {
+            padding: 100px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding-top: 0;
+        }
+
+        /* The Bento Grid Engine */
+        .grid-bento {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.4s var(--ease), border-color 0.4s var(--ease);
+        }
+
+        .card:hover {
+            border-color: var(--text-dim);
+            transform: translateY(-5px);
+            z-index: 2;
+        }
+
+        /* Grid Spans */
+        .col-12 { grid-column: span 12; }
+        .col-8 { grid-column: span 8; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+
+        /* ================= COMPONENTS ================= */
+        
+        /* 1. Marquee Strip */
+        .marquee-container {
+            width: 100%;
+            overflow: hidden;
+            background: var(--accent);
+            padding: 15px 0;
+            transform: rotate(-2deg) scale(1.05);
+            margin: 50px 0;
+        }
+        .marquee-content {
+            white-space: nowrap;
+            display: flex;
+            gap: 50px;
+            font-weight: 900;
+            font-size: 1.5rem;
+            color: white;
+            text-transform: uppercase;
+            animation: scroll 20s linear infinite;
+        }
+        @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* 2. Redacted Effect */
+        .redacted {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+        }
+        .redacted span {
+            filter: blur(8px);
+            background: var(--text);
+            color: transparent;
+            user-select: none;
+            transition: 0.4s;
+            border-radius: 4px;
+            padding: 0 6px;
+        }
+        .redacted:hover span { filter: blur(0); background: transparent; color: var(--text); }
+
+        /* 3. Skill Tags */
+        .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+        .tag {
+            background: var(--surface-hover);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            transition: 0.3s;
+        }
+        .tag:hover { border-color: var(--accent); color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+
+        /* 4. Timeline Items */
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            align-items: start;
+        }
+        .timeline-item:last-child { border-bottom: none; }
+        .year {
+            font-weight: 800;
+            color: var(--accent);
+            font-family: monospace;
+            font-size: 1.1rem;
+        }
+
+        /* 5. Inputs */
+        .input-box {
+            width: 100%;
+            padding: 20px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: 0.3s;
+            outline: none;
+        }
+        .input-box:focus { border-color: var(--accent); }
+        .btn-submit {
+            background: var(--text);
+            color: var(--bg);
+            width: 100%;
+            padding: 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+        .btn-submit:hover { background: var(--accent); color: white; }
+
+        /* ================= MOBILE RESPONSIVE ================= */
+        @media (max-width: 1024px) {
+            .col-8, .col-6, .col-4 { grid-column: span 12; } /* Stack everything */
+            
+            .nav-island {
+                bottom: 20px;
+                width: 90%;
+                justify-content: space-between;
+                padding: 15px;
+            }
+            .nav-link { padding: 0; background: none !important; color: var(--text-dim) !important; }
+            .nav-link.active { color: var(--accent) !important; }
+            
+            h1 { font-size: 3.5rem; } /* Fix giant text on mobile */
+            .section { padding: 60px 20px; }
+            .card { padding: 1.5rem; }
+            
+            .timeline-item { grid-template-columns: 1fr; gap: 5px; } /* Stack timeline years */
+        }
     </style>
 </head>
 <body>
-    <!-- Scroll Progress -->
-    <div class="scroll-progress" id="scrollProgress"></div>
 
-    <!-- Header -->
-    <header class="header premium-card" id="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="header-brand">
-                    <div class="profile-photo">
-                        <div class="profile-initials">K</div>
-                    </div>
-                    <div class="header-text">
-                        <h1 class="header-title">RAREKARTIK</h1>
-                        <p class="header-subtitle">Personal Brand Built with Passion for Technology</p>
-                    </div>
-                </div>
+    <nav class="nav-island">
+        <a href="#home" class="nav-link active"><i class="fas fa-home"></i></a>
+        <a href="#about" class="nav-link">About</a>
+        <a href="#skills" class="nav-link">Skills</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <div style="width: 1px; background: var(--border); height: 20px; align-self: center;"></div>
+        <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
+        <button id="pdfBtn" class="icon-btn" title="Download Resume"><i class="fas fa-download"></i></button>
+    </nav>
 
-                <div class="header-controls">
-                    <button class="premium-button secondary" id="themeToggle">
-                        <span>🌙</span>
-                        <span>Dark</span>
-                    </button>
-                    <button class="premium-button secondary" id="viewToggle">
-                        <span>📱</span>
-                        <span>Mobile</span>
-                    </button>
-                </div>
+    <section id="home" class="hero-section">
+        <div class="anim-hero">
+            <div style="display: inline-block; padding: 8px 16px; border: 1px solid var(--border); border-radius: 50px; margin-bottom: 30px; color: var(--accent);">
+                Available for Work 2025
             </div>
-
-            <nav class="navigation">
-                <div class="nav-list">
-                    <a href="#home" class="nav-link active">Home</a>
-                    <a href="#about" class="nav-link">About</a>
-                    <a href="#education" class="nav-link">Education</a>
-                    <a href="#skills" class="nav-link">Skills</a>
-                    <a href="#resume" class="nav-link">Resume</a>
-                    <a href="#contact" class="nav-link">Contact</a>
-                </div>
-            </nav>
         </div>
-    </header>
+        <h1 class="anim-hero">KARTIK<br><span style="color: var(--text-dim)">CHOUHAN</span></h1>
+        <p class="anim-hero" style="max-width: 600px; margin-top: 30px;">
+            A multidisciplined <strong>MCom Student</strong> bridging the gap between <span class="text-accent">Financial Analysis</span> and <span class="text-accent">Creative Technology</span>.
+        </p>
+    </section>
 
-    <!-- Main Content -->
-    <main class="main">
-        <!-- Hero Section -->
-        <section id="home" class="section hero">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title animate-fade-in">Welcome to My Portfolio</h1>
-                    <p class="hero-subtitle animate-fade-in">Exploring the intersection of commerce, technology, and creativity</p>
-                    <div class="hero-cta animate-fade-in">
-                        <button class="premium-button primary large" id="discoverBtn">Discover More</button>
-                        <button class="premium-button secondary large" id="contactBtn">Get in Touch</button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- About Section -->
-        <section id="about" class="section about">
-            <div class="container">
-                <h2 class="section-title animate-on-scroll">About Me</h2>
-                <div class="about-content">
-                    <div class="about-card premium-card animate-on-scroll">
-                        <div class="about-text">
-                            <p>Hello, My name is Kartik Chouhan and I'm 21 Years old as of now. Born on 3rd Sep 2004, I spent my childhood in my home village "Private Information"</p>
-                        </div>
-                        <div class="about-stats">
-                            <div class="stat-item">
-                                <div class="stat-number" data-target="21">0</div>
-                                <div class="stat-label">Years Old</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" data-target="5">0</div>
-                                <div class="stat-label">Years Experience</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" data-target="100">0</div>
-                                <div class="stat-label">Projects</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Education Section -->
-        <section id="education" class="section education">
-            <div class="container">
-                <h2 class="section-title animate-on-scroll">Academic Qualification</h2>
-                <div class="timeline">
-                    <div class="timeline-item animate-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content premium-card">
-                            <h3 class="timeline-title">Masters of Commerce (MCom)</h3>
-                            <p class="timeline-institution">"Private Information"</p>
-                            <p class="timeline-session">Session: 2025-2027</p>
-                            <span class="timeline-status pursuing">Pursuing</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item animate-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content premium-card">
-                            <h3 class="timeline-title">BCom</h3>
-                            <p class="timeline-institution">"Private Information"</p>
-                            <p class="timeline-session">Session: 2022-2025</p>
-                            <span class="timeline-status completed">Completed</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item animate-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content premium-card">
-                            <h3 class="timeline-title">12th Commerce</h3>
-                            <p class="timeline-institution">"Private Information"</p>
-                            <p class="timeline-session">Session: 2021-2022</p>
-                            <span class="timeline-status completed">Completed</span>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item animate-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <div class="timeline-content premium-card">
-                            <h3 class="timeline-title">10th General Stream</h3>
-                            <p class="timeline-institution">"Private Information"</p>
-                            <p class="timeline-session">Session: 2019-2020</p>
-                            <span class="timeline-status completed">Completed</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Skills Section -->
-        <section id="skills" class="section skills">
-            <div class="container">
-                <h2 class="section-title animate-on-scroll">Technical Skills</h2>
-                <div class="skills-grid">
-                    <div class="skill-card premium-card animate-on-scroll">
-                        <h3 class="skill-title">One Year Diploma in Computer Applications with JAVA</h3>
-                        <div class="skill-progress">
-                            <div class="skill-progress-bar" data-level="85"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-card premium-card animate-on-scroll">
-                        <h3 class="skill-title">Skilled in Tally ERP 9 & Tally Prime</h3>
-                        <div class="skill-progress">
-                            <div class="skill-progress-bar" data-level="95"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-card premium-card animate-on-scroll">
-                        <h3 class="skill-title">Skilled in MS Word, PowerPoint, Excel, etc.</h3>
-                        <div class="skill-progress">
-                            <div class="skill-progress-bar" data-level="90"></div>
-                        </div>
-                    </div>
-
-                    <div class="skill-card premium-card animate-on-scroll">
-                        <h3 class="skill-title">Expert in Photography & Videography</h3>
-                        <div class="skill-progress">
-                            <div class="skill-progress-bar" data-level="92"></div>
-                        </div>
-                        <a href="https://youtube.com/@rarekartik?si=q8Iowa-BHqLEjS_a" class="premium-button secondary" style="margin-top: 16px; display: inline-flex;" target="_blank">View YouTube</a>
-                    </div>
-                </div>
-
-                <h2 class="section-title" style="margin-top: 64px; margin-bottom: 32px;">Core Skills</h2>
-                <div class="core-skills-grid">
-                    <div class="core-skill-card premium-card animate-on-scroll">
-                        <div class="core-skill-icon">💰</div>
-                        <h3 class="core-skill-title">Financial Literacy</h3>
-                        <p class="core-skill-description">Strong understanding of financial principles and market analysis</p>
-                        <div class="core-skill-level">Expert Level: 90%</div>
-                    </div>
-
-                    <div class="core-skill-card premium-card animate-on-scroll">
-                        <div class="core-skill-icon">📊</div>
-                        <h3 class="core-skill-title">Accounting & Bookkeeping</h3>
-                        <p class="core-skill-description">Expert in financial records and accounting software</p>
-                        <div class="core-skill-level">Expert Level: 95%</div>
-                    </div>
-
-                    <div class="core-skill-card premium-card animate-on-scroll">
-                        <div class="core-skill-icon">📈</div>
-                        <h3 class="core-skill-title">Business Analytics</h3>
-                        <p class="core-skill-description">Data analysis and business intelligence skills</p>
-                        <div class="core-skill-level">Advanced Level: 85%</div>
-                    </div>
-
-                    <div class="core-skill-card premium-card animate-on-scroll">
-                        <div class="core-skill-icon">💻</div>
-                        <h3 class="core-skill-title">Tech Enthusiast</h3>
-                        <p class="core-skill-description">Passionate about technology and innovation</p>
-                        <div class="core-skill-level">Advanced Level: 80%</div>
-                    </div>
-
-                    <div class="core-skill-card premium-card animate-on-scroll">
-                        <div class="core-skill-icon">🎯</div>
-                        <h3 class="core-skill-title">Creative Learner</h3>
-                        <p class="core-skill-description">Continuous learning with creative problem-solving</p>
-                        <div class="core-skill-level">Expert Level: 88%</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Resume Section -->
-        <section id="resume" class="section resume">
-            <div class="container">
-                <h2 class="section-title animate-on-scroll">Download My Resume</h2>
-                <div class="resume-content">
-                    <div class="resume-card premium-card animate-on-scroll">
-                        <h3>Professional Resume</h3>
-                        <p class="resume-description">Download my comprehensive resume with all educational background, technical skills, and professional experience.</p>
-                        <div class="resume-actions">
-                            <button class="premium-button primary large" id="downloadResume">
-                                💾 Download Resume
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="section contact">
-            <div class="container">
-                <h2 class="section-title animate-on-scroll">Let's Connect</h2>
-                <div class="contact-content">
-                    <div class="contact-intro animate-on-scroll">
-                        <p class="contact-message">I'm always interested in discussing opportunities in commerce, finance, and business. Whether it's about collaboration, learning, or just connecting with like-minded professionals, feel free to reach out!</p>
-                    </div>
-
-                    <div class="contact-grid">
-                        <div class="contact-info">
-                            <div class="contact-item premium-card animate-on-scroll">
-                                <div class="contact-icon">📧</div>
-                                <div class="contact-details">
-                                    <h4>Email</h4>
-                                    <p><a href="mailto:rarekartik@outlook.in">rarekartik@outlook.in</a></p>
-                                </div>
-                            </div>
-
-                            <div class="contact-item premium-card animate-on-scroll">
-                                <div class="contact-icon">🌐</div>
-                                <div class="contact-details">
-                                    <h4>Portfolio</h4>
-                                    <p><a href="https://linktr.ee/rarekartik" target="_blank">linktr.ee/rarekartik</a></p>
-                                </div>
-                            </div>
-
-                            <div class="contact-item premium-card animate-on-scroll">
-                                <div class="contact-icon">🎥</div>
-                                <div class="contact-details">
-                                    <h4>YouTube</h4>
-                                    <p><a href="https://youtube.com/@rarekartik?si=q8Iowa-BHqLEjS_a" target="_blank">@rarekartik</a></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="contact-form-container">
-                            <form class="contact-form" id="contactForm">
-                                <div class="form-group">
-                                    <label class="form-label" for="name">Name</label>
-                                    <input type="text" id="name" name="name" class="form-input" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="email">Email</label>
-                                    <input type="email" id="email" name="email" class="form-input" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="form-label" for="message">Message</label>
-                                    <textarea id="message" name="message" class="form-textarea" required></textarea>
-                                </div>
-
-                                <button type="submit" class="premium-button primary large">
-                                    📤 Send Message
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Notification -->
-    <div class="notification" id="notification">
-        <div class="notification-content">
-            <span class="notification-icon" id="notificationIcon"></span>
-            <span class="notification-message" id="notificationMessage"></span>
+    <div class="marquee-container">
+        <div class="marquee-content">
+            FINANCE • TECHNOLOGY • ANALYTICS • VIDEOGRAPHY • TALLY EXPERT • CONTENT CREATOR • FINANCE • TECHNOLOGY • ANALYTICS • VIDEOGRAPHY • TALLY EXPERT • CONTENT CREATOR
         </div>
     </div>
 
+    <section id="about" class="section">
+        <div class="grid-bento">
+            <div class="card col-8 reveal">
+                <span class="text-label">01 — Profile</span>
+                <h2>Who is RareKartik?</h2>
+                <p>
+                    I am a 21-year-old commerce specialist based in <span class="redacted"><span>Himachal Pradesh, India</span></span>. 
+                    Unlike traditional students, I combine hard financial skills with digital creativity. 
+                    Currently mastering <strong>Masters of Commerce (MCom)</strong> while building a digital footprint.
+                </p>
+                <div style="margin-top: 30px; display: flex; gap: 40px;">
+                    <div>
+                        <h3 class="text-accent">21</h3>
+                        <span class="text-label">Years Old</span>
+                    </div>
+                    <div>
+                        <h3 class="text-accent">05+</h3>
+                        <span class="text-label">Years Exp</span>
+                    </div>
+                    <div>
+                        <h3 class="text-accent">100+</h3>
+                        <span class="text-label">Projects</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card col-4 reveal" style="background: var(--surface-hover); justify-content: center; align-items: center; text-align: center;">
+                <div style="width: 120px; height: 120px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 900; color: white; margin-bottom: 20px;">K</div>
+                <h3>Kartik Chouhan</h3>
+                <p>@rarekartik</p>
+            </div>
+
+            <div class="card col-4 reveal">
+                <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--accent); margin-bottom: 20px;"></i>
+                <h3>Finance</h3>
+                <p>Financial analysis, Tally ERP 9/Prime, and advanced accounting principles.</p>
+            </div>
+            <div class="card col-4 reveal">
+                <i class="fas fa-laptop-code" style="font-size: 2rem; color: var(--accent); margin-bottom: 20px;"></i>
+                <h3>Tech</h3>
+                <p>Java programming (DCA), Advanced Excel, and data management.</p>
+            </div>
+            <div class="card col-4 reveal">
+                <i class="fas fa-video" style="font-size: 2rem; color: var(--accent); margin-bottom: 20px;"></i>
+                <h3>Creative</h3>
+                <p>Professional video editing, photography, and YouTube content creation.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="card col-12 reveal">
+            <span class="text-label">02 — Academic Timeline</span>
+            <h2>Education History</h2>
+            
+            <div class="timeline-item">
+                <div class="year">2025-27</div>
+                <div>
+                    <h3>Masters of Commerce (MCom)</h3>
+                    <p>Himachal Pradesh University &bull; <span class="text-accent">Pursuing</span></p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="year">2022-25</div>
+                <div>
+                    <h3>Bachelor of Commerce (BCom)</h3>
+                    <p>Himachal Pradesh University &bull; <span style="color: #10b981;">Completed</span></p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="year">2021-22</div>
+                <div>
+                    <h3>12th Commerce Stream</h3>
+                    <p>Local Institution &bull; <span style="color: #10b981;">Completed</span></p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="year">2019-20</div>
+                <div>
+                    <h3>10th General Stream</h3>
+                    <p>Local Institution &bull; <span style="color: #10b981;">Completed</span></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="section">
+        <div class="grid-bento">
+            <div class="card col-6 reveal">
+                <span class="text-label">03 — Software Stack</span>
+                <h2>Technical Skills</h2>
+                <div class="tag-cloud">
+                    <span class="tag">Tally ERP 9</span>
+                    <span class="tag">Tally Prime</span>
+                    <span class="tag">MS Excel</span>
+                    <span class="tag">Java (DCA)</span>
+                    <span class="tag">PowerPoint</span>
+                    <span class="tag">Windows OS</span>
+                </div>
+            </div>
+            <div class="card col-6 reveal">
+                <span class="text-label">04 — Core Competencies</span>
+                <h2>Professional</h2>
+                <div class="tag-cloud">
+                    <span class="tag">Financial Accounting</span>
+                    <span class="tag">Bookkeeping</span>
+                    <span class="tag">Business Analytics</span>
+                    <span class="tag">Video Editing</span>
+                    <span class="tag">Photography</span>
+                    <span class="tag">Social Media Growth</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="section">
+        <div class="grid-bento">
+            <div class="card col-6 reveal" style="background: var(--accent); border: none;">
+                <h2 style="color: white;">Let's Build Something Together.</h2>
+                <p style="color: rgba(255,255,255,0.8);">
+                    Open for collaboration, freelance projects, or academic discussions.
+                </p>
+                <div style="margin-top: auto;">
+                    <a href="mailto:rarekartik@outlook.in" style="font-size: 1.5rem; color: white; font-weight: 700; text-decoration: none;">
+                        rarekartik@outlook.in &nearr;
+                    </a>
+                </div>
+            </div>
+
+            <div class="card col-6 reveal">
+                <form id="contactForm">
+                    <input type="text" class="input-box" placeholder="Your Name" required>
+                    <input type="email" class="input-box" placeholder="Email Address" required>
+                    <textarea class="input-box" rows="5" placeholder="Tell me about your project..." required></textarea>
+                    <button type="submit" class="btn-submit">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 50px 0 100px; color: var(--text-dim); border-top: 1px solid var(--border); margin-top: 50px;">
+        <p>&copy; 2025 Kartik Chouhan. Built with Passion.</p>
+        <div style="margin-top: 20px; font-size: 1.5rem; display: flex; gap: 20px; justify-content: center;">
+            <a href="#" style="color: var(--text-dim)"><i class="fab fa-youtube"></i></a>
+            <a href="#" style="color: var(--text-dim)"><i class="fab fa-instagram"></i></a>
+            <a href="#" style="color: var(--text-dim)"><i class="fas fa-envelope"></i></a>
+        </div>
+    </footer>
+
     <script>
-class EnhancedPortfolio {
-    constructor() {
-        this.currentTheme = localStorage.getItem('theme') || 'light';
-        this.currentView = localStorage.getItem('viewMode') || 'desktop';
-        this.scrollTicking = false;
-        this.isInitialized = false;
-        this.init();
-    }
+        // 1. ANIMATION ENGINE (GSAP)
+        gsap.registerPlugin(ScrollTrigger);
 
-    init() {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.setupAll());
-        } else {
-            this.setupAll();
-        }
-    }
+        // Hero Stagger
+        gsap.from(".anim-hero", {
+            y: 100,
+            opacity: 0,
+            duration: 1.2,
+            stagger: 0.2,
+            ease: "power4.out"
+        });
 
-    async setupAll() {
-        try {
-            window.scrollTo(0, 0);
+        // Scroll Reveal for Cards
+        gsap.utils.toArray('.reveal').forEach(element => {
+            gsap.from(element, {
+                scrollTrigger: {
+                    trigger: element,
+                    start: "top 85%",
+                    toggleActions: "play none none reverse"
+                },
+                y: 60,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out"
+            });
+        });
 
-            this.setupThemeSystem();
-            this.setupViewMode();
-            this.setupNavigation();
-            this.setupScrollSystem();
-            this.setupAnimations();
-            this.setupPDFGeneration();
-            this.setupForm();
-            this.setupInteractions();
-            this.setupNotifications();
-
-            this.isInitialized = true;
-
-            setTimeout(() => {
-                this.showNotification('🎉 Welcome to my enhanced portfolio!', 'success');
-            }, 1000);
-
-        } catch (error) {
-            console.error('Portfolio initialization failed:', error);
-        }
-    }
-
-    setupThemeSystem() {
-        this.applyTheme(this.currentTheme);
-        document.getElementById('themeToggle')?.addEventListener('click', () => this.toggleTheme());
-    }
-
-    toggleTheme() {
-        this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-        this.applyTheme(this.currentTheme);
-        localStorage.setItem('theme', this.currentTheme);
-        this.showNotification(`Switched to ${this.currentTheme} theme 🎨`, 'info');
-    }
-
-    applyTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        const toggle = document.getElementById('themeToggle');
-        if (toggle) {
-            const spans = toggle.querySelectorAll('span');
-            if (theme === 'dark') {
-                spans[0].textContent = '☀️';
-                spans[1].textContent = 'Light';
-            } else {
-                spans[0].textContent = '🌙';
-                spans[1].textContent = 'Dark';
-            }
-        }
-    }
-
-    setupViewMode() {
-        this.applyViewMode(this.currentView);
-        document.getElementById('viewToggle')?.addEventListener('click', () => this.toggleViewMode());
-    }
-
-    toggleViewMode() {
-        this.currentView = this.currentView === 'desktop' ? 'mobile' : 'desktop';
-        this.applyViewMode(this.currentView);
-        localStorage.setItem('viewMode', this.currentView);
-        this.showNotification(`Switched to ${this.currentView} view 📱`, 'info');
-    }
-
-    applyViewMode(mode) {
+        // 2. THEME LOGIC
+        const themeBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
-        const body = document.body;
-
-        if (mode === 'mobile') {
-            html.style.fontSize = '16px';
-            body.style.maxWidth = '375px';
-            body.style.margin = '0 auto';
-            body.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.1)';
-            document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=375, initial-scale=1.0');
-        } else {
-            html.style.fontSize = '16px';
-            body.style.maxWidth = '';
-            body.style.margin = '';
-            body.style.boxShadow = '';
-            document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0');
+        
+        if (localStorage.getItem('theme') === 'light') {
+            html.setAttribute('data-theme', 'light');
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
         }
 
-        const toggle = document.getElementById('viewToggle');
-        if (toggle) {
-            const spans = toggle.querySelectorAll('span');
-            if (mode === 'mobile') {
-                spans[0].textContent = '🖥️';
-                spans[1].textContent = 'Desktop';
-            } else {
-                spans[0].textContent = '📱';
-                spans[1].textContent = 'Mobile';
-            }
-        }
-    }
-
-    setupNavigation() {
-        const navLinks = document.querySelectorAll('.nav-link');
-        navLinks.forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const targetId = link.getAttribute('href').substring(1);
-                this.scrollToSection(targetId);
-                navLinks.forEach(l => l.classList.remove('active'));
-                link.classList.add('active');
-            });
-        });
-    }
-
-    scrollToSection(sectionId) {
-        const section = document.getElementById(sectionId);
-        if (section) {
-            const headerHeight = 200;
-            window.scrollTo({
-                top: Math.max(0, section.offsetTop - headerHeight),
-                behavior: 'smooth'
-            });
-        }
-    }
-
-    setupScrollSystem() {
-        window.addEventListener('scroll', () => {
-            if (!this.scrollTicking) {
-                requestAnimationFrame(() => {
-                    this.updateScrollProgress();
-                    this.checkScrollAnimations();
-                    this.updateActiveNavigation();
-                    this.scrollTicking = false;
-                });
-                this.scrollTicking = true;
-            }
-        }, { passive: true });
-
-        this.setupScrollObserver();
-    }
-
-    setupScrollObserver() {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animated');
-                        if (entry.target.classList.contains('stat-number')) {
-                            this.animateCounter(entry.target);
-                        }
-                        if (entry.target.classList.contains('skill-card')) {
-                            this.animateSkillBar(entry.target);
-                        }
-                    }
-                });
-            },
-            { threshold: 0.1 }
-        );
-
-        document.querySelectorAll('.animate-on-scroll, .stat-number, .skill-card').forEach(el => {
-            observer.observe(el);
-        });
-    }
-
-    updateScrollProgress() {
-        const scrollProgress = document.getElementById('scrollProgress');
-        if (scrollProgress) {
-            const winScroll = window.scrollY;
-            const height = document.documentElement.scrollHeight - window.innerHeight;
-            const scrolled = (winScroll / height) * 100;
-            scrollProgress.style.width = Math.min(scrolled, 100) + '%';
-        }
-    }
-
-    checkScrollAnimations() {
-        const elements = document.querySelectorAll('.animate-on-scroll:not(.animated)');
-        elements.forEach(el => {
-            const rect = el.getBoundingClientRect();
-            if (rect.top < window.innerHeight - 100) {
-                el.classList.add('animated');
-            }
-        });
-    }
-
-    updateActiveNavigation() {
-        const sections = document.querySelectorAll('.section');
-        const navLinks = document.querySelectorAll('.nav-link');
-        let current = 'home';
-
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 250;
-            if (window.pageYOffset >= sectionTop) {
-                current = section.getAttribute('id');
-            }
+        themeBtn.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         });
 
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-                link.classList.add('active');
-            }
-        });
-    }
+        // 3. ADVANCED PDF GENERATOR (Full Information)
+      document.getElementById('pdfBtn').addEventListener('click', async function() {
+            const btn = this;
+            const originalIcon = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
 
-    setupAnimations() {
-        const buttons = document.querySelectorAll('.premium-button');
-        buttons.forEach(button => {
-            button.addEventListener('mousedown', () => {
-                button.style.transform = 'scale(0.95)';
-            });
-            button.addEventListener('mouseup', () => {
-                button.style.transform = '';
-            });
-            button.addEventListener('mouseleave', () => {
-                button.style.transform = '';
-            });
-        });
-    }
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                const pageWidth = doc.internal.pageSize.getWidth();
+                
+                // --- Helper Functions ---
+                const centerText = (text, y) => {
+                    const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+                    const x = (pageWidth - textWidth) / 2;
+                    doc.text(text, x, y);
+                };
 
-    animateCounter(element) {
-        if (element.dataset.animated) return;
-        const target = parseInt(element.dataset.target) || 0;
-        const duration = 2000;
-        const start = performance.now();
+                const addLine = (y) => {
+                    doc.setDrawColor(200);
+                    doc.line(20, y, pageWidth - 20, y);
+                    return y + 10;
+                };
 
-        const animate = (currentTime) => {
-            const elapsed = currentTime - start;
-            const progress = Math.min(elapsed / duration, 1);
-            const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-            const current = Math.round(easeOutQuart * target);
-            element.textContent = current;
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                element.textContent = target;
-                element.dataset.animated = 'true';
-            }
-        };
-
-        requestAnimationFrame(animate);
-    }
-
-    animateSkillBar(skillCard) {
-        const progressBar = skillCard.querySelector('.skill-progress-bar');
-        if (progressBar && !progressBar.dataset.animated) {
-            const level = progressBar.dataset.level || '80';
-            setTimeout(() => {
-                progressBar.style.width = level + '%';
-                progressBar.dataset.animated = 'true';
-            }, 200);
-        }
-    }
-
-    setupPDFGeneration() {
-        document.getElementById('downloadResume')?.addEventListener('click', () => this.generateCleanPDF());
-    }
-
-    async generateCleanPDF() {
-        const button = document.getElementById('downloadResume');
-        try {
-            if (button) {
-                button.disabled = true;
-                button.textContent = '⏳ Generating...';
-            }
-
-            this.showNotification('📋 Generating your comprehensive resume...', 'info');
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            if (!window.jspdf) throw new Error('PDF library not loaded');
-
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const leftMargin = 15;
-            const rightMargin = 195;
-            let yPos = 20;
-
-            // Header
-            doc.setFontSize(26);
-            doc.setTextColor(0, 122, 255);
-            doc.setFont('helvetica', 'bold');
-            doc.text('KARTIK CHOUHAN', leftMargin, yPos);
-
-            yPos += 8;
-            doc.setFontSize(10);
-            doc.setTextColor(80, 80, 80);
-            doc.setFont('helvetica', 'normal');
-            doc.text('Age: 21 | DOB: 3rd Sep 2004', leftMargin, yPos);
-
-            yPos += 5;
-            doc.text('📧 Email: rarekartik@outlook.in', leftMargin, yPos);
-
-            yPos += 5;
-            doc.text('🌐 Portfolio: linktr.ee/rarekartik | 🎥 YouTube: @rarekartik', leftMargin, yPos);
-
-            yPos += 12;
-            doc.setLineWidth(0.5);
-            doc.setDrawColor(0, 122, 255);
-            doc.line(leftMargin, yPos, rightMargin, yPos);
-
-            // About
-            yPos += 8;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'bold');
-            doc.text('PROFESSIONAL SUMMARY', leftMargin, yPos);
-
-            yPos += 7;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(40, 40, 40);
-            const aboutText = 'M.Com student at Himachal Pradesh University with strong foundation in commerce, finance, and technology. Proficient in Tally ERP, accounting software, financial analysis, and digital content creation. Passionate about exploring the intersection of commerce, technology, and creativity.';
-            const aboutLines = doc.splitTextToSize(aboutText, rightMargin - leftMargin);
-            aboutLines.forEach(line => {
-                doc.text(line, leftMargin, yPos);
-                yPos += 5;
-            });
-
-            // Education
-            yPos += 8;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'bold');
-            doc.text('ACADEMIC QUALIFICATION', leftMargin, yPos);
-
-            const education = [
-                { degree: 'Masters of Commerce (MCom)', inst: 'Himachal Pradesh University', year: '2025-2027', status: 'Pursuing' },
-                { degree: 'Bachelor of Commerce (BCom)', inst: 'Himachal Pradesh University', year: '2022-2025', status: 'Completed' },
-                { degree: '12th Commerce', inst: 'Local Institution', year: '2021-2022', status: 'Completed' },
-                { degree: '10th General Stream', inst: 'Local Institution', year: '2019-2020', status: 'Completed' }
-            ];
-
-            education.forEach(edu => {
-                yPos += 7;
+                // --- HEADER ---
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(26);
+                doc.setTextColor(37, 99, 235); // Blue
+                centerText("KARTIK CHOUHAN", 20);
+                
                 doc.setFontSize(11);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0);
-                doc.text(edu.degree + ' (' + edu.status + ')', leftMargin, yPos);
+                doc.setTextColor(80);
+                doc.setFont("helvetica", "normal");
+                centerText("MCom Student | Financial Analyst | Content Creator", 28);
+                centerText("rarekartik@outlook.in | Himachal Pradesh, India", 34);
 
-                yPos += 5;
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(80, 80, 80);
-                doc.text(edu.inst + ' | ' + edu.year, leftMargin + 2, yPos);
-            });
+                let y = 45;
+                y = addLine(y);
 
-            // Technical Skills
-            yPos += 10;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'bold');
-            doc.text('TECHNICAL SKILLS', leftMargin, yPos);
-
-            const technicalSkills = [
-                { skill: 'One Year Diploma in Computer Applications with JAVA', level: '85%' },
-                { skill: 'Skilled in Tally ERP 9 & Tally Prime', level: '95%' },
-                { skill: 'Microsoft Word, PowerPoint, Excel, etc.', level: '90%' },
-                { skill: 'Expert in Photography & Videography', level: '92%' }
-            ];
-
-            technicalSkills.forEach(item => {
-                yPos += 6;
+                // --- PROFILE SUMMARY ---
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text("PROFESSIONAL SUMMARY", 20, y);
+                y += 7;
+                
+                doc.setFont("helvetica", "normal");
                 doc.setFontSize(10);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(40, 40, 40);
-                doc.text('• ' + item.skill, leftMargin, yPos);
+                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing Masters of Commerce (MCom) with 5+ years of experience in academic projects and content creation. Expert in Tally ERP, Data Analysis, and Video Production.";
+                const splitSummary = doc.splitTextToSize(summary, pageWidth - 40);
+                doc.text(splitSummary, 20, y);
+                y += 20;
 
-                doc.setTextColor(0, 122, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.text(item.level, rightMargin - 15, yPos);
-            });
+                // --- EDUCATION (FULL) ---
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.text("EDUCATION HISTORY", 20, y);
+                y += 10;
 
-            // Core Competencies
-            yPos += 10;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'bold');
-            doc.text('CORE COMPETENCIES', leftMargin, yPos);
+                const education = [
+                    { date: "2025 - 2027", title: "Masters of Commerce (MCom)", place: "Himachal Pradesh University", status: "Pursuing" },
+                    { date: "2022 - 2025", title: "Bachelor of Commerce (BCom)", place: "Himachal Pradesh University", status: "Completed" },
+                    { date: "2021 - 2022", title: "12th Commerce Stream", place: "Local Institution", status: "Completed" },
+                    { date: "2019 - 2020", title: "10th General Stream", place: "Local Institution", status: "Completed" }
+                ];
 
-            const coreSkills = [
-                { title: 'Financial Literacy', desc: 'Strong understanding of financial principles and market analysis', level: '90%' },
-                { title: 'Accounting & Bookkeeping', desc: 'Expert in financial records and accounting software', level: '95%' },
-                { title: 'Business Analytics', desc: 'Data analysis and business intelligence skills', level: '85%' },
-                { title: 'Tech Enthusiast', desc: 'Passionate about technology and innovation', level: '80%' },
-                { title: 'Creative Learner', desc: 'Continuous learning with creative problem-solving', level: '88%' }
-            ];
+                education.forEach(edu => {
+                    doc.setFont("helvetica", "bold");
+                    doc.setFontSize(11);
+                    doc.text(edu.title, 20, y);
+                    
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(10);
+                    doc.text(`${edu.place} | ${edu.status}`, 20, y + 5);
+                    
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor(37, 99, 235);
+                    doc.text(edu.date, pageWidth - 50, y);
+                    doc.setTextColor(0);
+                    
+                    y += 15;
+                });
 
-            coreSkills.forEach(skill => {
-                yPos += 7;
+                y += 5;
+
+                // --- SKILLS ---
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(12);
+                doc.text("TECHNICAL & CORE SKILLS", 20, y);
+                y += 10;
+
+                const skills = [
+                    "• Tally ERP 9 & Tally Prime (Expert Level)",
+                    "• Java Programming (Diploma in Computer Applications)",
+                    "• Advanced MS Excel & Office Suite",
+                    "• Financial Accounting & Bookkeeping",
+                    "• Professional Video Editing & Photography",
+                    "• YouTube Content Strategy (@rarekartik)"
+                ];
+
+                doc.setFont("helvetica", "normal");
                 doc.setFontSize(10);
-                doc.setFont('helvetica', 'bold');
-                doc.setTextColor(0, 0, 0);
-                doc.text(skill.title, leftMargin, yPos);
+                skills.forEach(skill => {
+                    doc.text(skill, 20, y);
+                    y += 6;
+                });
 
-                yPos += 4;
-                doc.setFontSize(9);
-                doc.setFont('helvetica', 'normal');
-                doc.setTextColor(80, 80, 80);
-                doc.text(skill.desc, leftMargin, yPos);
+                doc.save("Kartik_Chouhan_Resume.pdf");
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(() => btn.innerHTML = originalIcon, 2000);
 
-                doc.setTextColor(0, 122, 255);
-                doc.setFont('helvetica', 'bold');
-                doc.text(skill.level, rightMargin - 15, yPos);
-            });
-
-            // Additional Info
-            yPos += 10;
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            doc.setFont('helvetica', 'bold');
-            doc.text('ADDITIONAL INFORMATION', leftMargin, yPos);
-
-            yPos += 7;
-            doc.setFontSize(10);
-            doc.setFont('helvetica', 'normal');
-            doc.setTextColor(40, 40, 40);
-            doc.text('• YouTube Content Creator (@rarekartik) - 100+ projects in Photography & Videography', leftMargin, yPos);
-
-            yPos += 6;
-            doc.text('• 5 Years of Academic & Personal Experience in Commerce & Technology', leftMargin, yPos);
-
-            yPos += 6;
-            doc.text('• Passion for exploring the intersection of commerce, technology, and creativity', leftMargin, yPos);
-
-            doc.save('Kartik_Chouhan_Resume.pdf');
-            this.showNotification('✅ Comprehensive resume downloaded!', 'success');
-
-        } catch (error) {
-            console.error('PDF Error:', error);
-            this.showNotification('❌ PDF generation failed', 'error');
-        } finally {
-            if (button) {
-                button.disabled = false;
-                button.textContent = '💾 Download Resume';
-            }
-        }
-    }
-
-    setupForm() {
-        const form = document.getElementById('contactForm');
-        if (!form) return;
-
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const inputs = form.querySelectorAll('input, textarea');
-            let isValid = true;
-
-            inputs.forEach(input => {
-                if (!input.value.trim()) isValid = false;
-                if (input.type === 'email' && !this.isValidEmail(input.value)) isValid = false;
-            });
-
-            if (isValid) {
-                this.showNotification('📧 Thank you! Your message has been sent.', 'success');
-                form.reset();
-            } else {
-                this.showNotification('❌ Please fill all fields correctly', 'error');
+            } catch (err) {
+                console.error(err);
+                alert("PDF Error");
+                btn.innerHTML = originalIcon;
             }
         });
-    }
 
-    isValidEmail(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    setupInteractions() {
-        document.getElementById('discoverBtn')?.addEventListener('click', () => this.scrollToSection('about'));
-        document.getElementById('contactBtn')?.addEventListener('click', () => this.scrollToSection('contact'));
-    }
-
-    setupNotifications() {
-        if (!document.getElementById('notification')) {
-            const notification = document.createElement('div');
-            notification.id = 'notification';
-            notification.className = 'notification';
-            notification.innerHTML = `<div class="notification-content"><span class="notification-icon"></span><span class="notification-message"></span></div>`;
-            document.body.appendChild(notification);
-        }
-    }
-
-    showNotification(message, type = 'info') {
-        const notification = document.getElementById('notification');
-        if (!notification) return;
-
-        const icon = notification.querySelector('.notification-icon');
-        const messageEl = notification.querySelector('.notification-message');
-
-        icon.textContent = type === 'success' ? '✓' : type === 'error' ? '✗' : 'ℹ';
-        messageEl.textContent = message;
-        notification.className = `notification ${type}`;
-        notification.classList.add('show');
-
-        setTimeout(() => notification.classList.remove('show'), 4000);
-    }
-}
-
-let portfolio;
-if (!window.portfolioInitialized) {
-    window.portfolioInitialized = true;
-    portfolio = new EnhancedPortfolio();
-}
+        // 4. FORM ANIMATION
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const original = btn.innerText;
+            btn.innerText = "Message Sent! 🚀";
+            btn.style.background = "#10b981";
+            btn.style.color = "white";
+            setTimeout(() => {
+                btn.innerText = original;
+                btn.style.background = "";
+                btn.style.color = "";
+                e.target.reset();
+            }, 3000);
+        });
     </script>
 </body>
 </html>
