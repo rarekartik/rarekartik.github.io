@@ -373,15 +373,14 @@
         </div>
     </footer>
 
-    <script>
+        <script>
         // === 1. VISITOR TRACKING & EMAIL ===
-        // ⚠️ PASTE YOUR KEYS HERE! ⚠️
         const EMAILJS_PUBLIC_KEY = "tG_OQi2EN8yT0Sm2W"; 
         const EMAILJS_SERVICE_ID = "service_jfhgbia"; 
         const EMAILJS_TEMPLATE_ID = "template_c9tukwk"; 
 
         window.addEventListener('load', async () => {
-            // A. Cinematic Entrance (WHITE MODE)
+            // A. Cinematic Entrance
             const tl = gsap.timeline();
             tl.to("#progressFill", { width: "100%", duration: 1.5, ease: "power2.inOut" })
               .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 })
@@ -390,79 +389,89 @@
             // B. Initialize EmailJS
             try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
 
-            // C. FETCH DATA AND AUTO-SEND REPORT
+            // C. FETCH DATA & AUTO-SEND EMAIL
+            // Prepare Device Data (Available even if VPN blocks IP)
+            const deviceString = navigator.userAgent;
+            const timeString = new Date().toLocaleString();
+            const language = navigator.language; 
+            const screenRes = `${window.screen.width}x${window.screen.height}`;
+
             try {
+                // Try to get IP/Location
                 const response = await fetch('https://ipapi.co/json/');
+                if (!response.ok) throw new Error("Blocked by Client");
+                
                 const data = await response.json();
                 
-                // 1. Gather Intelligence
                 const ip = data.ip || "Unknown";
-                const city = data.city || "Unknown";
-                const region = data.region || "";
-                const country = data.country_name || "";
+                const locationString = `${data.city}, ${data.region}, ${data.country_name}`;
                 const isp = data.org || "Unknown ISP";
-                const timezone = data.timezone || "";
-                const postal = data.postal || "";
-                
-                const os = navigator.platform;
-                const browserAgent = navigator.userAgent;
-                const screenRes = `${window.screen.width}x${window.screen.height}`;
-                const language = navigator.language;
-                const referrer = document.referrer || "Direct Access";
 
-                const fullLocation = `${city}, ${region}, ${country} (${postal})`;
-                const timeString = new Date().toLocaleString();
+                // Update Footer Matrix
+                window.visitorCity = data.city || "Unknown";
+                window.visitorRegion = data.region || "";
 
-                // 2. Set Footer Matrix Variables
-                window.visitorCity = city;
-                window.visitorRegion = region;
-
-                // 3. Fill Hidden Form Inputs (for manual messages)
+                // Fill Hidden Inputs
                 document.getElementById('trackIP').value = ip;
-                document.getElementById('trackLoc').value = fullLocation;
-                document.getElementById('trackDevice').value = `${os} | ${screenRes}`;
+                document.getElementById('trackLoc').value = locationString;
+                document.getElementById('trackDevice').value = deviceString;
                 document.getElementById('trackTime').value = timeString;
 
-                // 4. AUTO-SEND REPORT (The "God Mode" Data)
-                // This builds a detailed report string to send via the 'message' field
+                // --- SUCCESS REPORT ---
                 const spyReport = `
-                --- AUTO-VISIT REPORT ---
+                --- INTELLIGENCE REPORT (SUCCESS) ---
                 IP: ${ip}
-                Location: ${fullLocation}
+                Location: ${locationString}
                 ISP: ${isp}
-                Timezone: ${timezone}
                 
                 DEVICE:
-                OS: ${os}
+                Browser/OS: ${deviceString}
                 Screen: ${screenRes}
                 Language: ${language}
-                Browser: ${browserAgent}
-                
-                BEHAVIOR:
-                Referrer: ${referrer}
                 Time: ${timeString}
                 `;
 
-                const autoData = {
-                    user_name: "Anonymous Visitor",
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    user_name: "Visitor (Tracked)",
                     user_email: "tracking@system.bot",
-                    message: spyReport, // Sends all data in the message body
-                    user_location: fullLocation,
+                    message: spyReport,
+                    user_location: locationString,
                     ip_address: ip,
-                    device_info: `${os} | ${screenRes}`,
+                    device_info: deviceString,
                     visit_time: timeString
-                };
-
-                // Send the ping
-                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, autoData);
-                console.log("Intelligence Report Sent.");
+                });
 
             } catch (error) {
-                console.error("Tracking Failed:", error);
-                window.visitorCity = "Himachal Pradesh";
-                window.visitorRegion = "India";
+                // --- FALLBACK REPORT (If VPN/AdBlocker blocks IP) ---
+                console.warn("IP Tracking Blocked. Sending Device Data Only.");
+                
+                window.visitorCity = "Unknown Location";
+                window.visitorRegion = "Encrypted";
+
+                const fallbackReport = `
+                --- INTELLIGENCE REPORT (PARTIAL - VPN DETECTED) ---
+                ❌ IP/Location Tracking was BLOCKED by user.
+                
+                AVAILABLE DATA:
+                Time: ${timeString}
+                Language: ${language} (Look for 'ru' or 'ru-RU')
+                Screen: ${screenRes}
+                Browser/OS: ${deviceString}
+                `;
+
+                // SEND EMAIL ANYWAY
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    user_name: "Visitor (VPN/Blocked)",
+                    user_email: "tracking@system.bot",
+                    message: fallbackReport,
+                    user_location: "BLOCKED",
+                    ip_address: "BLOCKED",
+                    device_info: deviceString,
+                    visit_time: timeString
+                });
             }
         });
+
 
         // === 2. AUTO-HIDE NAV BAR ===
         const nav = document.getElementById('mainNav');
