@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuoteMuse | Kartik Chouhan</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&family=Inter:wght@400;600&family=Lora:ital,wght@0,400..700;1,400..700&family=Montserrat:wght@400..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* === RAREKARTIK DESIGN SYSTEM === */
+        :root {
+            --bg: #0a0a0a; 
+            --surface: #171717; 
+            --surface-hover: #262626; 
+            --border: #333333;
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --accent: #3b82f6; 
+            --radius: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            height: 100vh; overflow: hidden; 
+            display: flex; flex-direction: row;
+        }
+
+        /* === 1. SIDEBAR CONTROLS (BENTO STYLE) === */
+        .sidebar {
+            width: 400px; min-width: 400px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex; flex-direction: column;
+            padding: 25px; gap: 20px; z-index: 50;
+            overflow-y: auto; height: 100%;
+        }
+
+        /* Nav Back */
+        .nav-back {
+            display: flex; align-items: center; gap: 10px;
+            color: var(--text-dim); text-decoration: none;
+            font-weight: 700; font-size: 0.9rem; margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .nav-back:hover { color: var(--accent); }
+
+        /* Branding */
+        .brand-box {
+            background: var(--surface-hover); border: 1px solid var(--border);
+            padding: 20px; border-radius: var(--radius);
+            display: flex; align-items: center; gap: 15px;
+        }
+        .brand-icon {
+            width: 45px; height: 45px; background: rgba(59, 130, 246, 0.2);
+            color: var(--accent); border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        .brand-text h2 { font-size: 1.2rem; font-weight: 800; margin: 0; }
+        .brand-text p { font-size: 0.8rem; color: var(--text-dim); margin-top: 2px; }
+
+        /* Control Group */
+        .control-group {
+            border-top: 1px solid var(--border); padding-top: 20px;
+        }
+        .label {
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+            color: var(--text-dim); font-weight: 700; margin-bottom: 10px; display: block;
+        }
+
+        /* Inputs */
+        input[type="text"], select, textarea {
+            width: 100%; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); padding: 12px 15px; border-radius: 12px;
+            font-family: 'Satoshi', sans-serif; margin-bottom: 10px; outline: none;
+            transition: 0.3s; font-size: 0.9rem;
+        }
+        textarea { height: 100px; resize: vertical; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+        input::placeholder { color: var(--text-dim); opacity: 0.5; }
+
+        /* Sliders */
+        input[type="range"] {
+            width: 100%; margin-bottom: 15px; accent-color: var(--accent); cursor: pointer;
+        }
+
+        /* Alignment Buttons */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 10px; }
+        .icon-btn {
+            flex: 1; background: var(--bg); border: 1px solid var(--border);
+            color: var(--text-dim); padding: 10px; border-radius: 10px; cursor: pointer;
+            transition: 0.2s;
+        }
+        .icon-btn:hover { color: var(--text); border-color: var(--text-dim); }
+        .icon-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        /* Color Balls */
+        .gradient-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 5px; }
+        .grad-ball {
+            width: 100%; aspect-ratio: 1/1; border-radius: 8px; cursor: pointer; 
+            border: 2px solid transparent; transition: 0.2s;
+        }
+        .grad-ball:hover, .grad-ball.active { border-color: #fff; transform: scale(1.05); }
+
+        /* Primary Button */
+        .btn-primary {
+            background: var(--text); color: var(--bg);
+            border: none; padding: 15px; width: 100%; border-radius: 12px;
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 1rem; transition: 0.3s; margin-top: auto;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(255,255,255,0.2); }
+
+        /* Footer */
+        .sidebar-footer {
+            margin-top: 20px; font-size: 0.75rem; color: var(--text-dim); text-align: center;
+        }
+
+        /* === 2. CANVAS AREA === */
+        .canvas {
+            flex-grow: 1; background: #0f0f0f;
+            background-image: radial-gradient(#222 1px, transparent 1px);
+            background-size: 20px 20px;
+            padding: 40px; overflow: auto;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* The Export Container */
+        #exportFrame {
+            padding: 80px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transition: 0.3s;
+            width: 100%; max-width: 800px;
+            aspect-ratio: 1/1;
+            display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(to right, #ece9e6, #ffffff);
+        }
+
+        /* Quote Box */
+        #quoteContainer {
+            text-align: center; color: #111; padding: 40px;
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border-radius: 4px; border: 1px solid rgba(255,255,255,0.2);
+            width: 100%;
+        }
+
+        #quoteText {
+            font-family: 'Playfair Display', serif; font-size: 2.5rem;
+            font-weight: 700; line-height: 1.4; margin: 0 0 20px 0;
+        }
+        
+        #quoteAuthor {
+            font-family: 'Montserrat', sans-serif; font-size: 1rem;
+            font-weight: 600; opacity: 0.8; display: inline-block;
+        }
+        #quoteAuthor::before { content: "— "; }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow-y: auto; height: auto; }
+            .sidebar { width: 100%; min-width: 0; height: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 20px; }
+            .canvas { padding: 20px; overflow: hidden; }
+            #exportFrame { padding: 40px; aspect-ratio: auto; min-height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        
+        <div class="brand-box">
+            <div class="brand-icon"><i class="fas fa-quote-right"></i></div>
+            <div class="brand-text">
+                <h2>QuoteMuse</h2>
+                <p>Quote Generator</p>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="label">Content</span>
+            <textarea id="quoteInput" placeholder="Type your quote here..." oninput="updateView()">The only way to do great work is to love what you do.</textarea>
+            <input type="text" id="authorInput" placeholder="Author Name" value="Steve Jobs" oninput="updateView()">
+        </div>
+
+        <div class="control-group">
+            <span class="label">Typography</span>
+            <select id="fontSelect" onchange="updateView()">
+                <option value="'Playfair Display', serif">Playfair Display (Elegant)</option>
+                <option value="'Montserrat', sans-serif">Montserrat (Modern)</option>
+                <option value="'Lora', serif">Lora (Classic)</option>
+                <option value="'Cinzel', serif">Cinzel (Cinematic)</option>
+                <option value="'Inter', sans-serif">Inter (Clean)</option>
+            </select>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                <span class="label" style="margin:0">Size</span>
+                <span class="label" style="margin:0" id="sizeVal">2.5rem</span>
+            </div>
+            <input type="range" min="1.5" max="5" step="0.1" value="2.5" oninput="updateSize(this.value)">
+            
+            <div class="btn-group">
+                <button class="icon-btn" onclick="setAlign('left')"><i class="fas fa-align-left"></i></button>
+                <button class="icon-btn active" onclick="setAlign('center')"><i class="fas fa-align-center"></i></button>
+                <button class="icon-btn" onclick="setAlign('right')"><i class="fas fa-align-right"></i></button>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <span class="label">Style</span>
+            <select id="themeSelect" onchange="updateTheme()">
+                <option value="dark">Dark Text (For Light BG)</option>
+                <option value="light">Light Text (For Dark BG)</option>
+            </select>
+            
+            <div class="gradient-grid" id="bgGrid"></div>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 15px; margin-bottom: 5px;">
+                <span class="label" style="margin:0">Frame Padding</span>
+                <span class="label" style="margin:0" id="padVal">80px</span>
+            </div>
+            <input type="range" min="20" max="150" value="80" oninput="updatePadding(this.value)">
+        </div>
+
+        <button class="btn-primary" onclick="downloadImage()">
+            <i class="fas fa-download"></i> Download Quote
+        </button>
+
+        <div class="sidebar-footer">
+            &copy; 2026 Developed by Kartik Chouhan.
+        </div>
+    </div>
+
+    <div class="canvas">
+        <div id="exportFrame">
+            <div id="quoteContainer">
+                <div id="quoteText"></div>
+                <div id="quoteAuthor"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script>
+        // --- Configuration ---
+        const backgrounds = [
+            "linear-gradient(to right, #ece9e6, #ffffff)", 
+            "linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%)",
+            "linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%)",
+            "linear-gradient(to right, #434343 0%, black 100%)",
+            "linear-gradient(to right, #0f2027, #203a43, #2c5364)",
+            "linear-gradient(to right, #ba8b02, #181818)",
+            "#F5F5DC", "#2C3E50", "#1a1a1a", "#ffffff"
+        ];
+
+        // --- Init ---
+        const exportFrame = document.getElementById('exportFrame');
+        const quoteText = document.getElementById('quoteText');
+        const quoteAuthor = document.getElementById('quoteAuthor');
+        const quoteContainer = document.getElementById('quoteContainer');
+        const bgGrid = document.getElementById('bgGrid');
+        
+        // Generate Background Balls
+        backgrounds.forEach((bg, index) => {
+            const ball = document.createElement('div');
+            ball.className = 'grad-ball';
+            ball.style.background = bg;
+            if(index === 0) { ball.classList.add('active'); exportFrame.style.background = bg; }
+            
+            ball.onclick = () => {
+                document.querySelectorAll('.grad-ball').forEach(b => b.classList.remove('active'));
+                ball.classList.add('active');
+                exportFrame.style.background = bg;
+                
+                // Auto-theme switch
+                if(bg.includes('black') || bg.includes('#2C3E50') || bg.includes('#1a1a1a')) {
+                     document.getElementById('themeSelect').value = 'light';
+                } else {
+                     document.getElementById('themeSelect').value = 'dark';
+                }
+                updateTheme();
+            };
+            bgGrid.appendChild(ball);
+        });
+
+        // --- Logic ---
+        function updateView() {
+            quoteText.innerText = document.getElementById('quoteInput').value;
+            quoteAuthor.innerText = document.getElementById('authorInput').value;
+            quoteText.style.fontFamily = document.getElementById('fontSelect').value;
+            quoteAuthor.style.fontFamily = document.getElementById('fontSelect').value;
+        }
+
+        function updateSize(val) {
+            document.getElementById('sizeVal').innerText = val + 'rem';
+            quoteText.style.fontSize = val + 'rem';
+        }
+
+        function setAlign(align) {
+            document.querySelectorAll('.icon-btn').forEach(b => b.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            quoteContainer.style.textAlign = align;
+        }
+
+        function updateTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            if(theme === 'light') {
+                quoteContainer.style.color = '#ffffff';
+                quoteContainer.style.background = 'rgba(0,0,0,0.2)';
+            } else {
+                quoteContainer.style.color = '#111111';
+                quoteContainer.style.background = 'rgba(255,255,255,0.1)';
+            }
+        }
+
+        function updatePadding(val) {
+            document.getElementById('padVal').innerText = val + 'px';
+            exportFrame.style.padding = val + 'px';
+        }
+
+        function downloadImage() {
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Rendering...';
+            
+            html2canvas(exportFrame, {
+                scale: 2, backgroundColor: null, useCORS: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'quote-muse.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                btn.innerHTML = originalText;
+            });
+        }
+
+        // Start
+        updateView();
+        updateTheme();
+    </script>
+
+</body>
+</html>

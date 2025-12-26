@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PixelSqueeze | Kartik Chouhan</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* RAREKARTIK THEME */
+            --bg: #0a0a0a; 
+            --surface: #171717; 
+            --surface-hover: #262626; 
+            --border: #333333;
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --accent: #3b82f6; 
+            --radius: 20px;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* === 1. HEADER === */
+        .app-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand-group { display: flex; align-items: center; gap: 15px; }
+        .brand-logo { font-size: 1.4rem; font-weight: 900; color: white; display: flex; align-items: center; gap: 10px; }
+        .brand-logo i { color: var(--accent); }
+        .brand-desc { font-size: 0.8rem; color: var(--text-dim); border-left: 1px solid var(--border); padding-left: 15px; display: flex; flex-direction: column; }
+        .credit { color: var(--accent); font-weight: 700; font-size: 0.75rem; }
+        
+        .nav-back { color: var(--text-dim); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-back:hover { color: var(--accent); }
+
+        /* === 2. MAIN CONTAINER === */
+        .container {
+            max-width: 1100px; margin: 0 auto; padding: 40px 20px; width: 100%; flex: 1;
+        }
+
+        /* Badge */
+        .badge-container { text-align: center; margin-bottom: 40px; }
+        .badge { 
+            background: rgba(59, 130, 246, 0.1); color: var(--accent); 
+            padding: 6px 15px; border-radius: 99px; font-size: 0.85rem; font-weight: 700; 
+            border: 1px solid rgba(59, 130, 246, 0.2); display: inline-flex; align-items: center; gap: 8px;
+        }
+
+        /* Grid System */
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 25px; }
+        .span-12 { grid-column: span 12; }
+        .span-8 { grid-column: span 8; }
+        .span-4 { grid-column: span 4; }
+
+        /* Cards */
+        .card { 
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
+            padding: 30px; position: relative; overflow: hidden;
+            animation: fadeInUp 0.5s ease-out; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            height: 250px; border: 2px dashed var(--border); border-radius: 16px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.01);
+        }
+        .upload-zone:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.05); }
+        .upload-icon { font-size: 3.5rem; color: var(--text-dim); margin-bottom: 15px; transition: 0.3s; }
+        .upload-zone:hover .upload-icon { color: var(--accent); transform: scale(1.1); }
+        .upload-title { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .upload-sub { color: var(--text-dim); margin-top: 5px; font-size: 0.9rem; }
+
+        /* Controls */
+        .label { 
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; 
+            color: var(--text-dim); font-weight: 700; margin-bottom: 10px; display: flex; justify-content: space-between; 
+        }
+        
+        .mode-tabs { 
+            display: flex; background: var(--bg); padding: 5px; border-radius: 12px; 
+            border: 1px solid var(--border); margin-bottom: 25px; 
+        }
+        .tab { 
+            flex: 1; text-align: center; padding: 10px; font-size: 0.9rem; cursor: pointer; 
+            border-radius: 8px; color: var(--text-dim); transition: 0.2s; font-weight: 600; 
+        }
+        .tab.active { background: var(--surface-hover); color: var(--accent); box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+        input[type="number"] {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            padding: 12px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 1rem;
+            outline: none; transition: 0.2s;
+        }
+        input[type="number"]:focus { border-color: var(--accent); }
+
+        input[type="range"] {
+            width: 100%; cursor: pointer; accent-color: var(--accent); margin-bottom: 20px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--text); color: var(--bg); border: none; padding: 15px; width: 100%; border-radius: 12px;
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 1rem; transition: 0.3s; font-family: 'Satoshi', sans-serif;
+        }
+        .btn-primary:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-download {
+            background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px;
+            font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+            font-size: 0.9rem; transition: 0.3s;
+        }
+        .btn-download:hover { background: #2563eb; }
+
+        /* Preview Area */
+        .compare-container { display: flex; gap: 20px; margin-top: 20px; }
+        .preview-box { 
+            flex: 1; background: #000; border: 1px solid var(--border); border-radius: 12px; 
+            height: 350px; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden;
+        }
+        .preview-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        
+        .file-badge {
+            position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.8); 
+            padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333;
+        }
+        .tag { font-size: 0.7rem; font-weight: 800; padding: 4px 8px; border-radius: 4px; text-transform: uppercase; }
+        .tag-orig { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .tag-new { background: rgba(16, 185, 129, 0.2); color: var(--success); }
+        .size-text { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; }
+
+        /* Footer */
+        footer { 
+            text-align: center; padding: 30px; border-top: 1px solid var(--border);
+            color: var(--text-dim); font-size: 0.8rem; margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .bento-grid { display: flex; flex-direction: column; }
+            .compare-container { flex-direction: column; }
+            .preview-box { height: 250px; }
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="brand-group">
+            <div class="brand-logo"><i class="fas fa-compress-arrows-alt"></i> PixelSqueeze</div>
+            <div class="brand-desc">
+                <span>Image Optimizer</span>
+                <span class="credit">Developed by Kartik Chouhan</span>
+            </div>
+        </div>
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Home</a>
+    </header>
+
+    <div class="container">
+        
+        <div class="badge-container">
+            <span class="badge"><i class="fas fa-lock"></i> Govt. Mode Active: Brute Force Compression</span>
+        </div>
+
+        <div class="bento-grid">
+            
+            <div class="card span-12" id="uploadCard">
+                <input type="file" id="fileInput" accept="image/jpeg, image/png, image/webp" hidden>
+                <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-title">Click to Upload Image</div>
+                    <div class="upload-sub">Supports JPG, PNG, WEBP</div>
+                </div>
+            </div>
+
+            <div class="card span-4" id="controlsCard" style="display: none;">
+                <div class="label">Mode</div>
+                <div class="mode-tabs">
+                    <div class="tab active" id="tabTarget" onclick="setMode('target')">Target KB</div>
+                    <div class="tab" id="tabManual" onclick="setMode('manual')">Manual</div>
+                </div>
+
+                <div id="targetControls">
+                    <div class="label">Max File Size (KB)</div>
+                    <input type="number" id="targetKB" placeholder="e.g. 50" value="50">
+                    <p style="font-size:0.75rem; color:var(--text-dim); margin-top:8px; line-height:1.4;">
+                        Algorithm will force-compress image to fit under this limit.
+                    </p>
+                </div>
+
+                <div id="manualControls" style="display: none;">
+                    <div class="label"><span>Resize Width</span><span id="widthVal" style="color:var(--accent)">Original</span></div>
+                    <input type="range" id="resizeRange" min="200" max="4000" step="100" value="4000">
+                    
+                    <div class="label"><span>Quality</span><span id="qualityVal" style="color:var(--accent)">90%</span></div>
+                    <input type="range" id="qualityRange" min="10" max="100" value="90" step="5">
+                </div>
+
+                <div style="border-top: 1px solid var(--border); margin: 20px 0; padding-top: 20px;">
+                    <div class="label">Metadata</div>
+                    <input type="number" id="dpiInput" value="200" placeholder="Force DPI">
+                </div>
+
+                <button class="btn-primary" id="processBtn" style="margin-top:10px;">Compress Now</button>
+            </div>
+
+            <div class="card span-8" id="previewCard" style="display: none;">
+                <div class="label">Result Comparison</div>
+                
+                <div class="compare-container">
+                    <div class="preview-box">
+                        <img id="origImg" src="">
+                        <div class="file-badge">
+                            <span class="tag tag-orig">ORIGINAL</span>
+                            <span class="size-text" id="origSize">0 KB</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-box" style="border-color: var(--success);">
+                        <img id="newImg" src="">
+                        <div class="file-badge">
+                            <span class="tag tag-new">RESULT</span>
+                            <span class="size-text" id="newSize" style="color:var(--success)">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--text-dim); font-weight:700;">REDUCTION</div>
+                        <div style="color: var(--success); font-weight: 800; font-size: 1.1rem;" id="savedText">0%</div>
+                    </div>
+                    <a id="downloadLink" class="btn-download">
+                        <i class="fas fa-download"></i> Download Image
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 PixelSqueeze. Developed by Kartik Chouhan.
+    </footer>
+
+    <script>
+        const fileInput = document.getElementById('fileInput'), dropZone = document.getElementById('dropZone');
+        const controlsCard = document.getElementById('controlsCard'), previewCard = document.getElementById('previewCard');
+        const origImg = document.getElementById('origImg'), newImg = document.getElementById('newImg');
+        const origSize = document.getElementById('origSize'), newSize = document.getElementById('newSize');
+        const qualityRange = document.getElementById('qualityRange'), resizeRange = document.getElementById('resizeRange');
+        const qualityVal = document.getElementById('qualityVal'), widthVal = document.getElementById('widthVal');
+        const targetKB = document.getElementById('targetKB'), dpiInput = document.getElementById('dpiInput');
+        const processBtn = document.getElementById('processBtn'), downloadLink = document.getElementById('downloadLink');
+
+        let currentFile = null, originalWidth = 0, mode = 'target'; 
+
+        // Drag & Drop
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--accent)'; dropZone.style.background = 'rgba(59,130,246,0.1)'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--border)'; dropZone.style.background = 'rgba(255,255,255,0.01)'; });
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--border)'; dropZone.style.background = 'rgba(255,255,255,0.01)'; if(e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        
+        // Inputs
+        qualityRange.addEventListener('input', (e) => qualityVal.innerText = e.target.value + "%");
+        resizeRange.addEventListener('input', (e) => { widthVal.innerText = e.target.value + "px"; if(e.target.value == originalWidth) widthVal.innerText += " (Original)"; });
+
+        function handleFile(file) {
+            if (!file.type.match('image.*')) return alert("Please upload an image (JPG/PNG)");
+            currentFile = file;
+            controlsCard.style.display = 'block'; previewCard.style.display = 'block';
+            origSize.innerText = formatBytes(file.size);
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                origImg.src = e.target.result;
+                const img = new Image();
+                img.onload = () => {
+                    originalWidth = img.width;
+                    resizeRange.max = originalWidth; resizeRange.value = originalWidth;
+                    widthVal.innerText = originalWidth + "px (Original)";
+                    
+                    // Auto run
+                    if(mode === 'target') bruteForceCompress(targetKB.value * 1024);
+                }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('tabManual').className = mode === 'manual' ? 'tab active' : 'tab';
+            document.getElementById('tabTarget').className = mode === 'target' ? 'tab active' : 'tab';
+            document.getElementById('manualControls').style.display = mode === 'manual' ? 'block' : 'none';
+            document.getElementById('targetControls').style.display = mode === 'target' ? 'block' : 'none';
+        }
+
+        processBtn.addEventListener('click', () => {
+            const originalText = processBtn.innerText;
+            processBtn.innerText = "Processing..."; processBtn.disabled = true;
+            setTimeout(async () => {
+                if (mode === 'manual') {
+                    await compressImage(qualityRange.value / 100, parseInt(resizeRange.value));
+                } else {
+                    await bruteForceCompress(targetKB.value * 1024);
+                }
+                processBtn.innerText = originalText; processBtn.disabled = false;
+            }, 50);
+        });
+
+        // --- ALGORITHMS ---
+        async function bruteForceCompress(targetBytes) {
+            let w = originalWidth;
+            let q = 0.9;
+            let blob = await getCanvasBlob(q, w);
+            let attempts = 0;
+            
+            while (blob.size > targetBytes && attempts < 25) {
+                if (blob.size > targetBytes * 2) w = Math.round(w * 0.75);
+                else w = Math.round(w * 0.9);
+
+                if (w < 600 && q > 0.5) q = 0.7;
+                if (w < 100) { w = 100; break; }
+
+                blob = await getCanvasBlob(q, w);
+                attempts++;
+            }
+            updatePreview(blob);
+        }
+
+        async function compressImage(quality, width) {
+            const blob = await getCanvasBlob(quality, width);
+            updatePreview(blob);
+        }
+
+        function getCanvasBlob(quality, targetWidth) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = origImg.src;
+                img.crossOrigin = "anonymous"; 
+                img.onload = () => {
+                    const scale = targetWidth / img.width;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = targetWidth;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    
+                    ctx.fillStyle = "#FFFFFF";
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+                };
+            });
+        }
+
+        function updatePreview(blob) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                let base64 = e.target.result;
+                const dpi = parseInt(dpiInput.value) || 96;
+                base64 = changeDpiDataUrl(base64, dpi);
+                newImg.src = base64;
+                
+                const size = Math.round((base64.length * 3) / 4);
+                newSize.innerText = formatBytes(size);
+                
+                const target = targetKB.value * 1024;
+                if(mode === 'target' && size > target + 2048) newSize.style.color = '#ef4444';
+                else newSize.style.color = '#10b981';
+
+                const savings = Math.round(((currentFile.size - size) / currentFile.size) * 100);
+                document.getElementById('savedText').innerText = savings > 0 ? `Saved ${savings}%` : "No Savings";
+                
+                downloadLink.href = base64;
+                downloadLink.download = `optimized_${dpi}dpi.jpg`;
+            };
+            reader.readAsDataURL(blob);
+        }
+
+        function changeDpiDataUrl(b64, d){ const buf=base64ToArrayBuffer(b64), view=new DataView(buf); if(view.getUint16(2)!==0xFFE0)return b64; view.setUint8(13,1); view.setUint16(14,d); view.setUint16(16,d); return arrayBufferToBase64(buf); }
+        function base64ToArrayBuffer(b64){ const binaryString=window.atob(b64.split(',')[1]), len=binaryString.length, bytes=new Uint8Array(len); for(let i=0;i<len;i++){bytes[i]=binaryString.charCodeAt(i);} return bytes.buffer; }
+        function arrayBufferToBase64(buffer){ let binary=''; const bytes=new Uint8Array(buffer), len=bytes.byteLength; for(let i=0;i<len;i++){binary+=String.fromCharCode(bytes[i]);} return 'data:image/jpeg;base64,'+window.btoa(binary); }
+        
+        function formatBytes(b){if(b===0)return'0 Bytes';const k=1024,i=Math.floor(Math.log(b)/Math.log(k));return parseFloat((b/Math.pow(k,i)).toFixed(2))+' '+['Bytes','KB','MB'][i];}
+    </script>
+
+</body>
+</html>

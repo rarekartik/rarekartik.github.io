@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StatMaster Pro | Kartik Chouhan</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* RAREKARTIK THEME */
+            --bg: #0a0a0a; 
+            --surface: #171717; 
+            --surface-hover: #262626; 
+            --border: #333333;
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --accent: #3b82f6; 
+            --radius: 16px;
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* === 1. HEADER === */
+        .app-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand-group { display: flex; align-items: center; gap: 15px; }
+        .brand-logo { font-size: 1.4rem; font-weight: 900; color: white; display: flex; align-items: center; gap: 10px; }
+        .brand-logo i { color: var(--accent); }
+        .brand-desc { font-size: 0.8rem; color: var(--text-dim); border-left: 1px solid var(--border); padding-left: 15px; display: flex; flex-direction: column; }
+        .credit { color: var(--accent); font-weight: 700; font-size: 0.75rem; }
+        
+        .nav-back { color: var(--text-dim); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-back:hover { color: var(--accent); }
+
+        /* === 2. NAVIGATION TABS === */
+        .tabs-container {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .tabs { display: inline-flex; gap: 10px; background: var(--surface); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        .tab-btn {
+            background: transparent; border: none; color: var(--text-dim);
+            padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+            transition: 0.3s;
+        }
+        .tab-btn.active { background: var(--surface-hover); color: var(--accent); }
+        .tab-btn:hover { color: var(--text); }
+
+        /* === 3. MAIN CONTENT (BENTO) === */
+        .main-container {
+            flex: 1; padding: 30px 20px; max-width: 1200px; margin: 0 auto; width: 100%;
+        }
+
+        .card { 
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
+            padding: 25px; display: none; animation: fadeInUp 0.4s ease-out;
+        }
+        .card.active { display: block; }
+        
+        /* Inputs & Typography */
+        h1, h2, h3 { color: var(--text); margin-bottom: 15px; }
+        .section-title { font-size: 1.1rem; font-weight: 800; color: var(--accent); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+        
+        input, textarea, select {
+            width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text);
+            padding: 12px; border-radius: 10px; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; outline: none; transition: 0.2s;
+        }
+        input:focus, textarea:focus, select:focus { border-color: var(--accent); background: #000; }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--text); color: var(--bg); border: none; padding: 12px; width: 100%; border-radius: 10px;
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 0.95rem; transition: 0.3s; margin-top: 15px; font-family: 'Satoshi', sans-serif;
+        }
+        .btn-primary:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+
+        /* Results Box */
+        .result-box { 
+            background: rgba(59, 130, 246, 0.05); border: 1px solid var(--border); 
+            padding: 20px; border-radius: 12px; margin-top: 25px; 
+        }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        .result-row:last-child { border: none; margin: 0; padding: 0; }
+        .res-label { color: var(--text-dim); font-size: 0.9rem; }
+        .res-val { color: var(--text); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .highlight { color: var(--accent); font-size: 1.1rem; }
+
+        /* === CALCULATOR GRID === */
+        .calc-wrapper { max-width: 350px; margin: 0 auto; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .calc-btn {
+            background: var(--surface-hover); border: 1px solid var(--border); color: var(--text); padding: 15px; border-radius: 12px;
+            font-size: 1.2rem; cursor: pointer; transition: 0.2s; font-family: 'JetBrains Mono', monospace;
+        }
+        .calc-btn:hover { border-color: var(--accent); background: rgba(59, 130, 246, 0.1); }
+        .calc-btn.op { color: var(--accent); }
+        .calc-btn.eq { background: var(--accent); color: white; border-color: var(--accent); }
+        #calcDisplay { font-size: 2rem; text-align: right; padding: 20px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 12px; background: #000; }
+
+        /* === FOOTER === */
+        footer { 
+            text-align: center; padding: 30px; border-top: 1px solid var(--border);
+            color: var(--text-dim); font-size: 0.8rem; margin-top: auto;
+        }
+
+        /* GRID UTILS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; }
+        
+        @media (max-width: 700px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; }
+            .tabs-container { padding: 10px; }
+            .tabs { width: 100%; display: flex; overflow-x: auto; }
+            .tab-btn { flex-shrink: 0; }
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="brand-group">
+            <div class="brand-logo"><i class="fas fa-chart-pie"></i> StatMaster Pro</div>
+            <div class="brand-desc">
+                <span>Commerce Suite</span>
+                <span class="credit">Developed by Kartik Chouhan</span>
+            </div>
+        </div>
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Home</a>
+    </header>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('stats')"><i class="fas fa-chart-bar"></i> Statistics</button>
+            <button class="tab-btn" onclick="switchTab('tax')"><i class="fas fa-coins"></i> Income Tax</button>
+            <button class="tab-btn" onclick="switchTab('tables')"><i class="fas fa-book"></i> Log Tables</button>
+            <button class="tab-btn" onclick="switchTab('calc')"><i class="fas fa-calculator"></i> Calculator</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+
+        <div class="card active" id="statsCard">
+            <div class="section-title"><i class="fas fa-chart-line"></i> Advanced Statistics Engine</div>
+            
+            <div class="grid-2">
+                <div>
+                    <label>Variable X (Comma Separated)</label>
+                    <textarea id="dataX" placeholder="e.g. 10, 20, 25, 30, 45, 50, 55"></textarea>
+                </div>
+                <div>
+                    <label>Variable Y (Optional for Regression)</label>
+                    <textarea id="dataY" placeholder="e.g. 5, 12, 18, 22, 38, 42, 48"></textarea>
+                </div>
+            </div>
+            <button class="btn-primary" onclick="calculateDeepStats()">Calculate Statistics</button>
+
+            <div class="result-box" id="statsResult" style="display:none;">
+                <div class="grid-3">
+                    <div>
+                        <h4 style="color:var(--accent); margin-bottom:15px;">Central Tendency</h4>
+                        <div class="result-row"><span class="res-label">Mean (AM):</span> <span class="res-val" id="resMean">-</span></div>
+                        <div class="result-row"><span class="res-label">Geometric (GM):</span> <span class="res-val" id="resGM">-</span></div>
+                        <div class="result-row"><span class="res-label">Harmonic (HM):</span> <span class="res-val" id="resHM">-</span></div>
+                        <div class="result-row"><span class="res-label">Median:</span> <span class="res-val" id="resMedian">-</span></div>
+                        <div class="result-row"><span class="res-label">Mode:</span> <span class="res-val" id="resMode">-</span></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent); margin-bottom:15px;">Dispersion</h4>
+                        <div class="result-row"><span class="res-label">Std Dev (σ):</span> <span class="res-val" id="resSD">-</span></div>
+                        <div class="result-row"><span class="res-label">Variance:</span> <span class="res-val" id="resVar">-</span></div>
+                        <div class="result-row"><span class="res-label">CV (%):</span> <span class="res-val" id="resCV">-</span></div>
+                        <div class="result-row"><span class="res-label">Range:</span> <span class="res-val" id="resRange">-</span></div>
+                    </div>
+                    <div>
+                        <h4 style="color:var(--accent); margin-bottom:15px;">Shape</h4>
+                        <div class="result-row"><span class="res-label">Skewness:</span> <span class="res-val" id="resSkew">-</span></div>
+                        <div class="result-row"><span class="res-label">Correlation (r):</span> <span class="res-val highlight" id="resCorr">-</span></div>
+                        <div class="result-row"><span class="res-label">Regression (Y on X):</span> <span class="res-val" id="resRegYX">-</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="taxCard">
+            <div class="section-title"><i class="fas fa-file-invoice-dollar"></i> Tax Liability Estimator</div>
+
+            <div style="background:var(--surface-hover); padding:15px; border-radius:12px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <label style="color:var(--text); margin:0;">1. Salary Income</label>
+                    <span id="head1Total" style="font-family:'JetBrains Mono'; color:var(--success);">₹0</span>
+                </div>
+                <div class="grid-2">
+                    <input type="number" class="tax-inp head1" placeholder="Basic + DA">
+                    <input type="number" class="tax-inp head1" placeholder="HRA / Allowances">
+                    <input type="number" class="tax-inp head1" placeholder="Bonus / Commission">
+                    <input type="number" value="75000" disabled style="opacity:0.6;" title="Std Deduction">
+                </div>
+            </div>
+
+            <div style="background:var(--surface-hover); padding:15px; border-radius:12px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <label style="color:var(--text); margin:0;">2. House Property</label>
+                    <span id="head2Total" style="font-family:'JetBrains Mono'; color:var(--success);">₹0</span>
+                </div>
+                <div class="grid-3">
+                    <input type="number" id="hpRent" class="tax-inp" placeholder="Gross Rent">
+                    <input type="number" id="hpTax" class="tax-inp" placeholder="Muni Taxes">
+                    <input type="number" id="hpInt" class="tax-inp" placeholder="Loan Interest">
+                </div>
+            </div>
+
+            <div style="background:var(--surface-hover); padding:15px; border-radius:12px; margin-bottom:15px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <label style="color:var(--text); margin:0;">3. Other Sources</label>
+                    <span id="head3Total" style="font-family:'JetBrains Mono'; color:var(--success);">₹0</span>
+                </div>
+                <div class="grid-3">
+                    <input type="number" class="tax-inp head3" placeholder="Business/Prof">
+                    <input type="number" class="tax-inp head3" placeholder="Capital Gains">
+                    <input type="number" class="tax-inp head3" placeholder="Other Sources">
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div><label>80C (LIC/PPF) - Max 1.5L</label><input type="number" class="ded-inp" placeholder="0"></div>
+                <div><label>80D / Other Deductions</label><input type="number" class="ded-inp" placeholder="0"></div>
+            </div>
+
+            <button class="btn-primary" onclick="calculateTaxPro()">Compute Tax</button>
+
+            <div class="result-box" id="taxResult" style="display:none;">
+                <div class="grid-2">
+                    <div>
+                        <div class="result-row"><span class="res-label">Gross Income (GTI):</span> <span class="res-val" id="resGTI">0</span></div>
+                        <div class="result-row"><span class="res-label">Deductions:</span> <span class="res-val" id="resDed">0</span></div>
+                        <div class="result-row"><span class="res-label">Taxable Income:</span> <span class="res-val highlight" id="resNTI">0</span></div>
+                    </div>
+                    <div style="display:grid; gap:10px;">
+                        <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; text-align:center;">
+                            <div class="res-label">Old Regime Tax</div>
+                            <div style="font-size:1.2rem; font-weight:bold;" id="taxOld">₹0</div>
+                        </div>
+                        <div style="background:rgba(16,185,129,0.1); padding:10px; border-radius:8px; text-align:center; border:1px solid rgba(16,185,129,0.3);">
+                            <div class="res-label" style="color:var(--success);">New Regime Tax</div>
+                            <div style="font-size:1.2rem; font-weight:bold; color:var(--success);" id="taxNew">₹0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="tablesCard">
+            <div class="section-title"><i class="fas fa-table"></i> Mathematical Tables</div>
+            <div class="grid-2">
+                 <div>
+                    <label>Logarithms</label>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <select id="tableType">
+                            <option value="log">Log (Base 10)</option>
+                            <option value="ln">Ln (Natural)</option>
+                            <option value="antilog">Antilog</option>
+                            <option value="exp">Exp (e^x)</option>
+                        </select>
+                        <input type="number" id="tableInput" placeholder="Value">
+                    </div>
+                    <button class="btn-primary" onclick="calcTable()" style="margin-top:0;">Compute</button>
+                    <div class="result-box" style="margin-top:15px; text-align:center;">
+                        <span class="highlight" id="tableOutput">---</span>
+                    </div>
+                 </div>
+                 
+                 <div>
+                     <label>Statistics (Z-Table)</label>
+                     <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <select id="distType"><option value="z">Z to P-Value</option></select>
+                        <input type="number" id="distInput" placeholder="Z-Score">
+                    </div>
+                    <button class="btn-primary" onclick="calcDist()" style="margin-top:0;">Lookup</button>
+                    <div class="result-box" style="margin-top:15px; text-align:center;">
+                        <span class="highlight" id="distOutput">---</span>
+                    </div>
+                 </div>
+             </div>
+        </div>
+
+        <div class="card" id="calcCard">
+            <div class="section-title"><i class="fas fa-calculator"></i> Scientific Calculator</div>
+            <div class="calc-wrapper">
+                <input type="text" id="calcDisplay" readonly>
+                <div class="calc-grid">
+                    <button class="calc-btn op" onclick="ins('(')">(</button>
+                    <button class="calc-btn op" onclick="ins(')')">)</button>
+                    <button class="calc-btn op" onclick="back()">DEL</button>
+                    <button class="calc-btn op" onclick="clr()">AC</button>
+                    
+                    <button class="calc-btn" onclick="ins('7')">7</button>
+                    <button class="calc-btn" onclick="ins('8')">8</button>
+                    <button class="calc-btn" onclick="ins('9')">9</button>
+                    <button class="calc-btn op" onclick="ins('/')">÷</button>
+                    
+                    <button class="calc-btn" onclick="ins('4')">4</button>
+                    <button class="calc-btn" onclick="ins('5')">5</button>
+                    <button class="calc-btn" onclick="ins('6')">6</button>
+                    <button class="calc-btn op" onclick="ins('*')">×</button>
+                    
+                    <button class="calc-btn" onclick="ins('1')">1</button>
+                    <button class="calc-btn" onclick="ins('2')">2</button>
+                    <button class="calc-btn" onclick="ins('3')">3</button>
+                    <button class="calc-btn op" onclick="ins('-')">-</button>
+                    
+                    <button class="calc-btn" onclick="ins('0')">0</button>
+                    <button class="calc-btn" onclick="ins('.')">.</button>
+                    <button class="calc-btn eq" onclick="solve()">=</button>
+                    <button class="calc-btn op" onclick="ins('+')">+</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 StatMaster Pro. Developed by Kartik Chouhan.
+    </footer>
+
+<script>
+    // --- Tab Logic ---
+    function switchTab(id) {
+        document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(id + 'Card').classList.add('active');
+        // Find button that triggered this or map ID to index
+        const btns = document.querySelectorAll('.tab-btn');
+        if(id === 'stats') btns[0].classList.add('active');
+        if(id === 'tax') btns[1].classList.add('active');
+        if(id === 'tables') btns[2].classList.add('active');
+        if(id === 'calc') btns[3].classList.add('active');
+    }
+
+    // --- STATS LOGIC ---
+    function calculateDeepStats() {
+        const xStr = document.getElementById('dataX').value;
+        const yStr = document.getElementById('dataY').value;
+        const x = xStr.match(/-?\d+(\.\d+)?/g)?.map(Number).sort((a,b)=>a-b) || [];
+        const y = yStr.match(/-?\d+(\.\d+)?/g)?.map(Number) || [];
+
+        if(x.length === 0) return alert("Please enter Variable X data");
+
+        const n = x.length;
+        const sumX = x.reduce((a,b) => a+b, 0);
+        const mean = sumX / n;
+        const median = (n % 2 !== 0) ? x[Math.floor(n/2)] : (x[n/2 - 1] + x[n/2]) / 2;
+        
+        // Variance & SD
+        const variance = x.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / n;
+        const sd = Math.sqrt(variance);
+        
+        // GM & HM
+        const gm = Math.pow(x.reduce((a,b) => a * (b>0?b:1), 1), 1/n); 
+        const hm = n / x.reduce((a,b) => a + (1/b), 0);
+        
+        // Mode
+        const freq = {};
+        let maxFreq = 0, mode = "No Mode";
+        x.forEach(v => { freq[v] = (freq[v]||0)+1; if(freq[v]>maxFreq) maxFreq=freq[v]; });
+        if(maxFreq > 1) mode = Object.keys(freq).filter(k => freq[k]===maxFreq).join(", ");
+        
+        // Skewness
+        const skew = (mean - median) * 3 / (sd || 1);
+        const cv = (sd / mean) * 100;
+
+        document.getElementById('resMean').innerText = mean.toFixed(4);
+        document.getElementById('resGM').innerText = gm.toFixed(4);
+        document.getElementById('resHM').innerText = hm.toFixed(4);
+        document.getElementById('resMedian').innerText = median;
+        document.getElementById('resMode').innerText = mode;
+        document.getElementById('resSD').innerText = sd.toFixed(4);
+        document.getElementById('resVar').innerText = variance.toFixed(4);
+        document.getElementById('resCV').innerText = cv.toFixed(2) + "%";
+        document.getElementById('resRange').innerText = (x[n-1] - x[0]);
+        document.getElementById('resSkew').innerText = skew.toFixed(4);
+
+        if(y.length === n && n > 0) {
+             const sumY = y.reduce((a,b) => a+b, 0);
+             const meanY = sumY / n;
+             let num = 0, denX = 0, denY = 0;
+             for(let i=0; i<n; i++) {
+                 num += (x[i] - mean) * (y[i] - meanY);
+                 denX += Math.pow(x[i] - mean, 2);
+                 denY += Math.pow(y[i] - meanY, 2);
+             }
+             const r = num / Math.sqrt(denX * denY);
+             const byx = num / denX;
+             const intercept = meanY - (byx * mean);
+             
+             document.getElementById('resCorr').innerText = r.toFixed(4);
+             document.getElementById('resRegYX').innerText = `Y = ${byx.toFixed(2)}X + ${intercept.toFixed(2)}`;
+        } else {
+             document.getElementById('resCorr').innerText = "-";
+             document.getElementById('resRegYX').innerText = "-";
+        }
+        document.getElementById('statsResult').style.display = 'block';
+    }
+
+    // --- TAX LOGIC ---
+    function calculateTaxPro() {
+        let salaryGross = 0;
+        document.querySelectorAll('.head1').forEach(i => salaryGross += Number(i.value));
+        document.getElementById('head1Total').innerText = "Gross: ₹" + salaryGross.toLocaleString();
+
+        const rent = Number(document.getElementById('hpRent').value);
+        const munTax = Number(document.getElementById('hpTax').value);
+        const hpInt = Number(document.getElementById('hpInt').value);
+        const nav = rent - munTax;
+        const stdDedHP = nav * 0.30;
+        const incomeHP = nav - stdDedHP - hpInt;
+        document.getElementById('head2Total').innerText = "Net: ₹" + incomeHP.toLocaleString();
+
+        let otherTotal = 0;
+        document.querySelectorAll('.head3').forEach(i => otherTotal += Number(i.value));
+        document.getElementById('head3Total').innerText = "Total: ₹" + otherTotal.toLocaleString();
+
+        const gti_common = incomeHP + otherTotal;
+        
+        // Old Regime: Salary - 50k
+        const salaryNetOld = Math.max(0, salaryGross - 50000);
+        const gtiOld = salaryNetOld + gti_common;
+        let ded80 = 0;
+        document.querySelectorAll('.ded-inp').forEach(i => ded80 += Number(i.value));
+        const totalIncOld = Math.max(0, gtiOld - ded80);
+        const taxOld = calcSlabOld(totalIncOld);
+
+        // New Regime: Salary - 75k (Updated FY25)
+        const salaryNetNew = Math.max(0, salaryGross - 75000);
+        const gtiNew = salaryNetNew + gti_common; 
+        const taxNew = calcSlabNew(gtiNew);
+
+        document.getElementById('resGTI').innerText = "₹ " + gtiOld.toLocaleString(); 
+        document.getElementById('resDed').innerText = "₹ " + ded80.toLocaleString();
+        document.getElementById('resNTI').innerText = "₹ " + totalIncOld.toLocaleString();
+        document.getElementById('taxOld').innerText = "₹ " + taxOld.toLocaleString();
+        document.getElementById('taxNew').innerText = "₹ " + taxNew.toLocaleString();
+        document.getElementById('taxResult').style.display = 'block';
+    }
+
+    function calcSlabOld(inc) {
+        if(inc <= 250000) return 0; // Up to 2.5L Exempt
+        if(inc <= 500000) return 0; // Rebate 87A makes it 0
+        let tax = 0;
+        // Calculation logic for Old Slabs > 5L
+        if(inc > 1000000) { tax += (inc - 1000000) * 0.30; inc = 1000000; }
+        if(inc > 500000) { tax += (inc - 500000) * 0.20; inc = 500000; }
+        if(inc > 250000) { tax += (inc - 250000) * 0.05; }
+        return Math.round(tax * 1.04); 
+    }
+
+    function calcSlabNew(inc) {
+        if(inc <= 300000) return 0; // Up to 3L Exempt
+        if(inc <= 700000) return 0; // Rebate 87A
+        let tax = 0;
+        if(inc > 1500000) { tax += (inc - 1500000) * 0.30; inc = 1500000; }
+        if(inc > 1200000) { tax += (inc - 1200000) * 0.20; inc = 1200000; }
+        if(inc > 900000) { tax += (inc - 900000) * 0.15; inc = 900000; }
+        if(inc > 600000) { tax += (inc - 600000) * 0.10; inc = 600000; }
+        if(inc > 300000) { tax += (inc - 300000) * 0.05; }
+        return Math.round(tax * 1.04);
+    }
+
+    // --- LOG TABLES ---
+    function calcTable() {
+        const type = document.getElementById('tableType').value;
+        const val = parseFloat(document.getElementById('tableInput').value);
+        if(isNaN(val)) return;
+        let res = (type==='log') ? Math.log10(val) : (type==='ln') ? Math.log(val) : (type==='antilog') ? Math.pow(10,val) : Math.exp(val);
+        document.getElementById('tableOutput').innerText = res.toPrecision(7);
+    }
+    
+    function calcDist() {
+        const val = parseFloat(document.getElementById('distInput').value);
+        if(isNaN(val)) return;
+        // Approximation of Erf/Normal CDF
+        const p = 1 / (1 + Math.exp(-val * (1.5976 + 0.070566 * val * val)));
+        document.getElementById('distOutput').innerText = "P = " + p.toFixed(5);
+    }
+
+    // --- CALCULATOR ENGINE ---
+    const disp = document.getElementById('calcDisplay');
+    function ins(v) { disp.value += v; }
+    function clr() { disp.value = ''; }
+    function back() { disp.value = disp.value.slice(0, -1); }
+    function solve() { 
+        try { disp.value = eval(disp.value); } 
+        catch { disp.value = "Error"; } 
+    }
+</script>
+
+</body>
+</html>

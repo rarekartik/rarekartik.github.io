@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Fortress | Kartik Chouhan</title>
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* RAREKARTIK THEME */
+            --bg: #0a0a0a; 
+            --surface: #171717; 
+            --surface-hover: #262626; 
+            --border: #333333;
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --accent: #3b82f6; 
+            --radius: 16px;
+            
+            /* Status Colors */
+            --safe: #10b981; 
+            --warn: #f59e0b; 
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background-color: var(--bg); color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+
+        /* === 1. HEADER === */
+        .app-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 15px 25px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand-group { display: flex; align-items: center; gap: 15px; }
+        .brand-logo { font-size: 1.4rem; font-weight: 900; color: white; display: flex; align-items: center; gap: 10px; }
+        .brand-logo i { color: var(--accent); }
+        .brand-desc { font-size: 0.8rem; color: var(--text-dim); border-left: 1px solid var(--border); padding-left: 15px; display: flex; flex-direction: column; }
+        .credit { color: var(--accent); font-weight: 700; font-size: 0.75rem; }
+        
+        .nav-back { color: var(--text-dim); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .nav-back:hover { color: var(--accent); }
+
+        /* === 2. NAVIGATION TABS === */
+        .tabs-container {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 20px; display: flex; justify-content: center;
+        }
+        .tabs { display: inline-flex; gap: 5px; background: var(--surface); padding: 5px; border-radius: 12px; border: 1px solid var(--border); }
+        .tab-btn {
+            background: transparent; border: none; color: var(--text-dim);
+            padding: 10px 25px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: 700;
+            transition: 0.3s; min-width: 150px;
+        }
+        .tab-btn.active { background: var(--surface-hover); color: var(--accent); }
+        .tab-btn:hover { color: var(--text); }
+
+        /* === 3. MAIN CONTENT (BENTO) === */
+        .main-container {
+            flex: 1; padding: 40px 20px; max-width: 1000px; margin: 0 auto; width: 100%;
+        }
+
+        .card { 
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); 
+            padding: 25px; display: none; animation: fadeInUp 0.4s ease-out; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .card.active { display: block; }
+
+        /* Grid System */
+        .bento-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+        .span-12 { grid-column: span 12; }
+        .span-8 { grid-column: span 8; }
+        .span-4 { grid-column: span 4; }
+
+        /* Typography */
+        h3 { color: var(--text); margin-bottom: 20px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        label { display: block; font-size: 0.75rem; color: var(--text-dim); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+
+        /* Password Display Box */
+        .password-display {
+            background: #000; border: 1px solid var(--border); padding: 30px; border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; text-align: center; color: var(--text);
+            word-break: break-all; min-height: 100px; display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; cursor: pointer; transition: 0.2s; position: relative;
+        }
+        .password-display:hover { border-color: var(--accent); transform: scale(1.01); }
+        .copy-hint { 
+            position: absolute; top: 10px; right: 10px; font-size: 0.7rem; 
+            color: var(--text-dim); text-transform: uppercase; font-family: 'Satoshi', sans-serif;
+            background: var(--surface); padding: 4px 8px; border-radius: 6px;
+        }
+
+        /* Controls */
+        .control-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 12px 0; border-bottom: 1px solid var(--border); 
+        }
+        .control-row:last-child { border: none; padding-bottom: 0; }
+        .control-text { font-weight: 600; font-size: 0.9rem; }
+        
+        input[type=range] { width: 120px; accent-color: var(--accent); }
+        input[type=checkbox] { 
+            width: 20px; height: 20px; accent-color: var(--accent); 
+            background: var(--bg); border: 1px solid var(--border); cursor: pointer;
+        }
+
+        /* Audit Input */
+        .audit-input {
+            width: 100%; background: #000; border: 1px solid var(--border); color: var(--text);
+            padding: 20px; border-radius: 12px; font-size: 1.4rem; text-align: center; font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 20px; outline: none; transition: 0.2s;
+        }
+        .audit-input:focus { border-color: var(--accent); }
+
+        /* Strength Meter */
+        .strength-container { background: var(--bg); padding: 5px; border-radius: 10px; border: 1px solid var(--border); margin-top: 20px; }
+        .strength-bar { height: 10px; width: 0%; border-radius: 6px; transition: 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+        
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 25px; }
+        .stat-box { 
+            background: var(--surface-hover); padding: 15px; border-radius: 12px; 
+            text-align: center; border: 1px solid var(--border); 
+        }
+        .stat-val { font-size: 1rem; font-weight: 800; color: var(--text); display: block; margin-bottom: 5px; }
+        .stat-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--text); color: var(--bg); border: none; padding: 15px; width: 100%; border-radius: 12px;
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-size: 1rem; transition: 0.3s; margin-top: 20px; font-family: 'Satoshi', sans-serif;
+        }
+        .btn-primary:hover { background: var(--accent); color: white; transform: translateY(-2px); }
+
+        /* Privacy Banner */
+        .privacy-badge {
+            background: rgba(16, 185, 129, 0.1); color: var(--safe); border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 10px; border-radius: 12px; text-align: center; font-size: 0.85rem; font-weight: 600;
+            margin-bottom: 30px; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* Footer */
+        footer { 
+            text-align: center; padding: 30px; border-top: 1px solid var(--border);
+            color: var(--text-dim); font-size: 0.8rem; margin-top: auto;
+        }
+
+        /* Responsive */
+        @media (max-width: 800px) {
+            .bento-grid { display: flex; flex-direction: column; }
+            .stat-grid { grid-template-columns: 1fr; }
+        }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="brand-group">
+            <div class="brand-logo"><i class="fas fa-shield-alt"></i> The Fortress</div>
+            <div class="brand-desc">
+                <span>Security Suite</span>
+                <span class="credit">Developed by Kartik Chouhan</span>
+            </div>
+        </div>
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Home</a>
+    </header>
+
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchMode('gen')"><i class="fas fa-key"></i> Generator</button>
+            <button class="tab-btn" onclick="switchMode('audit')"><i class="fas fa-user-secret"></i> Auditor</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+
+        <div class="privacy-badge">
+            <i class="fas fa-lock"></i> Zero-Knowledge: All encryption happens locally on your device.
+        </div>
+
+        <div class="bento-grid" id="genView">
+            
+            <div class="card active span-8">
+                <h3><i class="fas fa-terminal"></i> Generated Key</h3>
+                <div class="password-display" id="genOutput" onclick="copyPassword()">
+                    <span class="copy-hint">Click to Copy</span>
+                    <span id="pwText">...</span>
+                </div>
+                <button class="btn-primary" onclick="generate()">
+                    <i class="fas fa-sync-alt"></i> Regenerate
+                </button>
+            </div>
+
+            <div class="card active span-4">
+                <h3><i class="fas fa-sliders-h"></i> Config</h3>
+                <div class="control-row">
+                    <span class="control-text">Length: <span id="lenVal" style="color:var(--accent)">16</span></span>
+                    <input type="range" id="lengthRange" min="8" max="64" value="16" oninput="updateLen(this.value)">
+                </div>
+                <div class="control-row"><span class="control-text">A-Z (Upper)</span><input type="checkbox" id="incUpper" checked onchange="generate()"></div>
+                <div class="control-row"><span class="control-text">a-z (Lower)</span><input type="checkbox" id="incLower" checked onchange="generate()"></div>
+                <div class="control-row"><span class="control-text">0-9 (Numbers)</span><input type="checkbox" id="incNum" checked onchange="generate()"></div>
+                <div class="control-row"><span class="control-text">#@$ (Symbols)</span><input type="checkbox" id="incSym" checked onchange="generate()"></div>
+            </div>
+
+            <div class="card active span-12">
+                <h3><i class="fas fa-chart-bar"></i> Security Analysis</h3>
+                <div class="strength-container">
+                    <div class="strength-bar" id="genStrengthBar"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:0.9rem; font-weight:700;">
+                    <span id="genStrengthLabel" style="color:var(--text-dim)">Calculating...</span>
+                    <span id="genEntropyLabel" style="color:var(--text)">0 Bits</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bento-grid" id="auditView" style="display:none;">
+            
+            <div class="card active span-12">
+                <h3 style="justify-content:center;"><i class="fas fa-search"></i> Password Auditor</h3>
+                <input type="text" class="audit-input" id="auditInput" placeholder="Type password to test..." oninput="auditPassword(this.value)" autocomplete="off">
+                <p style="text-align:center; color:var(--text-dim); font-size:0.9rem;">
+                    Analyzes entropy, brute-force resistance, and character distribution.
+                </p>
+            </div>
+
+            <div class="card active span-12">
+                <h3><i class="fas fa-microchip"></i> Crack Resistance</h3>
+                
+                <div class="strength-container">
+                    <div class="strength-bar" id="auditStrengthBar"></div>
+                </div>
+                <div style="text-align:center; margin-top:10px; font-weight:800; font-size:1.1rem; color:var(--text);" id="auditStrengthLabel">Waiting for input...</div>
+
+                <div class="stat-grid">
+                    <div class="stat-box">
+                        <span class="stat-val" id="crackTime">...</span>
+                        <span class="stat-label">Brute Force Time</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-val" id="poolSize">...</span>
+                        <span class="stat-label">Char Pool</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-val" id="energyCost">...</span>
+                        <span class="stat-label">Cost to Hack ($)</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2026 The Fortress. Developed by Kartik Chouhan.
+    </footer>
+
+    <script>
+        // --- Config ---
+        const charsUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const charsLower = "abcdefghijklmnopqrstuvwxyz";
+        const charsNum = "0123456789";
+        const charsSym = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+
+        // --- Switch Logic ---
+        function switchMode(mode) {
+            const tabs = document.querySelectorAll('.tab-btn');
+            const genView = document.getElementById('genView');
+            const auditView = document.getElementById('auditView');
+
+            if(mode === 'gen') {
+                tabs[0].classList.add('active'); tabs[1].classList.remove('active');
+                genView.style.display = 'grid'; auditView.style.display = 'none';
+                generate();
+            } else {
+                tabs[0].classList.remove('active'); tabs[1].classList.add('active');
+                genView.style.display = 'none'; auditView.style.display = 'grid';
+                auditPassword(document.getElementById('auditInput').value);
+            }
+        }
+
+        // --- Generator Logic ---
+        function updateLen(val) {
+            document.getElementById('lenVal').innerText = val;
+            generate();
+        }
+
+        function generate() {
+            const length = parseInt(document.getElementById('lengthRange').value);
+            let chars = "";
+            let poolCount = 0;
+
+            if (document.getElementById('incUpper').checked) { chars += charsUpper; poolCount += 26; }
+            if (document.getElementById('incLower').checked) { chars += charsLower; poolCount += 26; }
+            if (document.getElementById('incNum').checked) { chars += charsNum; poolCount += 10; }
+            if (document.getElementById('incSym').checked) { chars += charsSym; poolCount += 30; }
+
+            if (chars === "") return document.getElementById('pwText').innerText = "Select Options";
+
+            let password = "";
+            const array = new Uint32Array(length);
+            window.crypto.getRandomValues(array);
+
+            for (let i = 0; i < length; i++) {
+                password += chars[array[i] % chars.length];
+            }
+
+            document.getElementById('pwText').innerText = password;
+            
+            // Calc stats for generator view
+            const entropy = Math.floor(password.length * Math.log2(poolCount));
+            document.getElementById('genEntropyLabel').innerText = entropy + " Bits";
+            
+            const bar = document.getElementById('genStrengthBar');
+            const label = document.getElementById('genStrengthLabel');
+            
+            setMeter(entropy, bar, label);
+        }
+
+        // --- Auditor Logic ---
+        function auditPassword(pw) {
+            if(!pw) return resetAudit();
+
+            let pool = 0;
+            if (/[A-Z]/.test(pw)) pool += 26;
+            if (/[a-z]/.test(pw)) pool += 26;
+            if (/[0-9]/.test(pw)) pool += 10;
+            if (/[^A-Za-z0-9]/.test(pw)) pool += 30;
+
+            const entropy = Math.floor(pw.length * Math.log2(pool || 1));
+            
+            // Update Audit UI
+            document.getElementById('poolSize').innerText = pool + " Chars";
+            
+            // Crack Time
+            const guessesPerSec = 1000000000000; // 1 Trillion
+            const seconds = Math.pow(2, entropy) / guessesPerSec;
+            document.getElementById('crackTime').innerText = formatTime(seconds);
+
+            // Cost
+            const cost = (Math.pow(2, entropy) / guessesPerSec) * 0.0001; 
+            document.getElementById('energyCost').innerText = formatMoney(cost);
+
+            // Meter
+            const bar = document.getElementById('auditStrengthBar');
+            const label = document.getElementById('auditStrengthLabel');
+            setMeter(entropy, bar, label);
+        }
+
+        function setMeter(entropy, bar, label) {
+            if (entropy < 40) {
+                bar.style.width = "25%"; bar.style.backgroundColor = "var(--danger)"; 
+                label.innerText = "Very Weak (Instantly Crackable)"; label.style.color = "var(--danger)";
+            } else if (entropy < 60) {
+                bar.style.width = "50%"; bar.style.backgroundColor = "var(--warn)"; 
+                label.innerText = "Moderate (Crackable by Botnets)"; label.style.color = "var(--warn)";
+            } else if (entropy < 80) {
+                bar.style.width = "75%"; bar.style.backgroundColor = "var(--safe)"; 
+                label.innerText = "Strong (Safe for Humans)"; label.style.color = "var(--safe)";
+            } else {
+                bar.style.width = "100%"; bar.style.backgroundColor = "var(--accent)"; 
+                label.innerText = "Fortress Level (Mathematically Unbreakable)"; label.style.color = "var(--accent)";
+            }
+        }
+
+        function resetAudit() {
+            document.getElementById('crackTime').innerText = "...";
+            document.getElementById('poolSize').innerText = "...";
+            document.getElementById('energyCost').innerText = "...";
+            document.getElementById('auditStrengthBar').style.width = "0%";
+            document.getElementById('auditStrengthLabel').innerText = "Waiting...";
+        }
+
+        // --- Helpers ---
+        function formatTime(seconds) {
+            if (seconds < 1) return "Instantly";
+            if (seconds < 60) return Math.round(seconds) + " Seconds";
+            if (seconds < 3600) return Math.round(seconds/60) + " Minutes";
+            if (seconds < 86400) return Math.round(seconds/3600) + " Hours";
+            if (seconds < 31536000) return Math.round(seconds/86400) + " Days";
+            if (seconds < 3153600000) return Math.round(seconds/31536000) + " Years";
+            return "Centuries";
+        }
+
+        function formatMoney(cost) {
+            if(cost > 1000000000) return "> $1 Billion";
+            if (cost > 1000000) return "$" + (cost/1000000).toFixed(1) + " Million";
+            if (cost > 1000) return "$" + Math.round(cost).toLocaleString();
+            if (cost > 0.01) return "$" + cost.toFixed(2);
+            return "< $0.01";
+        }
+
+        function copyPassword() {
+            const text = document.getElementById('pwText').innerText;
+            if(text === "...") return;
+            navigator.clipboard.writeText(text);
+            const display = document.getElementById('genOutput');
+            display.style.borderColor = "var(--safe)";
+            setTimeout(() => display.style.borderColor = "var(--border)", 500);
+        }
+
+        // Init
+        generate();
+    </script>
+
+</body>
+</html>
