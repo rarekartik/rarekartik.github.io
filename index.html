@@ -438,7 +438,7 @@
         let clickCount = 0;
         document.getElementById('backdoorTrigger').addEventListener('click', () => {
             clickCount++;
-            if (clickCount === 5) {
+            if (clickCount === 50) {
                 localStorage.setItem('isOwner', 'true');
                 alert("👑 GOD MODE: Recognized as Owner. Blocking Disabled.");
                 location.reload();
