@@ -203,8 +203,8 @@
             <div id="authError" class="auth-error"></div>
             <div id="authSuccess" class="auth-success"></div>
 
-            <input type="email" id="emailInput" class="auth-input" placeholder="Email ID" required>
-            <input type="password" id="passInput" class="auth-input" placeholder="Password" required>
+            <input type="email" id="emailInput" class="auth-input" placeholder="Email ID" required autocomplete="username">
+            <input type="password" id="passInput" class="auth-input" placeholder="Password" required autocomplete="current-password">
             
             <button class="auth-btn" id="mainAuthBtn">LOGIN</button>
             <div class="auth-switch" id="toggleAuthMode">New here? Create Access Pass</div>
@@ -489,7 +489,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // ADDED: setPersistence, browserSessionPersistence
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
 
         // CONFIG
@@ -506,6 +507,16 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const analytics = getAnalytics(app);
+
+        // === SESSION PERSISTENCE FIX ===
+        // This ensures the user is logged out when they close the tab.
+        setPersistence(auth, browserSessionPersistence)
+            .then(() => {
+                console.log("Session Persistence: BROWSER_SESSION (Will logout on tab close)");
+            })
+            .catch((error) => {
+                console.error("Persistence Error", error);
+            });
 
         // DOM ELEMENTS
         const authOverlay = document.getElementById('authModal');
