@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -19,6 +19,7 @@
             --text: #ffffff; --text-dim: #a1a1aa; --accent: #3b82f6; --radius: 24px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --matrix-green: #00ff41;
+            --danger: #ef4444;
         }
         [data-theme="light"] {
             --bg: #f4f4f5; --surface: #ffffff; --surface-hover: #e4e4e7; --border: #d4d4d8;
@@ -101,7 +102,7 @@
             display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             padding: 40px;
         }
-        #blockScreen h1 { color: #ef4444; font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
+        #blockScreen h1 { color: var(--danger); font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
         #blockScreen p { color: #ffffff; font-size: 1.2rem; font-family: 'Courier New', monospace; max-width: 800px; line-height: 1.6; }
 
         /* === PRELOADER === */
@@ -116,6 +117,64 @@
         .progress-bar { width: 200px; height: 2px; background: #e4e4e7; margin-top: 20px; border-radius: 2px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: #000000; }
 
+        /* === FIREBASE LOGIN MODAL (BENTO STYLE) === */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 9000; display: none;
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.5s ease;
+        }
+        .auth-card {
+            background: var(--surface); border: 1px solid var(--border);
+            padding: 50px 40px; border-radius: 24px; width: 90%; max-width: 450px;
+            text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+            position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .auth-card::after {
+            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+            width: 40%; height: 2px; background: var(--text); border-radius: 0 0 10px 10px;
+        }
+
+        .auth-title { font-size: 2rem; margin-bottom: 10px; font-weight: 900; letter-spacing: -0.03em; color: var(--text); }
+        .auth-subtitle { color: var(--text-dim); margin-bottom: 30px; font-size: 1rem; }
+        
+        .auth-savage-note {
+            margin-top: 25px; padding-top: 20px;
+            border-top: 1px dashed var(--border);
+            color: var(--text-dim); font-size: 0.8rem;
+            font-family: 'Courier New', monospace; line-height: 1.4;
+            font-style: italic;
+            display: none; /* HIDDEN BY DEFAULT */
+        }
+
+        .auth-input {
+            width: 100%; padding: 20px; margin-bottom: 15px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 12px; color: var(--text); outline: none;
+            font-family: 'Satoshi', sans-serif; font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .auth-input:focus { border-color: var(--text-dim); }
+        
+        .auth-btn {
+            width: 100%; padding: 20px; margin-top: 10px;
+            background: var(--text); color: var(--bg);
+            border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
+            cursor: pointer; transition: 0.3s; letter-spacing: 0.05em; text-transform: uppercase;
+        }
+        .auth-btn:hover { opacity: 0.8; }
+        
+        .auth-switch {
+            margin-top: 20px; font-size: 0.9rem; color: var(--text-dim); cursor: pointer;
+            transition: color 0.3s; font-weight: 500;
+        }
+        .auth-switch:hover { color: var(--text); }
+        
+        .auth-error { color: #ef4444; font-size: 0.9rem; margin-bottom: 20px; display: none; font-weight: bold; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; }
+        .auth-success { color: #10b981; font-size: 0.9rem; margin-bottom: 20px; display: none; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 8px; }
+
         @media (max-width: 1024px) {
             .nav-island { width: 90%; justify-content: space-between; padding: 12px 15px; bottom: 20px; }
             .nav-link { padding: 0; background: none !important; color: var(--text-dim) !important; font-size: 1.2rem; }
@@ -124,7 +183,7 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;">
+<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;" style="overflow: hidden;">
 
     <div id="blockScreen">
         <h1 id="blockTitle">ACCESS DENIED</h1>
@@ -134,6 +193,27 @@
     <div class="preloader" id="preloader">
         <div class="preloader-text">RAREKARTIK</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="auth-overlay" id="authModal">
+        <div class="auth-card">
+            <h2 class="auth-title" id="authHeading">Restricted Access</h2>
+            <p class="auth-subtitle">Identify yourself to enter the portfolio.</p>
+            
+            <div id="authError" class="auth-error"></div>
+            <div id="authSuccess" class="auth-success"></div>
+
+            <input type="email" id="emailInput" class="auth-input" placeholder="Email ID" required>
+            <input type="password" id="passInput" class="auth-input" placeholder="Password" required>
+            
+            <button class="auth-btn" id="mainAuthBtn">LOGIN</button>
+            <div class="auth-switch" id="toggleAuthMode">New here? Create Access Pass</div>
+
+            <div class="auth-savage-note" id="kanpurNote">
+                <i class="fas fa-server"></i> SERVER CAPACITY NOTE:<br>
+                Residents of the 'Most Populated State' are requested to show mercy. Our firewall is already scared of you.
+            </div>
+        </div>
     </div>
 
     <div id="mainApp">
@@ -215,7 +295,7 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0;">
                     <div class="text-accent" style="font-weight: 800;">2021-22</div>
-                    <div><h3>12th Commerce Stream/h3><p>Local Institution &bull; Completed</p></div>
+                    <div><h3>12th Commerce Stream</h3><p>Local Institution &bull; Completed</p></div>
                 </div>
             </div>
         </section>
@@ -368,12 +448,11 @@
                 </div>
 
                 <div class="card col-6 reveal">
-                    <form id="contactForm">
-                        <input type="hidden" name="ip_address" id="trackIP">
-                        <input type="hidden" name="user_location" id="trackLoc">
-                        <input type="hidden" name="device_info" id="trackDevice">
-                        <input type="hidden" name="visit_time" id="trackTime">
-
+                    <form action="https://formsubmit.co/rarekartik@outlook.in" method="POST">
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_template" value="table">
+                        <input type="hidden" name="_subject" value="New Portfolio Message!">
+                        
                         <input type="text" name="user_name" class="input-box" placeholder="Name" required>
                         <input type="email" name="user_email" class="input-box" placeholder="Email" required>
                         <textarea name="message" class="input-box" rows="4" placeholder="How can we collaborate?" required></textarea>
@@ -408,33 +487,146 @@
         </footer>
     </div>
 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+
+        // CONFIG
+        const firebaseConfig = {
+          apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o",
+          authDomain: "rarekartik-web.firebaseapp.com",
+          projectId: "rarekartik-web",
+          storageBucket: "rarekartik-web.firebasestorage.app",
+          messagingSenderId: "581350794286",
+          appId: "1:581350794286:web:8f208212eae9d8eb602bbf",
+          measurementId: "G-9ZLLW9JJ6G"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const analytics = getAnalytics(app);
+
+        // DOM ELEMENTS
+        const authOverlay = document.getElementById('authModal');
+        const emailIn = document.getElementById('emailInput');
+        const passIn = document.getElementById('passInput');
+        const authBtn = document.getElementById('mainAuthBtn');
+        const toggleBtn = document.getElementById('toggleAuthMode');
+        const errorMsg = document.getElementById('authError');
+        const successMsg = document.getElementById('authSuccess');
+        const titleMsg = document.getElementById('authHeading');
+
+        let isLoginMode = true;
+
+        // AUTH OBSERVER
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (user.emailVerified) {
+                    authOverlay.style.display = 'none';
+                    document.body.style.overflow = 'auto'; 
+                } else {
+                    successMsg.style.display = 'block';
+                    successMsg.innerText = `Please verify email sent to ${user.email} then login again.`;
+                    signOut(auth);
+                }
+            }
+        });
+
+        // HANDLE LOGIN CLICK (INCLUDES THE TRAP TRIGGER)
+        authBtn.addEventListener('click', async () => {
+            
+            // === THE TRAP IS HERE ===
+            if (window.isTrapActive) {
+                authOverlay.style.display = 'none';
+                
+                const screen = document.getElementById('blockScreen');
+                const title = document.getElementById('blockTitle');
+                const reason = document.getElementById('blockReason');
+                
+                title.innerText = "HAHA NICE TRY!";
+                reason.innerText = "Haha Nice Try! Told you, our server can't handle the traffic from most populated state. Did you really think that would work?";
+                
+                screen.style.display = 'flex';
+                
+                if(window.sendReport) window.sendReport("Trap Triggered (Kanpur)", "User fell for the bait.");
+                
+                return; // STOP HERE
+            }
+            // ========================
+
+            const email = emailIn.value;
+            const pass = passIn.value;
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            authBtn.innerText = "Processing...";
+
+            try {
+                if (isLoginMode) {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+                    const user = userCredential.user;
+                    if (!user.emailVerified) throw new Error("Email not verified yet.");
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+                    const user = userCredential.user;
+                    await sendEmailVerification(user);
+                    successMsg.style.display = 'block';
+                    successMsg.innerText = "Verification link sent to your email! Please click it.";
+                    isLoginMode = true;
+                    titleMsg.innerText = "Restricted Access";
+                    authBtn.innerText = "LOGIN";
+                    toggleBtn.innerText = "New here? Create Access Pass";
+                    passIn.value = "";
+                }
+            } catch (error) {
+                authBtn.innerText = isLoginMode ? "LOGIN" : "CREATE PASS";
+                errorMsg.style.display = 'block';
+                if(error.message.includes("auth/invalid-email")) errorMsg.innerText = "Invalid Email Address.";
+                else if(error.message.includes("auth/wrong-password")) errorMsg.innerText = "Wrong Password.";
+                else if(error.message.includes("auth/user-not-found")) errorMsg.innerText = "User not found. Sign up first.";
+                else if(error.message.includes("Email not verified")) errorMsg.innerText = "Please check your inbox & verify email first!";
+                else if(error.message.includes("auth/email-already-in-use")) errorMsg.innerText = "Email already registered. Login instead.";
+                else errorMsg.innerText = error.message;
+            }
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            isLoginMode = !isLoginMode;
+            titleMsg.innerText = isLoginMode ? "Restricted Access" : "Create Account";
+            authBtn.innerText = isLoginMode ? "LOGIN" : "CREATE PASS";
+            toggleBtn.innerText = isLoginMode ? "New here? Create Access Pass" : "Already have a pass? Login";
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        });
+
+        // DELAY TRIGGER
+        setTimeout(() => {
+            const user = auth.currentUser;
+            if (!user || !user.emailVerified) {
+                const modal = document.getElementById('authModal');
+                if(modal) {
+                    modal.style.display = 'flex';
+                    setTimeout(() => modal.style.opacity = '1', 100); 
+                }
+            }
+        }, 4500);
+    </script>
+
     <script>
-        // === 1. CONFIGURATION ===
-        const EMAILJS_PUBLIC_KEY = "tG_OQi2EN8yT0Sm2W"; 
-        const EMAILJS_SERVICE_ID = "service_jfhgbia"; 
-        const EMAILJS_TEMPLATE_ID = "template_c9tukwk"; 
-        
-        // BLACKLIST TARGETS
         const TARGET_IPS = [
             "2409:40e3:101f:707c:d9a0:4993:f6b:a7e9",
             "2409:40e3:101f:707c:8000::"
         ];
         
-        // === 2. ANTI-THEFT & SECURITY SHIELD ===
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; // F12
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Ctrl+S
-            if(e.ctrlKey && e.keyCode == 'P'.charCodeAt(0)) return false; // Ctrl+P
+            if(e.keyCode == 123) return false; 
+            if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false; 
+            if(e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'S'.charCodeAt(0) || e.keyCode == 'P'.charCodeAt(0))) return false; 
         }
 
-        // === 3. GLOBAL STATE ===
         let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", isp: "Unknown", device: "Unknown", battery: "Unknown", isVPN: false };
+        window.isTrapActive = false; // EXPORT FOR AUTH SCRIPT
 
-        // === 4. GOD MODE (Backdoor) ===
         let clickCount = 0;
         document.getElementById('backdoorTrigger').addEventListener('click', () => {
             clickCount++;
@@ -445,182 +637,131 @@
             }
         });
 
-        // === 5. INITIALIZATION ===
         window.addEventListener('load', async () => {
-            // UI Reveal
             const tl = gsap.timeline();
             tl.to("#progressFill", { width: "100%", duration: 1.5 })
               .to(".preloader-text", { opacity: 1, y: 0 })
               .to(".preloader", { y: "-100%", delay: 0.5 });
 
-            try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
-
-            // CHECK OWNER
             if (localStorage.getItem('isOwner') === 'true') return;
-
-            // GATHER DATA & ENFORCE
             await gatherIntelligence();
             enforceSecurity();
         });
 
-        // === 6. INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
-            // Enhanced Device Parsing
             const ua = navigator.userAgent;
-            let browser = "Unknown", os = "Unknown", dev = "Unknown";
-
-            // OS Detection
+            let browser = "Unknown", os = "Unknown";
             if (ua.indexOf("Win") !== -1) os = "Windows";
             else if (ua.indexOf("Mac") !== -1) os = "MacOS";
             else if (ua.indexOf("Linux") !== -1) os = "Linux";
-            else if (ua.indexOf("Android") !== -1) { 
-                os = "Android"; 
-                const match = ua.match(/Android\s([0-9\.]*)/);
-                if(match) os += " " + match[1];
-            }
+            else if (ua.indexOf("Android") !== -1) os = "Android";
             else if (ua.indexOf("like Mac") !== -1) os = "iOS";
 
-            // Browser Detection
-            if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
-            else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Internet";
-            else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
-            else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
+            if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
             else if (ua.indexOf("Safari") !== -1) browser = "Safari";
+            else if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
 
-            // Screen
-            const screen = `${window.screen.width}x${window.screen.height}`;
-            visitorData.device = `${os} | ${browser} | ${screen}`;
+            visitorData.device = `${os} | ${browser} | ${window.screen.width}x${window.screen.height}`;
 
-            // Battery
             if (navigator.getBattery) {
                 try { const b = await navigator.getBattery(); visitorData.battery = `${Math.round(b.level * 100)}%${b.charging ? ' ⚡' : ''}`; } catch(e) {}
             }
 
-            // IP & Location
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
-                
                 visitorData.ip = data.ip || "Unknown";
                 visitorData.city = data.city || "Unknown";
                 visitorData.region = data.region || "Unknown";
                 visitorData.isp = data.org || "Unknown ISP";
                 
-                // Footer (Fix: Update immediately)
                 const locEl = document.getElementById('userLoc');
                 if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
 
-                // VPN Check (Timezone) with CALCUTTA/KOLKATA FIX
                 const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const ipTZ = data.timezone;
                 const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
-                
-                if (sysTZ && ipTZ && normalize(sysTZ) !== normalize(ipTZ)) {
-                    visitorData.isVPN = true;
-                }
+                if (sysTZ && ipTZ && normalize(sysTZ) !== normalize(ipTZ)) visitorData.isVPN = true;
 
             } catch (e) { console.warn("IP Tracking Failed"); }
         }
 
-        // === 7. SECURITY ENFORCEMENT ===
         function enforceSecurity() {
             let action = "ALLOW";
-            let title = "";
-            let message = "";
-            let emailSubject = "Visitor (Verified)";
+            let title = "", message = "", emailSubject = "Visitor (Verified)";
 
-            // PRIORITY 1: SPECIFIC IP (The Stalker)
+            // 1. HARD BLOCKS (Immediate)
             if (TARGET_IPS.includes(visitorData.ip)) {
-                action = "BLOCK";
-                title = "ACCESS BLOCKED";
-                message = "Your access to this website is Blocked. If you're reading this, it means you already messed up. Now close the Tab in an orderly manner.";
-                emailSubject = "This is an Old Visitor";
-            }
-            // PRIORITY 2: VPN USER
-            else if (visitorData.isVPN) {
-                action = "BLOCK";
-                title = "ACCESS BLOCKED";
-                message = "Access Blocked. Turn off the VPN to get inside.";
-                emailSubject = "Blocked VPN User";
-            }
-            // PRIORITY 3: KANPUR USER
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Your access is Blocked."; emailSubject = "Blocked Old Visitor";
+            } else if (visitorData.isVPN) {
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Turn off VPN."; emailSubject = "Blocked VPN User";
+            } 
+            
+            // 2. THE TRAP (Kanpur)
             else if (visitorData.city === "Kanpur") {
-                action = "BLOCK";
-                title = "ACCESS DENIED";
-                message = "Since you come from a restrictive State Uttar Pradesh, You cannot visit this website. Behave mannerly and close the Tab.";
-                emailSubject = "Blocked Kanpur User";
+                // DO NOT BLOCK YET. SET THE TRAP.
+                window.isTrapActive = true; 
+                
+                // === THIS REVEALS THE SARCASTIC NOTE FOR KANPUR ONLY ===
+                const note = document.getElementById('kanpurNote');
+                if(note) note.style.display = 'block';
+                // ========================================================
+
+                sendReport("Trap Set (Kanpur)", "Visitor Allowed to Login Screen (Waiting for Click)");
+                return; // Exit function so we don't send "Safe Visitor" report yet
             }
 
-            // EXECUTE
             if (action === "BLOCK") {
                 document.getElementById('mainApp').style.display = 'none';
                 document.getElementById('preloader').style.display = 'none';
-                
                 const screen = document.getElementById('blockScreen');
                 document.getElementById('blockTitle').innerText = title;
                 document.getElementById('blockReason').innerText = message;
                 screen.style.display = 'flex';
-                
                 sendReport(emailSubject, message);
             } else {
-                // ALLOWED
-                sendReport("INTELLIGENCE REPORT (SUCCESS)", "Safe Visitor");
-                // Fill Form
-                document.getElementById('trackIP').value = visitorData.ip;
-                document.getElementById('trackLoc').value = `${visitorData.city}, ${visitorData.region}`;
+                sendReport("Safe Visitor Log", "Allowed");
             }
         }
 
-        // === 8. REPORTING ===
-        function sendReport(subject, statusMsg) {
-            const report = `
-            ${subject}
-            --------------------------------------------------
-            STATUS: ${statusMsg}
-            
-            📍 NETWORK:
-            IP: ${visitorData.ip}
-            ISP: ${visitorData.isp}
-            Location: ${visitorData.city}, ${visitorData.region}
-            VPN Detected: ${visitorData.isVPN}
-            
-            📱 DEVICE:
-            Info: ${visitorData.device}
-            Battery: ${visitorData.battery}
-            User Agent: ${navigator.userAgent}
-            
-            🕒 TIMESTAMP:
-            ${new Date().toLocaleString()}
-            `;
+        // Export sendReport to window so module script can use it
+        window.sendReport = function(subject, statusMsg) {
+            const reportData = {
+                _subject: subject,
+                _template: "table",
+                _captcha: "false",
+                Status: statusMsg,
+                IP: visitorData.ip,
+                Location: `${visitorData.city}, ${visitorData.region}`,
+                ISP: visitorData.isp,
+                Device: visitorData.device,
+                Battery: visitorData.battery,
+                VPN: visitorData.isVPN,
+                Time: new Date().toLocaleString()
+            };
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                user_name: subject,
-                user_email: "security@rarekartik.io",
-                message: report,
-                user_location: `${visitorData.city}, ${visitorData.region}`,
-                ip_address: visitorData.ip,
-                device_info: visitorData.device,
-                visit_time: new Date().toLocaleString()
-            });
+            fetch("https://formsubmit.co/ajax/rarekartik@outlook.in", {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(reportData)
+            })
+            .then(response => console.log("Security Report Sent"))
+            .catch(error => console.log("Report Error", error));
         }
 
-        // === 9. INTERACTIONS & NAV BAR SCROLL FIX ===
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('mainNav');
             const footer = document.getElementById('footerTrigger');
-            
             if (footer && nav) {
                 const footerRect = footer.getBoundingClientRect();
-                // If top of footer is within view (or above bottom of screen)
-                if (footerRect.top < window.innerHeight) { 
-                    nav.classList.add('hidden'); 
-                } else { 
-                    nav.classList.remove('hidden'); 
-                }
+                if (footerRect.top < window.innerHeight) nav.classList.add('hidden'); 
+                else nav.classList.remove('hidden'); 
             }
         });
 
-        // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
         gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 2.2 });
         gsap.utils.toArray('.reveal').forEach(el => {
@@ -629,10 +770,8 @@
         gsap.to("#scrollingText1", { x: 200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
         gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
 
-        // Toggle Card
         function toggleCard(card) { card.classList.toggle('active'); }
 
-        // Theme Toggle
         const themeBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
         if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
@@ -643,7 +782,6 @@
             themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         });
 
-        // Matrix Effect
         const timeEl = document.getElementById('userTime');
         let hasAnimated = false;
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
@@ -669,52 +807,15 @@
         });
         observer.observe(document.getElementById('footerTrigger'));
 
-        // PDF Generator
         document.getElementById('pdfBtn').addEventListener('click', async function() {
             const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
                 const { jsPDF } = window.jspdf; const doc = new jsPDF();
                 doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(0,0,0);
                 doc.text("KARTIK CHOUHAN", 20, 20);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(80);
-                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 26);
-                doc.text("MCom Student | Financial Tech Enthusiast", 20, 31);
-                doc.setLineWidth(0.5); doc.line(20, 35, 190, 35);
-                let y = 45;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0);
-                doc.text("PROFESSIONAL PROFILE", 20, y); y+=7;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom with expertise in Tally ERP, Data Analysis (Excel), and Content Strategy. Passionate about solving business problems through technology.";
-                doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("ACADEMIC HISTORY", 20, y); y+=8;
-                doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); 
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2025 - Present", 120, y); 
-                doc.text("• Specializing in Corporate Tax, Macro-Economics, and Strategic Management.", 20, y+5); y+=12;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2022 - 2025", 120, y); 
-                doc.text("• Graduated with focus on Accounting and Business Law.", 20, y+5); y+=15;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("CORE COMPETENCIES", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-                doc.text("• Financial Tech: Tally ERP 9, Tally Prime (GST/Payroll), Advanced Excel.", 20, y); y+=6;
-                doc.text("• Digital Tools: Java (Diploma), MS Office Suite, Windows OS.", 20, y); y+=6;
-                doc.text("• Creative: Content Creation (YouTube), Video Editing, Photography.", 20, y); y+=6;
-                doc.text("• Soft Skills: Strategic Thinking, Analytical Problem Solving, Adaptability.", 20, y); 
                 doc.save("Kartik_Chouhan_CV.pdf");
                 btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
             } catch(e) { console.error(e); btn.innerHTML = originalIcon; }
-        });
-
-        // Contact Form
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const btn = this.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "Sending...";
-            emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
-                .then(() => {
-                    btn.innerText = "Message Sent! 🚀"; btn.style.background = "#10b981"; this.reset();
-                    setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 3000);
-                }, (error) => { btn.innerText = "Error"; console.error(error); });
         });
     </script>
 </body>
