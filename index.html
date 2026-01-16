@@ -34,7 +34,7 @@
         /* 3D BACKGROUND CANVAS */
         #bg-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; opacity: 0.6; pointer-events: none;
+            z-index: -1; opacity: 0.8; pointer-events: none;
         }
 
         /* Typography */
@@ -469,7 +469,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // Changed to 'inMemoryPersistence' for Strict Security (Logout on Reload/Close)
+        // STRICT SECURITY: 'inMemoryPersistence'
         import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
@@ -489,7 +489,6 @@
         const database = getDatabase(app);
 
         // ** STRICT SECURITY: IN-MEMORY PERSISTENCE **
-        // This ensures the user is logged out immediately if the tab is closed OR the page is refreshed.
         setPersistence(auth, inMemoryPersistence)
             .then(() => {
                 console.log("Strict Memory Persistence Enabled.");
@@ -498,7 +497,7 @@
                 console.error("Auth Persistence Error:", error);
             });
 
-        // Also add an explicit listener for navigation away to force logout attempt
+        // Explicit logout on unload
         window.addEventListener('beforeunload', () => {
             signOut(auth).catch(() => {});
         });
@@ -677,7 +676,7 @@
             gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
         });
 
-        // === 7. THREE.JS PARTICLE SYSTEM ===
+        // === 7. THREE.JS PARTICLE SYSTEM (REFINED) ===
         const initThreeJS = () => {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
@@ -689,39 +688,74 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             camera.position.z = 30;
 
+            // Geometry
             const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 700;
+            const particlesCount = 800; // Count
             const posArray = new Float32Array(particlesCount * 3);
 
             for(let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 60; 
+                // Spread them out more (100 range instead of 60)
+                posArray[i] = (Math.random() - 0.5) * 100; 
             }
 
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            // Material: Smaller size (0.04)
             const material = new THREE.PointsMaterial({
-                size: 0.15,
+                size: 0.04,
                 color: 0x3b82f6,
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.8,
+                sizeAttenuation: true
             });
 
             const particlesMesh = new THREE.Points(particlesGeometry, material);
             scene.add(particlesMesh);
 
+            // Interaction Variables
             let mouseX = 0;
             let mouseY = 0;
+            let scrollY = 0;
+            let clickImpulse = 0;
 
+            // Listeners
             document.addEventListener('mousemove', (event) => {
-                mouseX = event.clientX;
-                mouseY = event.clientY;
+                mouseX = (event.clientX / window.innerWidth) - 0.5;
+                mouseY = (event.clientY / window.innerHeight) - 0.5;
             });
+            
+            document.addEventListener('scroll', () => {
+                scrollY = window.scrollY;
+            });
+
+            document.addEventListener('click', () => {
+                clickImpulse = 0.02; // Momentary speed boost
+            });
+
+            const clock = new THREE.Clock();
 
             const animate = () => {
                 requestAnimationFrame(animate);
-                particlesMesh.rotation.y += 0.001;
-                particlesMesh.rotation.x += 0.0005;
-                particlesMesh.rotation.x += mouseY * 0.00005;
-                particlesMesh.rotation.y += mouseX * 0.00005;
+                const elapsedTime = clock.getElapsedTime();
+
+                // 1. Organic Swaying (Direction change with time)
+                // Sine wave ensures it goes left then right
+                particlesMesh.rotation.y = Math.sin(elapsedTime * 0.1) * 0.2; 
+                particlesMesh.rotation.x = Math.cos(elapsedTime * 0.15) * 0.1;
+
+                // 2. Scroll Influence (Rotate based on scroll depth)
+                particlesMesh.rotation.z += scrollY * 0.00005;
+
+                // 3. Mouse Influence (Parallax)
+                particlesMesh.rotation.y += mouseX * 0.05;
+                particlesMesh.rotation.x += mouseY * 0.05;
+
+                // 4. Click Impulse (Decay)
+                if (clickImpulse > 0.0001) {
+                    particlesMesh.rotation.y += clickImpulse;
+                    clickImpulse *= 0.95; // Slow down quickly
+                }
+
                 renderer.render(scene, camera);
             };
 
