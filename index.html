@@ -8,7 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -94,48 +94,13 @@
         }
         .project-card:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2); }
 
-        /* === SECURITY SCREENS === */
-        #blockScreen, #authScreen {
+        /* === BLOCK SCREEN === */
+        #blockScreen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 99999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            background: #000000; z-index: 100000;
+            display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             padding: 40px;
         }
-        #blockScreen { display: none; z-index: 100000; } /* Security Block is highest priority */
-        
-        /* Auth Screen Styles */
-        #authScreen h1 { font-size: 2rem; margin-bottom: 10px; }
-        
-        .auth-form {
-            display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 350px; margin-top: 20px;
-        }
-        .auth-input {
-            width: 100%; padding: 15px; background: #171717; border: 1px solid #333;
-            color: white; border-radius: 8px; outline: none;
-        }
-        .auth-input:focus { border-color: var(--accent); }
-        
-        .btn-auth {
-            padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s;
-        }
-        .btn-primary { background: var(--text); color: var(--bg); }
-        .btn-secondary { background: #333; color: white; }
-        .btn-auth:hover { transform: scale(1.02); }
-
-        .btn-google {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: white; color: black; padding: 15px;
-            border-radius: 8px; font-weight: 700;
-            border: none; cursor: pointer; transition: transform 0.2s;
-            width: 100%; max-width: 350px; margin-top: 10px;
-        }
-        .btn-google:hover { transform: scale(1.02); }
-        
-        .divider {
-            width: 100%; max-width: 350px; height: 1px; background: #333; margin: 20px 0;
-            position: relative;
-        }
-
         #blockScreen h1 { color: #ef4444; font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
         #blockScreen p { color: #ffffff; font-size: 1.2rem; font-family: 'Courier New', monospace; max-width: 800px; line-height: 1.6; }
 
@@ -150,9 +115,6 @@
         }
         .progress-bar { width: 200px; height: 2px; background: #e4e4e7; margin-top: 20px; border-radius: 2px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: #000000; }
-
-        /* HIDE APP INITIALLY */
-        #mainApp { display: none; }
 
         @media (max-width: 1024px) {
             .nav-island { width: 90%; justify-content: space-between; padding: 12px 15px; bottom: 20px; }
@@ -169,31 +131,6 @@
         <p id="blockReason">Security Protocol Initiated.</p>
     </div>
 
-    <div id="authScreen">
-        <div style="width: 80px; height: 80px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-            <i class="fas fa-fingerprint" style="font-size: 30px; color: white;"></i>
-        </div>
-        <h1>RESTRICTED ACCESS</h1>
-        <p>Identify yourself to enter the portfolio.</p>
-        
-        <div class="auth-form">
-            <input type="email" id="emailInput" class="auth-input" placeholder="Enter Email" required>
-            <input type="password" id="passInput" class="auth-input" placeholder="Enter Password" required>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button id="emailLoginBtn" class="btn-auth btn-primary">Login</button>
-                <button id="emailSignupBtn" class="btn-auth btn-secondary">Sign Up</button>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <button id="googleLoginBtn" class="btn-google">
-            <i class="fab fa-google"></i> Continue with Google
-        </button>
-        
-        <p id="loginStatus" style="margin-top: 20px; font-size: 0.9rem; color: #ef4444; min-height: 20px;"></p>
-    </div>
-
     <div class="preloader" id="preloader">
         <div class="preloader-text">RAREKARTIK</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -208,7 +145,6 @@
             <div style="width: 1px; background: var(--border); height: 20px; align-self: center;"></div>
             <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
             <button id="pdfBtn" class="icon-btn"><i class="fas fa-download"></i></button>
-            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></button>
         </nav>
 
         <section id="home" class="hero-section">
@@ -437,12 +373,9 @@
                         <input type="hidden" name="user_location" id="trackLoc">
                         <input type="hidden" name="device_info" id="trackDevice">
                         <input type="hidden" name="visit_time" id="trackTime">
-                        
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_subject" value="New Portfolio Contact">
 
-                        <input type="text" name="name" class="input-box" placeholder="Name" required>
-                        <input type="email" name="email" class="input-box" placeholder="Email" required>
+                        <input type="text" name="user_name" class="input-box" placeholder="Name" required>
+                        <input type="email" name="user_email" class="input-box" placeholder="Email" required>
                         <textarea name="message" class="input-box" rows="4" placeholder="How can we collaborate?" required></textarea>
                         <button type="submit" class="btn-submit">Send Message</button>
                     </form>
@@ -475,126 +408,11 @@
         </footer>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // Added createUserWithEmailAndPassword, signInWithEmailAndPassword
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // CONFIG
-        const firebaseConfig = {
-          apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o",
-          authDomain: "rarekartik-web.firebaseapp.com",
-          projectId: "rarekartik-web",
-          storageBucket: "rarekartik-web.firebasestorage.app",
-          messagingSenderId: "581350794286",
-          appId: "1:581350794286:web:8f208212eae9d8eb602bbf",
-          measurementId: "G-9ZLLW9JJ6G"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const database = getDatabase(app);
-        const provider = new GoogleAuthProvider();
-
-        // --- DOM ELEMENTS FOR AUTH ---
-        const authScreen = document.getElementById('authScreen');
-        const mainApp = document.getElementById('mainApp');
-        
-        // Buttons & Inputs
-        const emailInput = document.getElementById('emailInput');
-        const passInput = document.getElementById('passInput');
-        const emailLoginBtn = document.getElementById('emailLoginBtn');
-        const emailSignupBtn = document.getElementById('emailSignupBtn');
-        const googleLoginBtn = document.getElementById('googleLoginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const loginStatus = document.getElementById('loginStatus');
-
-        // --- 1. MONITOR AUTH STATE ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                console.log("User is:", user.email);
-                authScreen.style.display = 'none';
-                mainApp.style.display = 'block';
-                ScrollTrigger.refresh();
-            } else {
-                authScreen.style.display = 'flex';
-                mainApp.style.display = 'none';
-            }
-        });
-
-        // --- 2. EMAIL LOGIN & SIGNUP LOGIC ---
-        
-        // Login Function
-        emailLoginBtn.addEventListener('click', () => {
-            const email = emailInput.value;
-            const pass = passInput.value;
-            loginStatus.innerText = "Verifying...";
-            
-            signInWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
-                    loginStatus.innerText = "Success! Welcome back.";
-                    // onAuthStateChanged will auto-unlock
-                })
-                .catch((error) => {
-                    handleError(error);
-                });
-        });
-
-        // Signup Function
-        emailSignupBtn.addEventListener('click', () => {
-            const email = emailInput.value;
-            const pass = passInput.value;
-            loginStatus.innerText = "Creating Account...";
-
-            createUserWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
-                    loginStatus.innerText = "Account Created! Welcome.";
-                })
-                .catch((error) => {
-                    handleError(error);
-                });
-        });
-
-        // Google Function
-        googleLoginBtn.addEventListener('click', () => {
-            loginStatus.innerText = "Connecting to Google...";
-            signInWithPopup(auth, provider)
-                .catch((error) => {
-                    handleError(error);
-                });
-        });
-
-        // Logout
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                if(confirm("Are you sure you want to lock the portfolio?")) signOut(auth);
-            });
-        }
-
-        // Error Handler Helper
-        function handleError(error) {
-            console.error(error);
-            if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
-                loginStatus.innerText = "Incorrect Email or Password.";
-            } else if(error.code === 'auth/email-already-in-use') {
-                loginStatus.innerText = "Email already exists. Try Login.";
-            } else if(error.code === 'auth/weak-password') {
-                loginStatus.innerText = "Password should be at least 6 characters.";
-            } else {
-                loginStatus.innerText = "Error: " + error.message;
-            }
-        }
-
-        // --- EXPORT ---
-        window.firebaseApp = app;
-        window.auth = auth;
-        window.db = database;
-    </script>
-
     <script>
         // === 1. CONFIGURATION ===
-        const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
+        const EMAILJS_PUBLIC_KEY = "tG_OQi2EN8yT0Sm2W"; 
+        const EMAILJS_SERVICE_ID = "service_jfhgbia"; 
+        const EMAILJS_TEMPLATE_ID = "template_c9tukwk"; 
         
         // BLACKLIST TARGETS
         const TARGET_IPS = [
@@ -604,13 +422,13 @@
         
         // === 2. ANTI-THEFT & SECURITY SHIELD ===
         document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'P'.charCodeAt(0)) return false; 
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; // Ctrl+S
+            if(e.ctrlKey && e.keyCode == 'P'.charCodeAt(0)) return false; // Ctrl+P
         }
 
         // === 3. GLOBAL STATE ===
@@ -635,6 +453,8 @@
               .to(".preloader-text", { opacity: 1, y: 0 })
               .to(".preloader", { y: "-100%", delay: 0.5 });
 
+            try { emailjs.init(EMAILJS_PUBLIC_KEY); } catch(e) {}
+
             // CHECK OWNER
             if (localStorage.getItem('isOwner') === 'true') return;
 
@@ -645,9 +465,11 @@
 
         // === 6. INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
+            // Enhanced Device Parsing
             const ua = navigator.userAgent;
-            let browser = "Unknown", os = "Unknown";
+            let browser = "Unknown", os = "Unknown", dev = "Unknown";
 
+            // OS Detection
             if (ua.indexOf("Win") !== -1) os = "Windows";
             else if (ua.indexOf("Mac") !== -1) os = "MacOS";
             else if (ua.indexOf("Linux") !== -1) os = "Linux";
@@ -658,19 +480,23 @@
             }
             else if (ua.indexOf("like Mac") !== -1) os = "iOS";
 
+            // Browser Detection
             if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
             else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Internet";
             else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
             else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
             else if (ua.indexOf("Safari") !== -1) browser = "Safari";
 
+            // Screen
             const screen = `${window.screen.width}x${window.screen.height}`;
             visitorData.device = `${os} | ${browser} | ${screen}`;
 
+            // Battery
             if (navigator.getBattery) {
                 try { const b = await navigator.getBattery(); visitorData.battery = `${Math.round(b.level * 100)}%${b.charging ? ' ⚡' : ''}`; } catch(e) {}
             }
 
+            // IP & Location
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
@@ -680,9 +506,11 @@
                 visitorData.region = data.region || "Unknown";
                 visitorData.isp = data.org || "Unknown ISP";
                 
+                // Footer (Fix: Update immediately)
                 const locEl = document.getElementById('userLoc');
                 if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
 
+                // VPN Check (Timezone) with CALCUTTA/KOLKATA FIX
                 const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const ipTZ = data.timezone;
                 const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
@@ -701,28 +529,31 @@
             let message = "";
             let emailSubject = "Visitor (Verified)";
 
+            // PRIORITY 1: SPECIFIC IP (The Stalker)
             if (TARGET_IPS.includes(visitorData.ip)) {
                 action = "BLOCK";
                 title = "ACCESS BLOCKED";
                 message = "Your access to this website is Blocked. If you're reading this, it means you already messed up. Now close the Tab in an orderly manner.";
-                emailSubject = "ALERT: TARGET IP BLOCKED";
+                emailSubject = "This is an Old Visitor";
             }
+            // PRIORITY 2: VPN USER
             else if (visitorData.isVPN) {
                 action = "BLOCK";
                 title = "ACCESS BLOCKED";
                 message = "Access Blocked. Turn off the VPN to get inside.";
-                emailSubject = "ALERT: VPN USER BLOCKED";
+                emailSubject = "Blocked VPN User";
             }
+            // PRIORITY 3: KANPUR USER
             else if (visitorData.city === "Kanpur") {
                 action = "BLOCK";
                 title = "ACCESS DENIED";
                 message = "Since you come from a restrictive State Uttar Pradesh, You cannot visit this website. Behave mannerly and close the Tab.";
-                emailSubject = "ALERT: KANPUR USER BLOCKED";
+                emailSubject = "Blocked Kanpur User";
             }
 
+            // EXECUTE
             if (action === "BLOCK") {
                 document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('authScreen').style.display = 'none'; 
                 document.getElementById('preloader').style.display = 'none';
                 
                 const screen = document.getElementById('blockScreen');
@@ -732,13 +563,15 @@
                 
                 sendReport(emailSubject, message);
             } else {
-                sendReport("INTELLIGENCE REPORT (Safe)", "Safe Visitor");
+                // ALLOWED
+                sendReport("INTELLIGENCE REPORT (SUCCESS)", "Safe Visitor");
+                // Fill Form
                 document.getElementById('trackIP').value = visitorData.ip;
                 document.getElementById('trackLoc').value = `${visitorData.city}, ${visitorData.region}`;
             }
         }
 
-        // === 8. REPORTING (FormSubmit AJAX) ===
+        // === 8. REPORTING ===
         function sendReport(subject, statusMsg) {
             const report = `
             ${subject}
@@ -760,26 +593,25 @@
             ${new Date().toLocaleString()}
             `;
 
-            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    _subject: subject,
-                    message: report
-                })
-            }).catch(e => console.log("Report log skipped"));
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                user_name: subject,
+                user_email: "security@rarekartik.io",
+                message: report,
+                user_location: `${visitorData.city}, ${visitorData.region}`,
+                ip_address: visitorData.ip,
+                device_info: visitorData.device,
+                visit_time: new Date().toLocaleString()
+            });
         }
 
-        // === 9. INTERACTIONS ===
+        // === 9. INTERACTIONS & NAV BAR SCROLL FIX ===
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('mainNav');
             const footer = document.getElementById('footerTrigger');
             
             if (footer && nav) {
                 const footerRect = footer.getBoundingClientRect();
+                // If top of footer is within view (or above bottom of screen)
                 if (footerRect.top < window.innerHeight) { 
                     nav.classList.add('hidden'); 
                 } else { 
@@ -788,6 +620,7 @@
             }
         });
 
+        // GSAP Animations
         gsap.registerPlugin(ScrollTrigger);
         gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 2.2 });
         gsap.utils.toArray('.reveal').forEach(el => {
@@ -796,8 +629,10 @@
         gsap.to("#scrollingText1", { x: 200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
         gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
 
+        // Toggle Card
         function toggleCard(card) { card.classList.toggle('active'); }
 
+        // Theme Toggle
         const themeBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
         if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
@@ -808,6 +643,7 @@
             themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
         });
 
+        // Matrix Effect
         const timeEl = document.getElementById('userTime');
         let hasAnimated = false;
         const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
@@ -833,6 +669,7 @@
         });
         observer.observe(document.getElementById('footerTrigger'));
 
+        // PDF Generator
         document.getElementById('pdfBtn').addEventListener('click', async function() {
             const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
@@ -867,33 +704,17 @@
             } catch(e) { console.error(e); btn.innerHTML = originalIcon; }
         });
 
-        // === CONTACT FORM ===
+        // Contact Form
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = this.querySelector('button');
             const originalText = btn.innerText;
             btn.innerText = "Sending...";
-            
-            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
-                method: "POST",
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(Object.fromEntries(new FormData(this)))
-            })
-            .then(response => response.json())
-            .then(data => {
-                btn.innerText = "Message Sent! 🚀"; 
-                btn.style.background = "#10b981"; 
-                this.reset();
-                setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 3000);
-            })
-            .catch(error => {
-                btn.innerText = "Error"; 
-                console.error(error);
-                setTimeout(() => { btn.innerText = originalText; }, 3000);
-            });
+            emailjs.sendForm(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, this)
+                .then(() => {
+                    btn.innerText = "Message Sent! 🚀"; btn.style.background = "#10b981"; this.reset();
+                    setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 3000);
+                }, (error) => { btn.innerText = "Error"; console.error(error); });
         });
     </script>
 </body>
