@@ -469,7 +469,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Changed to 'inMemoryPersistence' for Strict Security (Logout on Reload/Close)
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // CONFIG
@@ -487,14 +488,20 @@
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        // SET SESSION PERSISTENCE
-        setPersistence(auth, browserSessionPersistence)
+        // ** STRICT SECURITY: IN-MEMORY PERSISTENCE **
+        // This ensures the user is logged out immediately if the tab is closed OR the page is refreshed.
+        setPersistence(auth, inMemoryPersistence)
             .then(() => {
-                console.log("Session Persistence Enabled.");
+                console.log("Strict Memory Persistence Enabled.");
             })
             .catch((error) => {
                 console.error("Auth Persistence Error:", error);
             });
+
+        // Also add an explicit listener for navigation away to force logout attempt
+        window.addEventListener('beforeunload', () => {
+            signOut(auth).catch(() => {});
+        });
 
         // DOM ELEMENTS
         const authScreen = document.getElementById('authScreen');
