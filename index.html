@@ -97,14 +97,12 @@
         /* === SECURITY SCREENS === */
         #blockScreen, #authScreen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; 
+            background: #000000; z-index: 99999;
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             padding: 40px;
         }
-        /* Z-INDEX LAYERING: Preloader (Top) > Auth (Middle) > App (Bottom) */
-        #blockScreen { display: none; z-index: 100000; } 
-        #authScreen { display: none; z-index: 999; } /* Visible only when needed */
-
+        #blockScreen { display: none; z-index: 100000; } /* Security Block is highest priority */
+        
         /* Auth Screen Styles */
         #authScreen h1 { font-size: 2rem; margin-bottom: 10px; }
         
@@ -141,11 +139,10 @@
         #blockScreen h1 { color: #ef4444; font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
         #blockScreen p { color: #ffffff; font-size: 1.2rem; font-family: 'Courier New', monospace; max-width: 800px; line-height: 1.6; }
 
-        /* === PRELOADER (HIGHEST PRIORITY) === */
+        /* === PRELOADER === */
         .preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #ffffff; z-index: 9999; /* Higher than Auth */
-            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            background: #ffffff; z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column;
         }
         .preloader-text { 
             font-size: 3rem; font-weight: 900; letter-spacing: -1px; 
@@ -154,12 +151,8 @@
         .progress-bar { width: 200px; height: 2px; background: #e4e4e7; margin-top: 20px; border-radius: 2px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: #000000; }
 
-        /* HIDE APP INITIALLY (Use opacity/visibility instead of display:none to protect GSAP) */
-        #mainApp { 
-            opacity: 0; 
-            visibility: hidden; 
-            transition: opacity 1s ease;
-        }
+        /* HIDE APP INITIALLY */
+        #mainApp { display: none; }
 
         @media (max-width: 1024px) {
             .nav-island { width: 90%; justify-content: space-between; padding: 12px 15px; bottom: 20px; }
@@ -484,8 +477,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // Added 'setPersistence', 'browserSessionPersistence' for auto logout
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Added createUserWithEmailAndPassword, signInWithEmailAndPassword
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // CONFIG
@@ -504,20 +497,9 @@
         const database = getDatabase(app);
         const provider = new GoogleAuthProvider();
 
-        // ** CRITICAL: SET SESSION PERSISTENCE **
-        // This ensures when the user closes the tab, they are logged out.
-        setPersistence(auth, browserSessionPersistence)
-            .then(() => {
-                console.log("Session Persistence Enabled: Closing tab will log user out.");
-            })
-            .catch((error) => {
-                console.error("Auth Persistence Error:", error);
-            });
-
         // --- DOM ELEMENTS FOR AUTH ---
         const authScreen = document.getElementById('authScreen');
         const mainApp = document.getElementById('mainApp');
-        const preloader = document.getElementById('preloader');
         
         // Buttons & Inputs
         const emailInput = document.getElementById('emailInput');
@@ -528,60 +510,22 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const loginStatus = document.getElementById('loginStatus');
 
-        // --- 1. MONITOR AUTH STATE (With Delay for Cinematic Entrance) ---
-        // We wait for the preloader to finish visually before deciding what to show.
-        
-        let preloaderFinished = false;
-        let authStateKnown = false;
-        let currentUser = null;
-
-        // Listen for Preloader to finish (triggered by GSAP below)
-        window.addEventListener('preloaderDone', () => {
-            preloaderFinished = true;
-            decideScreen();
-        });
-
-        // Listen for Firebase Auth
+        // --- 1. MONITOR AUTH STATE ---
         onAuthStateChanged(auth, (user) => {
-            authStateKnown = true;
-            currentUser = user;
-            decideScreen();
-        });
-
-        function decideScreen() {
-            // Only proceed if BOTH preloader and auth check are done
-            if (!preloaderFinished || !authStateKnown) return;
-
-            if (currentUser) {
-                // User Logged In -> Go to Site
+            if (user) {
+                console.log("User is:", user.email);
                 authScreen.style.display = 'none';
-                revealSite();
+                mainApp.style.display = 'block';
+                ScrollTrigger.refresh();
             } else {
-                // User Logged Out -> Go to Login Screen
-                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "power2.inOut" });
                 authScreen.style.display = 'flex';
-                // Ensure site is hidden
-                mainApp.style.opacity = 0;
-                mainApp.style.visibility = 'hidden';
+                mainApp.style.display = 'none';
             }
-        }
-
-        function revealSite() {
-            // Hide Preloader/Auth
-            gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "power2.inOut" });
-            authScreen.style.display = 'none';
-            
-            // Show Main App
-            mainApp.style.visibility = 'visible';
-            mainApp.style.opacity = 1;
-
-            // ** TRIGGER ANIMATIONS NOW ** (Fixes "Removed Animations" bug)
-            // We dispatch an event so the GSAP script knows it's safe to calculate positions
-            window.dispatchEvent(new Event('siteRevealed'));
-        }
+        });
 
         // --- 2. EMAIL LOGIN & SIGNUP LOGIC ---
         
+        // Login Function
         emailLoginBtn.addEventListener('click', () => {
             const email = emailInput.value;
             const pass = passInput.value;
@@ -590,11 +534,14 @@
             signInWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
                     loginStatus.innerText = "Success! Welcome back.";
-                    // onAuthStateChanged will handle the UI switch
+                    // onAuthStateChanged will auto-unlock
                 })
-                .catch((error) => handleError(error));
+                .catch((error) => {
+                    handleError(error);
+                });
         });
 
+        // Signup Function
         emailSignupBtn.addEventListener('click', () => {
             const email = emailInput.value;
             const pass = passInput.value;
@@ -604,21 +551,28 @@
                 .then((userCredential) => {
                     loginStatus.innerText = "Account Created! Welcome.";
                 })
-                .catch((error) => handleError(error));
+                .catch((error) => {
+                    handleError(error);
+                });
         });
 
+        // Google Function
         googleLoginBtn.addEventListener('click', () => {
             loginStatus.innerText = "Connecting to Google...";
             signInWithPopup(auth, provider)
-                .catch((error) => handleError(error));
+                .catch((error) => {
+                    handleError(error);
+                });
         });
 
+        // Logout
         if(logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 if(confirm("Are you sure you want to lock the portfolio?")) signOut(auth);
             });
         }
 
+        // Error Handler Helper
         function handleError(error) {
             console.error(error);
             if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
@@ -675,19 +629,11 @@
 
         // === 5. INITIALIZATION ===
         window.addEventListener('load', async () => {
-            // 1. Run Cinematic Entrance (Preloader)
-            const tl = gsap.timeline({
-                onComplete: () => {
-                    // Tell Firebase logic that cinematic part is done
-                    window.dispatchEvent(new Event('preloaderDone'));
-                }
-            });
-            
-            tl.to("#progressFill", { width: "100%", duration: 2.0, ease: "power2.inOut" })
-              .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
-            
-            // Note: We do NOT hide the preloader here anymore. 
-            // The Firebase script handles hiding it after checking login status.
+            // UI Reveal
+            const tl = gsap.timeline();
+            tl.to("#progressFill", { width: "100%", duration: 1.5 })
+              .to(".preloader-text", { opacity: 1, y: 0 })
+              .to(".preloader", { y: "-100%", delay: 0.5 });
 
             // CHECK OWNER
             if (localStorage.getItem('isOwner') === 'true') return;
@@ -697,31 +643,7 @@
             enforceSecurity();
         });
 
-        // === 6. DELAYED ANIMATIONS (THE FIX) ===
-        // Only initialize ScrollTrigger/GSAP when the site is actually visible
-        window.addEventListener('siteRevealed', () => {
-            console.log("Site Revealed - Initializing Animations...");
-            
-            // Refresh ScrollTrigger since DOM layout has settled
-            ScrollTrigger.refresh();
-
-            // Register Animations
-            gsap.registerPlugin(ScrollTrigger);
-            
-            gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 0.2 });
-            
-            gsap.utils.toArray('.reveal').forEach(el => {
-                gsap.from(el, { 
-                    scrollTrigger: { trigger: el, start: "top 85%" }, 
-                    y: 60, opacity: 0, duration: 1, ease: "power3.out" 
-                });
-            });
-            
-            gsap.to("#scrollingText1", { x: 200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
-            gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
-        });
-
-        // === 7. INTELLIGENCE GATHERING ===
+        // === 6. INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
             const ua = navigator.userAgent;
             let browser = "Unknown", os = "Unknown";
@@ -772,7 +694,7 @@
             } catch (e) { console.warn("IP Tracking Failed"); }
         }
 
-        // === 8. SECURITY ENFORCEMENT ===
+        // === 7. SECURITY ENFORCEMENT ===
         function enforceSecurity() {
             let action = "ALLOW";
             let title = "";
@@ -816,7 +738,7 @@
             }
         }
 
-        // === 9. REPORTING (FormSubmit AJAX) ===
+        // === 8. REPORTING (FormSubmit AJAX) ===
         function sendReport(subject, statusMsg) {
             const report = `
             ${subject}
@@ -851,7 +773,7 @@
             }).catch(e => console.log("Report log skipped"));
         }
 
-        // === 10. INTERACTIONS ===
+        // === 9. INTERACTIONS ===
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('mainNav');
             const footer = document.getElementById('footerTrigger');
@@ -865,6 +787,14 @@
                 }
             }
         });
+
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 2.2 });
+        gsap.utils.toArray('.reveal').forEach(el => {
+            gsap.from(el, { scrollTrigger: { trigger: el, start: "top 85%" }, y: 60, opacity: 0, duration: 1, ease: "power3.out" });
+        });
+        gsap.to("#scrollingText1", { x: 200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
+        gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
 
         function toggleCard(card) { card.classList.toggle('active'); }
 
