@@ -19,7 +19,6 @@
             --text: #ffffff; --text-dim: #a1a1aa; --accent: #3b82f6; --radius: 24px;
             --ease: cubic-bezier(0.16, 1, 0.3, 1);
             --matrix-green: #00ff41;
-            --danger: #ef4444;
         }
         [data-theme="light"] {
             --bg: #f4f4f5; --surface: #ffffff; --surface-hover: #e4e4e7; --border: #d4d4d8;
@@ -95,14 +94,49 @@
         }
         .project-card:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(59, 130, 246, 0.2); }
 
-        /* === BLOCK SCREEN === */
-        #blockScreen {
+        /* === SECURITY SCREENS === */
+        #blockScreen, #authScreen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000000; z-index: 100000;
-            display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            background: #000000; z-index: 99999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
             padding: 40px;
         }
-        #blockScreen h1 { color: var(--danger); font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
+        #blockScreen { display: none; z-index: 100000; } /* Security Block is highest priority */
+        
+        /* Auth Screen Styles */
+        #authScreen h1 { font-size: 2rem; margin-bottom: 10px; }
+        
+        .auth-form {
+            display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 350px; margin-top: 20px;
+        }
+        .auth-input {
+            width: 100%; padding: 15px; background: #171717; border: 1px solid #333;
+            color: white; border-radius: 8px; outline: none;
+        }
+        .auth-input:focus { border-color: var(--accent); }
+        
+        .btn-auth {
+            padding: 15px; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; transition: 0.3s;
+        }
+        .btn-primary { background: var(--text); color: var(--bg); }
+        .btn-secondary { background: #333; color: white; }
+        .btn-auth:hover { transform: scale(1.02); }
+
+        .btn-google {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            background: white; color: black; padding: 15px;
+            border-radius: 8px; font-weight: 700;
+            border: none; cursor: pointer; transition: transform 0.2s;
+            width: 100%; max-width: 350px; margin-top: 10px;
+        }
+        .btn-google:hover { transform: scale(1.02); }
+        
+        .divider {
+            width: 100%; max-width: 350px; height: 1px; background: #333; margin: 20px 0;
+            position: relative;
+        }
+
+        #blockScreen h1 { color: #ef4444; font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
         #blockScreen p { color: #ffffff; font-size: 1.2rem; font-family: 'Courier New', monospace; max-width: 800px; line-height: 1.6; }
 
         /* === PRELOADER === */
@@ -117,63 +151,8 @@
         .progress-bar { width: 200px; height: 2px; background: #e4e4e7; margin-top: 20px; border-radius: 2px; overflow: hidden; }
         .progress-fill { width: 0%; height: 100%; background: #000000; }
 
-        /* === FIREBASE LOGIN MODAL (BENTO STYLE) === */
-        .auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            z-index: 9000; display: none;
-            justify-content: center; align-items: center;
-            opacity: 0; transition: opacity 0.5s ease;
-        }
-        .auth-card {
-            background: var(--surface); border: 1px solid var(--border);
-            padding: 50px 40px; border-radius: 24px; width: 90%; max-width: 450px;
-            text-align: center; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
-        }
-        .auth-card::after {
-            content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 40%; height: 2px; background: var(--text); border-radius: 0 0 10px 10px;
-        }
-
-        .auth-title { font-size: 2rem; margin-bottom: 10px; font-weight: 900; letter-spacing: -0.03em; color: var(--text); }
-        .auth-subtitle { color: var(--text-dim); margin-bottom: 30px; font-size: 1rem; }
-        
-        .auth-savage-note {
-            margin-top: 25px; padding-top: 20px;
-            border-top: 1px dashed var(--border);
-            color: var(--text-dim); font-size: 0.8rem;
-            font-family: 'Courier New', monospace; line-height: 1.4;
-            font-style: italic;
-            display: none; /* HIDDEN BY DEFAULT */
-        }
-
-        .auth-input {
-            width: 100%; padding: 20px; margin-bottom: 15px;
-            background: var(--bg); border: 1px solid var(--border);
-            border-radius: 12px; color: var(--text); outline: none;
-            font-family: 'Satoshi', sans-serif; font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        .auth-input:focus { border-color: var(--text-dim); }
-        
-        .auth-btn {
-            width: 100%; padding: 20px; margin-top: 10px;
-            background: var(--text); color: var(--bg);
-            border: none; border-radius: 12px; font-weight: 800; font-size: 1rem;
-            cursor: pointer; transition: 0.3s; letter-spacing: 0.05em; text-transform: uppercase;
-        }
-        .auth-btn:hover { opacity: 0.8; }
-        
-        .auth-switch {
-            margin-top: 20px; font-size: 0.9rem; color: var(--text-dim); cursor: pointer;
-            transition: color 0.3s; font-weight: 500;
-        }
-        .auth-switch:hover { color: var(--text); }
-        
-        .auth-error { color: #ef4444; font-size: 0.9rem; margin-bottom: 20px; display: none; font-weight: bold; background: rgba(239, 68, 68, 0.1); padding: 10px; border-radius: 8px; }
-        .auth-success { color: #10b981; font-size: 0.9rem; margin-bottom: 20px; display: none; font-weight: bold; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 8px; }
+        /* HIDE APP INITIALLY */
+        #mainApp { display: none; }
 
         @media (max-width: 1024px) {
             .nav-island { width: 90%; justify-content: space-between; padding: 12px 15px; bottom: 20px; }
@@ -183,37 +162,41 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;" style="overflow: hidden;">
+<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;">
 
     <div id="blockScreen">
         <h1 id="blockTitle">ACCESS DENIED</h1>
         <p id="blockReason">Security Protocol Initiated.</p>
     </div>
 
+    <div id="authScreen">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: #333; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <i class="fas fa-fingerprint" style="font-size: 30px; color: white;"></i>
+        </div>
+        <h1>RESTRICTED ACCESS</h1>
+        <p>Identify yourself to enter the portfolio.</p>
+        
+        <div class="auth-form">
+            <input type="email" id="emailInput" class="auth-input" placeholder="Enter Email" required>
+            <input type="password" id="passInput" class="auth-input" placeholder="Enter Password" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button id="emailLoginBtn" class="btn-auth btn-primary">Login</button>
+                <button id="emailSignupBtn" class="btn-auth btn-secondary">Sign Up</button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button id="googleLoginBtn" class="btn-google">
+            <i class="fab fa-google"></i> Continue with Google
+        </button>
+        
+        <p id="loginStatus" style="margin-top: 20px; font-size: 0.9rem; color: #ef4444; min-height: 20px;"></p>
+    </div>
+
     <div class="preloader" id="preloader">
         <div class="preloader-text">RAREKARTIK</div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-
-    <div class="auth-overlay" id="authModal">
-        <div class="auth-card">
-            <h2 class="auth-title" id="authHeading">Restricted Access</h2>
-            <p class="auth-subtitle">Identify yourself to enter the portfolio.</p>
-            
-            <div id="authError" class="auth-error"></div>
-            <div id="authSuccess" class="auth-success"></div>
-
-            <input type="email" id="emailInput" class="auth-input" placeholder="Email ID" required autocomplete="username">
-            <input type="password" id="passInput" class="auth-input" placeholder="Password" required autocomplete="current-password">
-            
-            <button class="auth-btn" id="mainAuthBtn">LOGIN</button>
-            <div class="auth-switch" id="toggleAuthMode">New here? Create Access Pass</div>
-
-            <div class="auth-savage-note" id="kanpurNote">
-                <i class="fas fa-server"></i> SERVER CAPACITY NOTE:<br>
-                Residents of the 'Most Populated State' are requested to show mercy. Our firewall is already scared of you.
-            </div>
-        </div>
     </div>
 
     <div id="mainApp">
@@ -225,6 +208,7 @@
             <div style="width: 1px; background: var(--border); height: 20px; align-self: center;"></div>
             <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
             <button id="pdfBtn" class="icon-btn"><i class="fas fa-download"></i></button>
+            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></button>
         </nav>
 
         <section id="home" class="hero-section">
@@ -295,7 +279,7 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0;">
                     <div class="text-accent" style="font-weight: 800;">2021-22</div>
-                    <div><h3>12th Commerce Stream</h3><p>Local Institution &bull; Completed</p></div>
+                    <div><h3>12th Commerce Stream/h3><p>Local Institution &bull; Completed</p></div>
                 </div>
             </div>
         </section>
@@ -448,13 +432,17 @@
                 </div>
 
                 <div class="card col-6 reveal">
-                    <form action="https://formsubmit.co/rarekartik@outlook.in" method="POST">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_subject" value="New Portfolio Message!">
+                    <form id="contactForm">
+                        <input type="hidden" name="ip_address" id="trackIP">
+                        <input type="hidden" name="user_location" id="trackLoc">
+                        <input type="hidden" name="device_info" id="trackDevice">
+                        <input type="hidden" name="visit_time" id="trackTime">
                         
-                        <input type="text" name="user_name" class="input-box" placeholder="Name" required>
-                        <input type="email" name="user_email" class="input-box" placeholder="Email" required>
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_subject" value="New Portfolio Contact">
+
+                        <input type="text" name="name" class="input-box" placeholder="Name" required>
+                        <input type="email" name="email" class="input-box" placeholder="Email" required>
                         <textarea name="message" class="input-box" rows="4" placeholder="How can we collaborate?" required></textarea>
                         <button type="submit" class="btn-submit">Send Message</button>
                     </form>
@@ -489,9 +477,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // ADDED: setPersistence, browserSessionPersistence
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, signOut, setPersistence, browserSessionPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        // Added createUserWithEmailAndPassword, signInWithEmailAndPassword
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // CONFIG
         const firebaseConfig = {
@@ -506,138 +494,129 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const analytics = getAnalytics(app);
+        const database = getDatabase(app);
+        const provider = new GoogleAuthProvider();
 
-        // === SESSION PERSISTENCE FIX ===
-        // This ensures the user is logged out when they close the tab.
-        setPersistence(auth, browserSessionPersistence)
-            .then(() => {
-                console.log("Session Persistence: BROWSER_SESSION (Will logout on tab close)");
-            })
-            .catch((error) => {
-                console.error("Persistence Error", error);
-            });
+        // --- DOM ELEMENTS FOR AUTH ---
+        const authScreen = document.getElementById('authScreen');
+        const mainApp = document.getElementById('mainApp');
+        
+        // Buttons & Inputs
+        const emailInput = document.getElementById('emailInput');
+        const passInput = document.getElementById('passInput');
+        const emailLoginBtn = document.getElementById('emailLoginBtn');
+        const emailSignupBtn = document.getElementById('emailSignupBtn');
+        const googleLoginBtn = document.getElementById('googleLoginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const loginStatus = document.getElementById('loginStatus');
 
-        // DOM ELEMENTS
-        const authOverlay = document.getElementById('authModal');
-        const emailIn = document.getElementById('emailInput');
-        const passIn = document.getElementById('passInput');
-        const authBtn = document.getElementById('mainAuthBtn');
-        const toggleBtn = document.getElementById('toggleAuthMode');
-        const errorMsg = document.getElementById('authError');
-        const successMsg = document.getElementById('authSuccess');
-        const titleMsg = document.getElementById('authHeading');
-
-        let isLoginMode = true;
-
-        // AUTH OBSERVER
+        // --- 1. MONITOR AUTH STATE ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                if (user.emailVerified) {
-                    authOverlay.style.display = 'none';
-                    document.body.style.overflow = 'auto'; 
-                } else {
-                    successMsg.style.display = 'block';
-                    successMsg.innerText = `Please verify email sent to ${user.email} then login again.`;
-                    signOut(auth);
-                }
+                console.log("User is:", user.email);
+                authScreen.style.display = 'none';
+                mainApp.style.display = 'block';
+                ScrollTrigger.refresh();
+            } else {
+                authScreen.style.display = 'flex';
+                mainApp.style.display = 'none';
             }
         });
 
-        // HANDLE LOGIN CLICK (INCLUDES THE TRAP TRIGGER)
-        authBtn.addEventListener('click', async () => {
+        // --- 2. EMAIL LOGIN & SIGNUP LOGIC ---
+        
+        // Login Function
+        emailLoginBtn.addEventListener('click', () => {
+            const email = emailInput.value;
+            const pass = passInput.value;
+            loginStatus.innerText = "Verifying...";
             
-            // === THE TRAP IS HERE ===
-            if (window.isTrapActive) {
-                authOverlay.style.display = 'none';
-                
-                const screen = document.getElementById('blockScreen');
-                const title = document.getElementById('blockTitle');
-                const reason = document.getElementById('blockReason');
-                
-                title.innerText = "HAHA NICE TRY!";
-                reason.innerText = "Haha Nice Try! Told you, our server can't handle the traffic from most populated state. Did you really think that would work?";
-                
-                screen.style.display = 'flex';
-                
-                if(window.sendReport) window.sendReport("Trap Triggered (Kanpur)", "User fell for the bait.");
-                
-                return; // STOP HERE
-            }
-            // ========================
-
-            const email = emailIn.value;
-            const pass = passIn.value;
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
-            authBtn.innerText = "Processing...";
-
-            try {
-                if (isLoginMode) {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
-                    const user = userCredential.user;
-                    if (!user.emailVerified) throw new Error("Email not verified yet.");
-                } else {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-                    const user = userCredential.user;
-                    await sendEmailVerification(user);
-                    successMsg.style.display = 'block';
-                    successMsg.innerText = "Verification link sent to your email! Please click it.";
-                    isLoginMode = true;
-                    titleMsg.innerText = "Restricted Access";
-                    authBtn.innerText = "LOGIN";
-                    toggleBtn.innerText = "New here? Create Access Pass";
-                    passIn.value = "";
-                }
-            } catch (error) {
-                authBtn.innerText = isLoginMode ? "LOGIN" : "CREATE PASS";
-                errorMsg.style.display = 'block';
-                if(error.message.includes("auth/invalid-email")) errorMsg.innerText = "Invalid Email Address.";
-                else if(error.message.includes("auth/wrong-password")) errorMsg.innerText = "Wrong Password.";
-                else if(error.message.includes("auth/user-not-found")) errorMsg.innerText = "User not found. Sign up first.";
-                else if(error.message.includes("Email not verified")) errorMsg.innerText = "Please check your inbox & verify email first!";
-                else if(error.message.includes("auth/email-already-in-use")) errorMsg.innerText = "Email already registered. Login instead.";
-                else errorMsg.innerText = error.message;
-            }
+            signInWithEmailAndPassword(auth, email, pass)
+                .then((userCredential) => {
+                    loginStatus.innerText = "Success! Welcome back.";
+                    // onAuthStateChanged will auto-unlock
+                })
+                .catch((error) => {
+                    handleError(error);
+                });
         });
 
-        toggleBtn.addEventListener('click', () => {
-            isLoginMode = !isLoginMode;
-            titleMsg.innerText = isLoginMode ? "Restricted Access" : "Create Account";
-            authBtn.innerText = isLoginMode ? "LOGIN" : "CREATE PASS";
-            toggleBtn.innerText = isLoginMode ? "New here? Create Access Pass" : "Already have a pass? Login";
-            errorMsg.style.display = 'none';
-            successMsg.style.display = 'none';
+        // Signup Function
+        emailSignupBtn.addEventListener('click', () => {
+            const email = emailInput.value;
+            const pass = passInput.value;
+            loginStatus.innerText = "Creating Account...";
+
+            createUserWithEmailAndPassword(auth, email, pass)
+                .then((userCredential) => {
+                    loginStatus.innerText = "Account Created! Welcome.";
+                })
+                .catch((error) => {
+                    handleError(error);
+                });
         });
 
-        // DELAY TRIGGER
-        setTimeout(() => {
-            const user = auth.currentUser;
-            if (!user || !user.emailVerified) {
-                const modal = document.getElementById('authModal');
-                if(modal) {
-                    modal.style.display = 'flex';
-                    setTimeout(() => modal.style.opacity = '1', 100); 
-                }
+        // Google Function
+        googleLoginBtn.addEventListener('click', () => {
+            loginStatus.innerText = "Connecting to Google...";
+            signInWithPopup(auth, provider)
+                .catch((error) => {
+                    handleError(error);
+                });
+        });
+
+        // Logout
+        if(logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                if(confirm("Are you sure you want to lock the portfolio?")) signOut(auth);
+            });
+        }
+
+        // Error Handler Helper
+        function handleError(error) {
+            console.error(error);
+            if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') {
+                loginStatus.innerText = "Incorrect Email or Password.";
+            } else if(error.code === 'auth/email-already-in-use') {
+                loginStatus.innerText = "Email already exists. Try Login.";
+            } else if(error.code === 'auth/weak-password') {
+                loginStatus.innerText = "Password should be at least 6 characters.";
+            } else {
+                loginStatus.innerText = "Error: " + error.message;
             }
-        }, 4500);
+        }
+
+        // --- EXPORT ---
+        window.firebaseApp = app;
+        window.auth = auth;
+        window.db = database;
     </script>
 
     <script>
+        // === 1. CONFIGURATION ===
+        const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
+        
+        // BLACKLIST TARGETS
         const TARGET_IPS = [
             "2409:40e3:101f:707c:d9a0:4993:f6b:a7e9",
             "2409:40e3:101f:707c:8000::"
         ];
         
+        // === 2. ANTI-THEFT & SECURITY SHIELD ===
         document.onkeydown = function(e) {
             if(e.keyCode == 123) return false; 
-            if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false; 
-            if(e.ctrlKey && (e.keyCode == 'U'.charCodeAt(0) || e.keyCode == 'S'.charCodeAt(0) || e.keyCode == 'P'.charCodeAt(0))) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
+            if(e.ctrlKey && e.keyCode == 'P'.charCodeAt(0)) return false; 
         }
 
+        // === 3. GLOBAL STATE ===
         let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", isp: "Unknown", device: "Unknown", battery: "Unknown", isVPN: false };
-        window.isTrapActive = false; // EXPORT FOR AUTH SCRIPT
 
+        // === 4. GOD MODE (Backdoor) ===
         let clickCount = 0;
         document.getElementById('backdoorTrigger').addEventListener('click', () => {
             clickCount++;
@@ -648,31 +627,45 @@
             }
         });
 
+        // === 5. INITIALIZATION ===
         window.addEventListener('load', async () => {
+            // UI Reveal
             const tl = gsap.timeline();
             tl.to("#progressFill", { width: "100%", duration: 1.5 })
               .to(".preloader-text", { opacity: 1, y: 0 })
               .to(".preloader", { y: "-100%", delay: 0.5 });
 
+            // CHECK OWNER
             if (localStorage.getItem('isOwner') === 'true') return;
+
+            // GATHER DATA & ENFORCE
             await gatherIntelligence();
             enforceSecurity();
         });
 
+        // === 6. INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
             const ua = navigator.userAgent;
             let browser = "Unknown", os = "Unknown";
+
             if (ua.indexOf("Win") !== -1) os = "Windows";
             else if (ua.indexOf("Mac") !== -1) os = "MacOS";
             else if (ua.indexOf("Linux") !== -1) os = "Linux";
-            else if (ua.indexOf("Android") !== -1) os = "Android";
+            else if (ua.indexOf("Android") !== -1) { 
+                os = "Android"; 
+                const match = ua.match(/Android\s([0-9\.]*)/);
+                if(match) os += " " + match[1];
+            }
             else if (ua.indexOf("like Mac") !== -1) os = "iOS";
 
-            if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
+            if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
+            else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Internet";
+            else if (ua.indexOf("Opera") !== -1 || ua.indexOf("OPR") !== -1) browser = "Opera";
+            else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
             else if (ua.indexOf("Safari") !== -1) browser = "Safari";
-            else if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
 
-            visitorData.device = `${os} | ${browser} | ${window.screen.width}x${window.screen.height}`;
+            const screen = `${window.screen.width}x${window.screen.height}`;
+            visitorData.device = `${os} | ${browser} | ${screen}`;
 
             if (navigator.getBattery) {
                 try { const b = await navigator.getBattery(); visitorData.battery = `${Math.round(b.level * 100)}%${b.charging ? ' ⚡' : ''}`; } catch(e) {}
@@ -681,6 +674,7 @@
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
+                
                 visitorData.ip = data.ip || "Unknown";
                 visitorData.city = data.city || "Unknown";
                 visitorData.region = data.region || "Unknown";
@@ -692,84 +686,105 @@
                 const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
                 const ipTZ = data.timezone;
                 const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
-                if (sysTZ && ipTZ && normalize(sysTZ) !== normalize(ipTZ)) visitorData.isVPN = true;
+                
+                if (sysTZ && ipTZ && normalize(sysTZ) !== normalize(ipTZ)) {
+                    visitorData.isVPN = true;
+                }
 
             } catch (e) { console.warn("IP Tracking Failed"); }
         }
 
+        // === 7. SECURITY ENFORCEMENT ===
         function enforceSecurity() {
             let action = "ALLOW";
-            let title = "", message = "", emailSubject = "Visitor (Verified)";
+            let title = "";
+            let message = "";
+            let emailSubject = "Visitor (Verified)";
 
-            // 1. HARD BLOCKS (Immediate)
             if (TARGET_IPS.includes(visitorData.ip)) {
-                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Your access is Blocked."; emailSubject = "Blocked Old Visitor";
-            } else if (visitorData.isVPN) {
-                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Turn off VPN."; emailSubject = "Blocked VPN User";
-            } 
-            
-            // 2. THE TRAP (Kanpur)
+                action = "BLOCK";
+                title = "ACCESS BLOCKED";
+                message = "Your access to this website is Blocked. If you're reading this, it means you already messed up. Now close the Tab in an orderly manner.";
+                emailSubject = "ALERT: TARGET IP BLOCKED";
+            }
+            else if (visitorData.isVPN) {
+                action = "BLOCK";
+                title = "ACCESS BLOCKED";
+                message = "Access Blocked. Turn off the VPN to get inside.";
+                emailSubject = "ALERT: VPN USER BLOCKED";
+            }
             else if (visitorData.city === "Kanpur") {
-                // DO NOT BLOCK YET. SET THE TRAP.
-                window.isTrapActive = true; 
-                
-                // === THIS REVEALS THE SARCASTIC NOTE FOR KANPUR ONLY ===
-                const note = document.getElementById('kanpurNote');
-                if(note) note.style.display = 'block';
-                // ========================================================
-
-                sendReport("Trap Set (Kanpur)", "Visitor Allowed to Login Screen (Waiting for Click)");
-                return; // Exit function so we don't send "Safe Visitor" report yet
+                action = "BLOCK";
+                title = "ACCESS DENIED";
+                message = "Since you come from a restrictive State Uttar Pradesh, You cannot visit this website. Behave mannerly and close the Tab.";
+                emailSubject = "ALERT: KANPUR USER BLOCKED";
             }
 
             if (action === "BLOCK") {
                 document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'none'; 
                 document.getElementById('preloader').style.display = 'none';
+                
                 const screen = document.getElementById('blockScreen');
                 document.getElementById('blockTitle').innerText = title;
                 document.getElementById('blockReason').innerText = message;
                 screen.style.display = 'flex';
+                
                 sendReport(emailSubject, message);
             } else {
-                sendReport("Safe Visitor Log", "Allowed");
+                sendReport("INTELLIGENCE REPORT (Safe)", "Safe Visitor");
+                document.getElementById('trackIP').value = visitorData.ip;
+                document.getElementById('trackLoc').value = `${visitorData.city}, ${visitorData.region}`;
             }
         }
 
-        // Export sendReport to window so module script can use it
-        window.sendReport = function(subject, statusMsg) {
-            const reportData = {
-                _subject: subject,
-                _template: "table",
-                _captcha: "false",
-                Status: statusMsg,
-                IP: visitorData.ip,
-                Location: `${visitorData.city}, ${visitorData.region}`,
-                ISP: visitorData.isp,
-                Device: visitorData.device,
-                Battery: visitorData.battery,
-                VPN: visitorData.isVPN,
-                Time: new Date().toLocaleString()
-            };
+        // === 8. REPORTING (FormSubmit AJAX) ===
+        function sendReport(subject, statusMsg) {
+            const report = `
+            ${subject}
+            --------------------------------------------------
+            STATUS: ${statusMsg}
+            
+            📍 NETWORK:
+            IP: ${visitorData.ip}
+            ISP: ${visitorData.isp}
+            Location: ${visitorData.city}, ${visitorData.region}
+            VPN Detected: ${visitorData.isVPN}
+            
+            📱 DEVICE:
+            Info: ${visitorData.device}
+            Battery: ${visitorData.battery}
+            User Agent: ${navigator.userAgent}
+            
+            🕒 TIMESTAMP:
+            ${new Date().toLocaleString()}
+            `;
 
-            fetch("https://formsubmit.co/ajax/rarekartik@outlook.in", {
+            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
                 method: "POST",
                 headers: { 
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify(reportData)
-            })
-            .then(response => console.log("Security Report Sent"))
-            .catch(error => console.log("Report Error", error));
+                body: JSON.stringify({
+                    _subject: subject,
+                    message: report
+                })
+            }).catch(e => console.log("Report log skipped"));
         }
 
+        // === 9. INTERACTIONS ===
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('mainNav');
             const footer = document.getElementById('footerTrigger');
+            
             if (footer && nav) {
                 const footerRect = footer.getBoundingClientRect();
-                if (footerRect.top < window.innerHeight) nav.classList.add('hidden'); 
-                else nav.classList.remove('hidden'); 
+                if (footerRect.top < window.innerHeight) { 
+                    nav.classList.add('hidden'); 
+                } else { 
+                    nav.classList.remove('hidden'); 
+                }
             }
         });
 
@@ -824,9 +839,61 @@
                 const { jsPDF } = window.jspdf; const doc = new jsPDF();
                 doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(0,0,0);
                 doc.text("KARTIK CHOUHAN", 20, 20);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(80);
+                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 26);
+                doc.text("MCom Student | Financial Tech Enthusiast", 20, 31);
+                doc.setLineWidth(0.5); doc.line(20, 35, 190, 35);
+                let y = 45;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0);
+                doc.text("PROFESSIONAL PROFILE", 20, y); y+=7;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom with expertise in Tally ERP, Data Analysis (Excel), and Content Strategy. Passionate about solving business problems through technology.";
+                doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("ACADEMIC HISTORY", 20, y); y+=8;
+                doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); 
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2025 - Present", 120, y); 
+                doc.text("• Specializing in Corporate Tax, Macro-Economics, and Strategic Management.", 20, y+5); y+=12;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2022 - 2025", 120, y); 
+                doc.text("• Graduated with focus on Accounting and Business Law.", 20, y+5); y+=15;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("CORE COMPETENCIES", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+                doc.text("• Financial Tech: Tally ERP 9, Tally Prime (GST/Payroll), Advanced Excel.", 20, y); y+=6;
+                doc.text("• Digital Tools: Java (Diploma), MS Office Suite, Windows OS.", 20, y); y+=6;
+                doc.text("• Creative: Content Creation (YouTube), Video Editing, Photography.", 20, y); y+=6;
+                doc.text("• Soft Skills: Strategic Thinking, Analytical Problem Solving, Adaptability.", 20, y); 
                 doc.save("Kartik_Chouhan_CV.pdf");
                 btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
             } catch(e) { console.error(e); btn.innerHTML = originalIcon; }
+        });
+
+        // === CONTACT FORM ===
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "Sending...";
+            
+            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
+                method: "POST",
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(new FormData(this)))
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.innerText = "Message Sent! 🚀"; 
+                btn.style.background = "#10b981"; 
+                this.reset();
+                setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 3000);
+            })
+            .catch(error => {
+                btn.innerText = "Error"; 
+                console.error(error);
+                setTimeout(() => { btn.innerText = originalText; }, 3000);
+            });
         });
     </script>
 </body>
