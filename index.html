@@ -27,27 +27,30 @@
             --accent: #3b82f6; 
             --accent-glow: rgba(59, 130, 246, 0.5);
             --radius: 24px;
-            --shadow: none; /* No shadow in dark mode, we use border/glow */
-            --ease: cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow: none; 
+            --ease: cubic-bezier(0.19, 1, 0.22, 1); /* Smoother Expo Ease */
             --matrix-green: #00ff41;
         }
 
         [data-theme="light"] {
-            /* LIGHT MODE (Revamped) */
-            --bg: #f0f4f8; /* Soft blue-grey */
+            /* LIGHT MODE */
+            --bg: #f0f4f8; 
             --surface: #ffffff; 
             --surface-hover: #f8fafc; 
             --border: #d1d5db;
-            --text: #0f172a; /* Deep Navy for contrast */
+            --text: #0f172a; 
             --text-dim: #64748b; 
             --accent: #2563eb;
             --accent-glow: rgba(37, 99, 235, 0.2);
-            --shadow: 0 10px 30px -10px rgba(0,0,0,0.1); /* Soft shadow for depth */
+            --shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
         }
 
         /* ================= CORE ================= */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Satoshi', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; position: relative; transition: background-color 0.5s ease, color 0.5s ease; }
+
+        /* Hardware Acceleration for Smoother Anim */
+        .anim-hero, .reveal, .card { will-change: transform, opacity; }
 
         /* 3D BACKGROUND CANVAS */
         #bg-canvas {
@@ -67,18 +70,21 @@
         .nav-island {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: rgba(18, 18, 18, 0.8); backdrop-filter: blur(16px); border: 1px solid var(--border);
-            padding: 8px 10px; border-radius: 50px; display: flex; gap: 10px; z-index: 1000;
+            padding: 8px 10px; border-radius: 50px; display: flex; align-items: center; gap: 5px; z-index: 1000;
             box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: transform 0.4s ease, opacity 0.4s ease;
+            max-width: 95vw;
         }
         .nav-island.hidden { transform: translateX(-50%) translateY(150%); opacity: 0; pointer-events: none; } 
         [data-theme="light"] .nav-island { background: rgba(255, 255, 255, 0.8); border-color: #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        .nav-link { color: #a1a1aa; text-decoration: none; font-weight: 600; font-size: 0.9rem; padding: 12px 24px; border-radius: 40px; transition: 0.3s; }
+        .nav-link { 
+            color: #a1a1aa; text-decoration: none; font-weight: 600; font-size: 0.9rem; 
+            padding: 12px 24px; border-radius: 40px; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+        }
         [data-theme="light"] .nav-link { color: #64748b; }
-        
         .nav-link:hover, .nav-link.active { color: white; background: var(--accent); }
         
-        .icon-btn { width: 48px; height: 48px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .icon-btn { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
         .icon-btn:hover { background: var(--text); color: var(--bg); transform: scale(1.1); }
 
         /* Grid System */
@@ -92,8 +98,6 @@
             .col-6 { grid-column: span 6; }
             .col-4 { grid-column: span 4; }
             .col-3 { grid-column: span 3; }
-            
-            /* Vertical span classes */
             .row-2 { grid-row: span 2; }
         }
 
@@ -107,10 +111,9 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
-            transition: all 0.4s var(--ease); 
+            transition: all 0.5s var(--ease); 
             box-shadow: var(--shadow);
         }
-        
         .card:hover { 
             border-color: var(--accent); 
             transform: translateY(-5px); 
@@ -118,29 +121,6 @@
             box-shadow: 0 20px 40px -10px var(--accent-glow);
         }
 
-        /* Special Card Types */
-        .card-glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-        }
-        [data-theme="light"] .card-glass {
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .card-highlight {
-            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
-        }
-
-        /* Expandable Card */
-        .card-expandable { cursor: pointer; height: auto; transition: all 0.5s var(--ease); }
-        .card-expandable:hover { background: var(--surface-hover); border-color: var(--accent); }
-        .card-hidden { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.5s ease; }
-        .card-expandable.active { background: var(--surface-hover); border-color: var(--accent); }
-        .card-expandable.active .card-hidden { max-height: 500px; opacity: 1; margin-top: 20px; }
-        .card-indicator { float: right; transition: 0.3s; }
-        .card-expandable.active .card-indicator { transform: rotate(180deg); }
-
-        /* Components */
         .manifesto-section { padding: 100px 0; overflow: hidden; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); }
         .manifesto-text { font-size: clamp(4rem, 15vw, 12rem); font-weight: 900; white-space: nowrap; color: transparent; -webkit-text-stroke: 1px var(--text-dim); opacity: 0.5; }
         
@@ -158,7 +138,6 @@
         @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .matrix-mode { color: var(--matrix-green) !important; font-family: 'Courier New', monospace; text-shadow: 0 0 5px var(--matrix-green); }
 
-        /* Project Card Special */
         .project-card { 
             background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%); 
             border: 1px solid var(--accent); cursor: pointer; text-decoration: none; color: inherit;
@@ -182,9 +161,6 @@
         .btn-secondary { background: #333; color: white; }
         .btn-auth:hover { transform: scale(1.02); }
 
-        #blockScreen h1 { color: #ef4444; font-size: clamp(2rem, 5vw, 4rem); text-transform: uppercase; margin-bottom: 20px; font-weight: 900; letter-spacing: -2px; }
-        #blockScreen p { color: #ffffff; font-size: 1.2rem; font-family: 'Courier New', monospace; max-width: 800px; line-height: 1.6; }
-
         /* === PRELOADER === */
         .preloader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
@@ -197,10 +173,24 @@
 
         #mainApp { opacity: 0; visibility: hidden; transition: opacity 1s ease; }
 
-        @media (max-width: 1024px) {
-            .nav-island { width: 90%; justify-content: space-between; padding: 12px 15px; bottom: 20px; }
-            .nav-link { padding: 0; background: none !important; color: var(--text-dim) !important; font-size: 1.2rem; }
+        /* === MOBILE RESPONSIVENESS FIX === */
+        @media (max-width: 768px) {
+            .nav-island { 
+                padding: 8px; 
+                bottom: 20px; 
+                gap: 5px; 
+                width: auto;
+            }
+            /* Hide text labels on mobile, keep icons */
+            .nav-link span { display: none; } 
+            .nav-link { 
+                padding: 10px; 
+                background: transparent !important; 
+                color: var(--text-dim) !important;
+            }
+            .nav-link i { font-size: 1.2rem; }
             .nav-link.active { color: var(--accent) !important; }
+            
             h1 { font-size: 3.5rem; }
             .grid-bento { grid-template-columns: 1fr; }
             .col-12, .col-8, .col-6, .col-4, .col-3 { grid-column: span 1; }
@@ -212,8 +202,8 @@
     <canvas id="bg-canvas"></canvas>
 
     <div id="blockScreen">
-        <h1 id="blockTitle">ACCESS DENIED</h1>
-        <p id="blockReason">Security Protocol Initiated.</p>
+        <h1 id="blockTitle" style="color:#ef4444; font-size:3rem; font-weight:900;">ACCESS DENIED</h1>
+        <p id="blockReason" style="font-family:monospace; color:white;">Security Protocol Initiated.</p>
     </div>
 
     <div id="authScreen">
@@ -221,18 +211,18 @@
             <i class="fas fa-fingerprint" style="font-size: 30px; color: white;"></i>
         </div>
         <h1>RESTRICTED ACCESS</h1>
-        <p>Identify yourself to enter the portfolio.</p>
+        <p>Verified Identity Required.</p>
         
         <div class="auth-form">
-            <input type="email" id="emailInput" class="auth-input" placeholder="Enter Email" required>
-            <input type="password" id="passInput" class="auth-input" placeholder="Enter Password" required>
+            <input type="email" id="emailInput" class="auth-input" placeholder="Enter Valid Email" required>
+            <input type="password" id="passInput" class="auth-input" placeholder="Password" required>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button id="emailLoginBtn" class="btn-auth btn-primary">Login</button>
                 <button id="emailSignupBtn" class="btn-auth btn-secondary">Sign Up</button>
             </div>
         </div>
         
-        <p id="loginStatus" style="margin-top: 20px; font-size: 0.9rem; color: #ef4444; min-height: 20px;"></p>
+        <p id="loginStatus" style="margin-top: 20px; font-size: 0.9rem; color: #ef4444; min-height: 20px; max-width: 350px;"></p>
     </div>
 
     <div class="preloader" id="preloader">
@@ -243,13 +233,13 @@
     <div id="mainApp">
         <nav class="nav-island" id="mainNav">
             <a href="#home" class="nav-link active"><i class="fas fa-home"></i></a>
-            <a href="#about" class="nav-link">About</a>
-            <a href="#skills" class="nav-link">Skills</a>
-            <a href="#contact" class="nav-link">Contact</a>
-            <div style="width: 1px; background: var(--border); height: 20px; align-self: center;"></div>
+            <a href="#about" class="nav-link"><i class="fas fa-user"></i><span>About</span></a>
+            <a href="#skills" class="nav-link"><i class="fas fa-code"></i><span>Skills</span></a>
+            <a href="#contact" class="nav-link"><i class="fas fa-paper-plane"></i><span>Contact</span></a>
+            <div style="width: 1px; background: var(--border); height: 20px; align-self: center; opacity: 0.5;"></div>
             <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
             <button id="pdfBtn" class="icon-btn"><i class="fas fa-download"></i></button>
-            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;"><i class="fas fa-sign-out-alt"></i></button>
+            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;"><i class="fas fa-power-off"></i></button>
         </nav>
 
         <section id="home" class="hero-section">
@@ -299,11 +289,11 @@
                     </div>
                 </div>
 
-                <div class="card col-4 reveal" style="background: linear-gradient(45deg, #1db954, #1ed760); border: none; color: black; justify-content: center;">
+                <a href="https://open.spotify.com/user/fse7aztoyuwdfomsvnv15spuk?si=8hOFqCbsR1yQp9ko8mZ74A" class="card col-4 reveal" style="background: linear-gradient(45deg, #1db954, #1ed760); border: none; color: black; justify-content: center; text-decoration: none; cursor: pointer;">
                     <i class="fab fa-spotify" style="font-size: 3rem; margin-bottom: 10px;"></i>
                     <h3>Focus Mode</h3>
                     <p style="color: rgba(0,0,0,0.7);">Always learning, always listening.</p>
-                </div>
+                </a>
             </div>
         </section>
 
@@ -476,8 +466,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        // STRICT SECURITY: 'inMemoryPersistence'
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, inMemoryPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // ADDED sendEmailVerification here
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, inMemoryPersistence, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getDatabase, ref, set, get, child, push, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         // CONFIG
@@ -495,19 +485,14 @@
         const auth = getAuth(app);
         const database = getDatabase(app);
 
-        // ** STRICT SECURITY: IN-MEMORY PERSISTENCE **
+        // ** STRICT SECURITY: SESSION ONLY **
         setPersistence(auth, inMemoryPersistence)
             .then(() => {
-                console.log("Strict Memory Persistence Enabled.");
+                console.log("Persistence set to SESSION (In Memory).");
             })
             .catch((error) => {
                 console.error("Auth Persistence Error:", error);
             });
-
-        // Explicit logout on unload
-        window.addEventListener('beforeunload', () => {
-            signOut(auth).catch(() => {});
-        });
 
         // DOM ELEMENTS
         const authScreen = document.getElementById('authScreen');
@@ -525,7 +510,6 @@
         let authStateKnown = false;
         let currentUser = null;
 
-        // AUTH & LOADING STATE
         window.addEventListener('preloaderDone', () => {
             preloaderFinished = true;
             decideScreen();
@@ -540,11 +524,19 @@
         function decideScreen() {
             if (!preloaderFinished || !authStateKnown) return;
 
-            if (currentUser) {
+            // CHECK IF VERIFIED
+            if (currentUser && currentUser.emailVerified) {
                 authScreen.style.display = 'none';
                 revealSite();
+            } else if (currentUser && !currentUser.emailVerified) {
+                // If logged in but not verified, force logout and show message
+                signOut(auth);
+                authScreen.style.display = 'flex';
+                loginStatus.innerText = "Email not verified. Please check your inbox.";
+                mainApp.style.opacity = 0;
+                mainApp.style.visibility = 'hidden';
             } else {
-                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "power2.inOut" });
+                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
                 authScreen.style.display = 'flex';
                 mainApp.style.opacity = 0;
                 mainApp.style.visibility = 'hidden';
@@ -552,14 +544,14 @@
         }
 
         function revealSite() {
-            gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "power2.inOut" });
+            gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
             authScreen.style.display = 'none';
             mainApp.style.visibility = 'visible';
             mainApp.style.opacity = 1;
             window.dispatchEvent(new Event('siteRevealed'));
         }
 
-        // LOGIN / SIGNUP HANDLERS
+        // LOGIN LOGIC
         emailLoginBtn.addEventListener('click', () => {
             const email = emailInput.value;
             const pass = passInput.value;
@@ -567,11 +559,18 @@
             
             signInWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
-                    loginStatus.innerText = "Success! Welcome back.";
+                    const user = userCredential.user;
+                    if (user.emailVerified) {
+                        loginStatus.innerText = "Verified. Access Granted.";
+                    } else {
+                        loginStatus.innerText = "Please verify your email first.";
+                        signOut(auth);
+                    }
                 })
                 .catch((error) => handleError(error));
         });
 
+        // SIGN UP LOGIC WITH EMAIL VERIFICATION
         emailSignupBtn.addEventListener('click', () => {
             const email = emailInput.value;
             const pass = passInput.value;
@@ -579,14 +578,22 @@
 
             createUserWithEmailAndPassword(auth, email, pass)
                 .then((userCredential) => {
-                    loginStatus.innerText = "Account Created! Welcome.";
+                    const user = userCredential.user;
+                    sendEmailVerification(user)
+                        .then(() => {
+                            loginStatus.innerText = "Verification link sent to " + email + ". Check your inbox then Login.";
+                            // Immediately sign out so they can't access until verified
+                            signOut(auth);
+                        });
                 })
                 .catch((error) => handleError(error));
         });
 
         if(logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                if(confirm("Are you sure you want to lock the portfolio?")) signOut(auth);
+                signOut(auth).then(() => {
+                    location.reload(); // Refresh to clear memory
+                });
             });
         }
 
@@ -625,8 +632,6 @@
             if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; 
             if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; 
             if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'S'.charCodeAt(0)) return false; 
-            if(e.ctrlKey && e.keyCode == 'P'.charCodeAt(0)) return false; 
         }
 
         // === 3. GLOBAL STATE ===
@@ -645,17 +650,15 @@
 
         // === 5. INITIALIZATION ===
         window.addEventListener('load', async () => {
-            // Cinematic Entrance
             const tl = gsap.timeline({
                 onComplete: () => {
                     window.dispatchEvent(new Event('preloaderDone'));
                 }
             });
             
-            tl.to("#progressFill", { width: "100%", duration: 2.0, ease: "power2.inOut" })
+            tl.to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" })
               .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
             
-            // 3D Background Init
             initThreeJS();
 
             if (localStorage.getItem('isOwner') === 'true') return;
@@ -664,18 +667,18 @@
             enforceSecurity();
         });
 
-        // === 6. DELAYED ANIMATIONS ===
+        // === 6. ANIMATIONS ===
         window.addEventListener('siteRevealed', () => {
             console.log("Site Revealed - Initializing Animations...");
             ScrollTrigger.refresh();
             gsap.registerPlugin(ScrollTrigger);
             
-            gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: "power4.out", delay: 0.2 });
+            gsap.from(".anim-hero", { y: 100, opacity: 0, duration: 1.5, stagger: 0.2, ease: "expo.out", delay: 0.2 });
             
             gsap.utils.toArray('.reveal').forEach(el => {
                 gsap.from(el, { 
                     scrollTrigger: { trigger: el, start: "top 85%" }, 
-                    y: 60, opacity: 0, duration: 1, ease: "power3.out" 
+                    y: 60, opacity: 0, duration: 1.2, ease: "expo.out" 
                 });
             });
             
@@ -683,7 +686,7 @@
             gsap.to("#scrollingText2", { x: -200, scrollTrigger: { trigger: ".manifesto-section", scrub: 1 } });
         });
 
-        // === 7. THREE.JS PARTICLE SYSTEM (REFINED for SLOW DRIFT) ===
+        // === 7. THREE.JS PARTICLE SYSTEM ===
         const initThreeJS = () => {
             const canvas = document.getElementById('bg-canvas');
             if (!canvas) return;
@@ -695,19 +698,16 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             camera.position.z = 30;
 
-            // Geometry
             const particlesGeometry = new THREE.BufferGeometry();
             const particlesCount = 800; 
             const posArray = new Float32Array(particlesCount * 3);
 
             for(let i = 0; i < particlesCount * 3; i++) {
-                // Spread them out more (100 range)
                 posArray[i] = (Math.random() - 0.5) * 100; 
             }
 
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             
-            // Material: TINY SIZE (0.02)
             const material = new THREE.PointsMaterial({
                 size: 0.02,
                 color: 0x3b82f6,
@@ -719,27 +719,20 @@
             const particlesMesh = new THREE.Points(particlesGeometry, material);
             scene.add(particlesMesh);
 
-            // Interaction Variables
             let mouseX = 0;
             let mouseY = 0;
 
             document.addEventListener('mousemove', (event) => {
-                // Smooth normalized mouse
                 mouseX = (event.clientX / window.innerWidth) - 0.5;
                 mouseY = (event.clientY / window.innerHeight) - 0.5;
             });
 
             const animate = () => {
                 requestAnimationFrame(animate);
-                
-                // Very Slow Drift
                 particlesMesh.rotation.y += 0.0002; 
                 particlesMesh.rotation.x += 0.0001;
-
-                // Gentle Mouse Parallax
                 particlesMesh.rotation.y += mouseX * 0.005;
                 particlesMesh.rotation.x += mouseY * 0.005;
-
                 renderer.render(scene, camera);
             };
 
@@ -768,8 +761,6 @@
             else if (ua.indexOf("like Mac") !== -1) os = "iOS";
 
             if (ua.indexOf("Firefox") !== -1) browser = "Firefox";
-            else if (ua.indexOf("SamsungBrowser") !== -1) browser = "Samsung Internet";
-            else if (ua.indexOf("Opera") !== -1) browser = "Opera";
             else if (ua.indexOf("Chrome") !== -1) browser = "Chrome";
             else if (ua.indexOf("Safari") !== -1) browser = "Safari";
 
@@ -810,22 +801,13 @@
             let emailSubject = "Visitor (Verified)";
 
             if (TARGET_IPS.includes(visitorData.ip)) {
-                action = "BLOCK";
-                title = "ACCESS BLOCKED";
-                message = "Your access to this website is Blocked. If you're reading this, it means you already messed up. Now close the Tab in an orderly manner.";
-                emailSubject = "ALERT: TARGET IP BLOCKED";
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Targeted IP blocked."; emailSubject = "ALERT: TARGET IP BLOCKED";
             }
             else if (visitorData.isVPN) {
-                action = "BLOCK";
-                title = "ACCESS BLOCKED";
-                message = "Access Blocked. Turn off the VPN to get inside.";
-                emailSubject = "ALERT: VPN USER BLOCKED";
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "VPN access is restricted."; emailSubject = "ALERT: VPN USER BLOCKED";
             }
             else if (visitorData.city === "Kanpur") {
-                action = "BLOCK";
-                title = "ACCESS DENIED";
-                message = "Since you come from a restrictive State Uttar Pradesh, You cannot visit this website. Behave mannerly and close the Tab.";
-                emailSubject = "ALERT: KANPUR USER BLOCKED";
+                action = "BLOCK"; title = "ACCESS DENIED"; message = "Restricted Region."; emailSubject = "ALERT: RESTRICTED REGION BLOCKED";
             }
 
             if (action === "BLOCK") {
@@ -846,26 +828,15 @@
             }
         }
 
-        // === 10. REPORTING ===
         function sendReport(subject, statusMsg) {
             const report = `
             ${subject}
             --------------------------------------------------
             STATUS: ${statusMsg}
-            
-            📍 NETWORK:
             IP: ${visitorData.ip}
-            ISP: ${visitorData.isp}
             Location: ${visitorData.city}, ${visitorData.region}
-            VPN Detected: ${visitorData.isVPN}
-            
-            📱 DEVICE:
-            Info: ${visitorData.device}
-            Battery: ${visitorData.battery}
-            User Agent: ${navigator.userAgent}
-            
-            🕒 TIMESTAMP:
-            ${new Date().toLocaleString()}
+            Device: ${visitorData.device}
+            VPN: ${visitorData.isVPN}
             `;
 
             fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, {
@@ -875,16 +846,7 @@
             }).catch(e => console.log("Report log skipped"));
         }
 
-        // === 11. INTERACTIONS ===
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('mainNav');
-            const footer = document.getElementById('footerTrigger');
-            if (footer && nav) {
-                const footerRect = footer.getBoundingClientRect();
-                if (footerRect.top < window.innerHeight) { nav.classList.add('hidden'); } else { nav.classList.remove('hidden'); }
-            }
-        });
-
+        // === 10. INTERACTIONS ===
         const themeBtn = document.getElementById('themeToggle');
         const html = document.documentElement;
         if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
@@ -920,41 +882,66 @@
         });
         observer.observe(document.getElementById('footerTrigger'));
 
+        // === PDF GENERATION (UPDATED) ===
         document.getElementById('pdfBtn').addEventListener('click', async function() {
             const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                doc.setFont("helvetica", "bold"); doc.setFontSize(24); doc.setTextColor(0,0,0);
-                doc.text("KARTIK CHOUHAN", 20, 20);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(80);
-                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 26);
-                doc.text("MCom Student | Financial Tech Enthusiast", 20, 31);
-                doc.setLineWidth(0.5); doc.line(20, 35, 190, 35);
-                let y = 45;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.setTextColor(0);
-                doc.text("PROFESSIONAL PROFILE", 20, y); y+=7;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom with expertise in Tally ERP, Data Analysis (Excel), and Content Strategy. Passionate about solving business problems through technology.";
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF();
+                
+                // HEADER
+                doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(0);
+                doc.text("KARTIK CHOUHAN", 20, 25);
+                
+                doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(80);
+                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32);
+                doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
+                
+                doc.setLineWidth(0.5); doc.setDrawColor(200); doc.line(20, 45, 190, 45);
+                
+                let y = 55;
+                
+                // SUMMARY
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0);
+                doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems.";
                 doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("ACADEMIC HISTORY", 20, y); y+=8;
+                
+                // EDUCATION
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0);
+                doc.text("EDUCATION", 20, y); y+=10;
+                
                 doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); 
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2025 - Present", 120, y); 
-                doc.text("• Specializing in Corporate Tax, Macro-Economics, and Strategic Management.", 20, y+5); y+=12;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.text("Himachal Pradesh University | 2022 - 2025", 120, y); 
-                doc.text("• Graduated with focus on Accounting and Business Law.", 20, y+5); y+=15;
-                doc.setFont("helvetica", "bold"); doc.setFontSize(12); doc.text("CORE COMPETENCIES", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-                doc.text("• Financial Tech: Tally ERP 9, Tally Prime (GST/Payroll), Advanced Excel.", 20, y); y+=6;
-                doc.text("• Digital Tools: Java (Diploma), MS Office Suite, Windows OS.", 20, y); y+=6;
-                doc.text("• Creative: Content Creation (YouTube), Video Editing, Photography.", 20, y); y+=6;
-                doc.text("• Soft Skills: Strategic Thinking, Analytical Problem Solving, Adaptability.", 20, y); 
+                doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+
+                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y);
+                doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+
+                // SKILLS
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0);
+                doc.text("TECHNICAL SKILLS", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6;
+                doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6;
+                doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6;
+                doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
+
+                // DECLARATION
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0);
+                doc.text("DECLARATION", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
+
                 doc.save("Kartik_Chouhan_CV.pdf");
-                btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
-            } catch(e) { console.error(e); btn.innerHTML = originalIcon; }
+                
+                btn.innerHTML = '<i class="fas fa-check"></i>'; 
+                setTimeout(() => btn.innerHTML = originalIcon, 2000);
+            } catch(e) { console.error(e); btn.innerHTML = originalIcon; alert("Error generating PDF"); }
         });
 
-        // === CONTACT FORM ===
         document.getElementById('contactForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const btn = this.querySelector('button');
