@@ -8,7 +8,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
@@ -17,7 +19,6 @@
     <style>
         /* ================= VARIABLES & THEMES ================= */
         :root {
-            /* DARK MODE (Default) */
             --bg: #050505; 
             --surface: rgba(18, 18, 18, 0.6); 
             --surface-hover: rgba(30, 30, 30, 0.8); 
@@ -31,7 +32,6 @@
         }
 
         [data-theme="light"] {
-            /* LIGHT MODE */
             --bg: #f0f4f8; 
             --surface: rgba(255, 255, 255, 0.7); 
             --surface-hover: rgba(255, 255, 255, 0.9); 
@@ -44,139 +44,533 @@
 
         /* ================= CORE STYLES ================= */
         * { 
-            margin: 0; padding: 0; box-sizing: border-box; 
-            -webkit-user-select: none; -moz-user-select: none; user-select: none; 
-            -webkit-touch-callout: none;
-            cursor: none; /* Hide default cursor for custom one */
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none; 
         }
         
         body { 
-            background-color: var(--bg); color: var(--text); 
-            font-family: 'Satoshi', sans-serif; overflow-x: hidden; 
-            -webkit-font-smoothing: antialiased; position: relative; 
-            transition: background-color 0.5s ease, color 0.5s ease;
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased; 
+            transition: background-color 0.5s ease, color 0.5s ease; 
         }
 
-        .anim-hero, .reveal, .card { will-change: transform, opacity; }
+        /* Hardware Acceleration for GSAP Animations */
+        .anim-hero, .reveal, .card { 
+            will-change: transform, opacity; 
+        }
+
+        /* Lenis Smooth Scroll Fixes */
         html.lenis { height: auto; }
         .lenis.lenis-smooth { scroll-behavior: auto; }
         .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 
         /* Cinematic Film Grain Overlay */
-        .film-grain {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 9998; opacity: 0.04;
-            background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        .film-grain { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            pointer-events: none; 
+            z-index: 9998; 
+            opacity: 0.04; 
+            background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E'); 
         }
 
-        /* Custom Cursor */
-        .custom-cursor {
-            position: fixed; top: 0; left: 0; width: 20px; height: 20px;
-            border: 2px solid var(--accent); border-radius: 50%;
-            pointer-events: none; z-index: 100000;
-            transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s, background-color 0.3s;
+        /* 3D Particle Canvas */
+        #bg-canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            pointer-events: none; 
         }
-        .custom-cursor.hovering { width: 50px; height: 50px; background-color: var(--accent-glow); border-color: transparent; mix-blend-mode: exclusion; }
-
-        /* 3D BACKGROUND CANVAS */
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
 
         /* Typography */
-        h1 { font-size: clamp(3.5rem, 10vw, 8rem); font-weight: 900; line-height: 0.9; letter-spacing: -0.04em; }
-        h2 { font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 20px; }
-        h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
-        p { color: var(--text-dim); line-height: 1.7; font-size: 1.1rem; }
-        .text-accent { color: var(--accent); }
-        .text-label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); font-weight: 700; margin-bottom: 15px; display: block; }
-        
-        /* Nav Island */
-        .nav-island {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); 
-            border: 1px solid var(--border); padding: 8px 10px; border-radius: 50px; display: flex; align-items: center; gap: 5px; z-index: 1000;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); transition: transform 0.4s var(--ease), opacity 0.4s var(--ease);
-            max-width: 95vw;
+        h1 { 
+            font-size: clamp(3.5rem, 10vw, 8rem); 
+            font-weight: 900; 
+            line-height: 0.9; 
+            letter-spacing: -0.04em; 
         }
-        .nav-island.hidden { transform: translateX(-50%) translateY(200%); opacity: 0; pointer-events: none; } 
+        
+        h2 { 
+            font-size: clamp(2rem, 5vw, 3.5rem); 
+            font-weight: 800; 
+            letter-spacing: -0.02em; 
+            margin-bottom: 20px; 
+        }
+        
+        h3 { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        p { 
+            color: var(--text-dim); 
+            line-height: 1.7; 
+            font-size: 1.1rem; 
+        }
+        
+        .text-accent { 
+            color: var(--accent); 
+        }
+        
+        .text-label { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--text-dim); 
+            font-weight: 700; 
+            margin-bottom: 15px; 
+            display: block; 
+        }
+                /* ================= NAVIGATION ISLAND ================= */
+        .nav-island { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--surface); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--border); 
+            padding: 8px 10px; 
+            border-radius: 50px; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            z-index: 1000; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+            transition: transform 0.4s var(--ease), opacity 0.4s var(--ease); 
+            max-width: 95vw; 
+        }
+        
+        .nav-island.hidden { 
+            transform: translateX(-50%) translateY(200%); 
+            opacity: 0; 
+            pointer-events: none; 
+        } 
         
         .nav-link { 
-            color: var(--text-dim); text-decoration: none; font-weight: 600; font-size: 0.9rem; 
-            padding: 12px 24px; border-radius: 40px; transition: 0.3s; display: flex; align-items: center; gap: 8px;
+            color: var(--text-dim); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            padding: 12px 24px; 
+            border-radius: 40px; 
+            transition: 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
         }
-        .nav-link:hover, .nav-link.active { color: white; background: var(--accent); }
-        .icon-btn { width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--border); background: transparent; color: var(--text); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
-        .icon-btn:hover { background: var(--text); color: var(--bg); transform: scale(1.1); }
+        
+        .nav-link:hover, .nav-link.active { 
+            color: white; 
+            background: var(--accent); 
+        }
+        
+        .icon-btn { 
+            width: 44px; 
+            height: 44px; 
+            flex-shrink: 0; 
+            border-radius: 50%; 
+            border: 1px solid var(--border); 
+            background: transparent; 
+            color: var(--text); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .icon-btn:hover { 
+            background: var(--text); 
+            color: var(--bg); 
+            transform: scale(1.1); 
+        }
 
-        /* Grid System & Cards */
-        .section { padding: 120px 20px; max-width: 1400px; margin: 0 auto; }
-        .hero-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .grid-bento { display: grid; grid-template-columns: 1fr; gap: 24px; width: 100%; perspective: 1000px; }
+        /* ================= BENTO GRID SYSTEM ================= */
+        .section { 
+            padding: 120px 20px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        
+        .hero-section { 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        
+        .grid-bento { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 24px; 
+            width: 100%; 
+        }
+        
         @media (min-width: 1024px) {
             .grid-bento { grid-template-columns: repeat(12, 1fr); }
-            .col-12 { grid-column: span 12; }
-            .col-8 { grid-column: span 8; }
-            .col-6 { grid-column: span 6; }
-            .col-4 { grid-column: span 4; }
+            .col-12 { grid-column: span 12; } 
+            .col-8 { grid-column: span 8; } 
+            .col-6 { grid-column: span 6; } 
+            .col-4 { grid-column: span 4; } 
             .row-2 { grid-row: span 2; }
         }
 
         .card { 
-            background: var(--surface); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border); border-radius: var(--radius); 
-            padding: 2.5rem; position: relative; overflow: hidden; display: flex; flex-direction: column; 
-            transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease); transform-style: preserve-3d;
+            background: var(--surface); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            padding: 2.5rem; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease); 
         }
-        .card:hover { border-color: var(--accent); z-index: 2; box-shadow: 0 20px 40px -10px var(--accent-glow); }
+        
+        .card:hover { 
+            border-color: var(--accent); 
+            z-index: 2; 
+            box-shadow: 0 20px 40px -10px var(--accent-glow); 
+        }
 
-        /* Inputs & Misc */
-        .list-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 15px; background: rgba(128,128,128,0.05); border-radius: 12px; border: 1px solid transparent; transition: 0.3s; }
-        .list-item:hover { border-color: var(--border); transform: translateX(5px); }
-        .input-box { width: 100%; padding: 20px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); border-radius: 12px; color: var(--text); margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .input-box:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-        .btn-submit { background: var(--text); color: var(--bg); width: 100%; padding: 20px; border-radius: 12px; font-weight: 800; border: none; transition: 0.3s; }
-        .btn-submit:hover { transform: scale(1.02); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        /* ================= NEW CARD SPECIFIC STYLES ================= */
+        /* Spotify Equalizer */
+        .equalizer { 
+            display: flex; 
+            gap: 4px; 
+            align-items: flex-end; 
+            height: 30px; 
+            margin-bottom: 15px; 
+        }
+        
+        .eq-bar { 
+            width: 6px; 
+            background: #1db954; 
+            border-radius: 3px; 
+            animation: eq 1s ease-in-out infinite alternate; 
+        }
+        
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; } 
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; } 
+        .eq-bar:nth-child(4) { animation-delay: 0.1s; }
+        
+        @keyframes eq { 
+            0% { height: 5px; } 
+            100% { height: 30px; } 
+        }
+        
+        /* Fort Knox Terminal */
+        .terminal-text { 
+            font-family: monospace; 
+            color: #00ff41; 
+            line-height: 1.5; 
+            font-size: 0.9rem; 
+        }
+        
+        .blinking-cursor { 
+            display: inline-block; 
+            width: 8px; 
+            height: 15px; 
+            background: #00ff41; 
+            animation: blink 1s step-end infinite; 
+        }
+        
+        @keyframes blink { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0; } 
+        }
 
-        /* Security Screens */
-        #blockScreen, #authScreen, .preloader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        /* ================= INPUTS & LISTS ================= */
+        .list-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+            padding: 15px; 
+            background: rgba(128,128,128,0.05); 
+            border-radius: 12px; 
+            border: 1px solid transparent; 
+            transition: 0.3s ease; 
+        }
+        
+        .list-item:hover { 
+            border-color: var(--border); 
+            transform: translateX(5px); 
+        }
+        
+        .input-box { 
+            width: 100%; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            color: var(--text); 
+            margin-bottom: 15px; 
+            outline: none; 
+            transition: 0.3s ease; 
+            font-family: 'Satoshi', sans-serif; 
+        }
+        
+        .input-box:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px var(--accent-glow); 
+        }
+        
+        .btn-submit { 
+            background: var(--text); 
+            color: var(--bg); 
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            border: none; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .btn-submit:hover { 
+            transform: scale(1.02); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+        }
+
+        /* ================= SECURITY SCREENS & PRELOADER ================= */
+        #blockScreen, #authScreen, .preloader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        
         #blockScreen { background: #000; display: none; z-index: 100000; padding: 40px; color: white; } 
         #authScreen { background: #000; display: none; z-index: 999; padding: 40px; color: white; } 
         .preloader { background: var(--bg); z-index: 9999; }
         
-        .auth-form { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 350px; margin-top: 20px; }
-        .auth-input { width: 100%; padding: 15px; background: rgba(255,255,255,0.05); border: 1px solid #333; color: white; border-radius: 8px; outline: none; }
+        .auth-form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            width: 100%; 
+            max-width: 350px; 
+            margin-top: 20px; 
+        }
+        
+        .auth-input { 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid #333; 
+            color: white; 
+            border-radius: 8px; 
+            outline: none; 
+        }
+        
         .auth-input:focus { border-color: var(--accent); }
-        .btn-auth { padding: 15px; border-radius: 8px; font-weight: 700; border: none; transition: 0.3s; }
-        .btn-primary { background: white; color: black; }
+        
+        .btn-auth { 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            border: none; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .btn-primary { background: white; color: black; } 
         .btn-secondary { background: #333; color: white; }
+        
+        .preloader-text { 
+            font-size: 3rem; 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            color: var(--text); 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .progress-bar { 
+            width: 200px; 
+            height: 2px; 
+            background: #333; 
+            margin-top: 20px; 
+            border-radius: 2px; 
+            overflow: hidden; 
+        }
+        
+        .progress-fill { 
+            width: 0%; 
+            height: 100%; 
+            background: var(--accent); 
+        }
+        
+        #mainApp { 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: opacity 1s ease; 
+        }
 
-        .preloader-text { font-size: 3rem; font-weight: 900; letter-spacing: -1px; color: var(--text); opacity: 0; transform: translateY(20px); }
-        .progress-bar { width: 200px; height: 2px; background: #333; margin-top: 20px; border-radius: 2px; overflow: hidden; }
-        .progress-fill { width: 0%; height: 100%; background: var(--accent); }
-        #mainApp { opacity: 0; visibility: hidden; transition: opacity 1s ease; }
+        /* ================= SECRET VAULT UI ================= */
+        #pinPadModal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 20000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: 0.5s ease; 
+        }
+        
+        .pin-box { 
+            background: rgba(25,25,25,0.9); 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            text-align: center; 
+            max-width: 400px; 
+            width: 90%; 
+        }
+        
+        .pin-input { 
+            width: 100%; 
+            background: transparent; 
+            border: none; 
+            border-bottom: 2px solid #555; 
+            color: white; 
+            font-size: 2rem; 
+            text-align: center; 
+            letter-spacing: 15px; 
+            outline: none; 
+            margin: 30px 0; 
+            font-family: monospace; 
+            transition: 0.3s ease; 
+        }
+        
+        .pin-input:focus { border-color: white; }
+        
+        #secretPage { 
+            display: none; 
+            min-height: 100vh; 
+            background: #020202; 
+            color: #d4d4d4; 
+            padding: 100px 20px; 
+            position: relative; 
+            z-index: 100; 
+            font-family: 'Satoshi', serif; 
+        }
+        
+        .secret-container { 
+            max-width: 700px; 
+            margin: 0 auto; 
+            line-height: 1.9; 
+            font-size: 1.15rem; 
+        }
+        
+        .secret-title { 
+            font-size: 3.5rem; 
+            color: white; 
+            margin-bottom: 50px; 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            line-height: 1.1; 
+        }
+        
+        .secret-text { 
+            margin-bottom: 25px; 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .secret-list { 
+            margin-bottom: 25px; 
+            padding-left: 20px; 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .secret-list li { margin-bottom: 8px; }
+        
+        .music-player { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 15px 25px; 
+            border-radius: 50px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin: 40px 0; 
+            color: white; 
+            text-decoration: none; 
+            transition: 0.3s ease; 
+        }
+        
+        .music-player:hover { 
+            background: rgba(255,255,255,0.1); 
+            transform: scale(1.02); 
+        }
 
+        /* ================= RESPONSIVE MEDIA QUERIES ================= */
         @media (max-width: 768px) {
-            .nav-island { padding: 8px; bottom: 20px; gap: 5px; width: auto; }
+            .nav-island { 
+                padding: 8px; 
+                bottom: 20px; 
+                width: auto; 
+            }
             .nav-link span { display: none; } 
-            .nav-link { padding: 10px; background: transparent !important; color: var(--text-dim) !important; }
+            .nav-link { 
+                padding: 10px; 
+                background: transparent !important; 
+                color: var(--text-dim) !important; 
+            }
             .nav-link.active { color: var(--accent) !important; }
-            h1 { font-size: 3.5rem; }
+            h1 { font-size: 3.5rem; } 
             .grid-bento { grid-template-columns: 1fr; }
             .col-12, .col-8, .col-6, .col-4 { grid-column: span 1; }
-            .custom-cursor { display: none; } /* Hide custom cursor on mobile touchscreens */
+            .secret-title { font-size: 2.5rem; }
         }
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;">
 
     <div class="film-grain"></div>
-
-    <div class="custom-cursor" id="customCursor"></div>
-
     <canvas id="bg-canvas"></canvas>
 
     <div id="blockScreen">
-        <h1 id="blockTitle" style="color:#ef4444; font-size:3rem; font-weight:900;">ACCESS DENIED</h1>
-        <p id="blockReason" style="font-family:monospace; color:white;">Security Protocol Initiated.</p>
+        <h1 id="blockTitle" style="color:#ef4444; font-size:3rem;">ACCESS DENIED</h1>
+        <p id="blockReason" style="font-family:monospace;">Security Protocol Initiated.</p>
     </div>
 
     <div id="authScreen">
@@ -198,19 +592,46 @@
 
     <div class="preloader" id="preloader">
         <div class="preloader-text">RAREKARTIK</div>
-        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div id="pinPadModal">
+        <div class="pin-box">
+            <i class="fas fa-lock" style="font-size: 2rem; color: #a1a1aa; margin-bottom: 20px;"></i>
+            <h3 style="color: white; margin-bottom: 10px;">Encrypted Vault</h3>
+            <p style="font-size: 0.9rem; color: #888;">Enter Passcode to unlock.</p>
+            <input type="password" id="secretPin" class="pin-input" maxlength="6" autocomplete="off" inputmode="numeric">
+            <p id="pinError" style="color: #ef4444; font-size: 0.85rem; height: 20px;"></p>
+        </div>
     </div>
 
     <div id="mainApp">
+        
         <nav class="nav-island" id="mainNav">
-            <a href="#home" class="nav-link active"><i class="fas fa-home"></i></a>
-            <a href="#about" class="nav-link"><i class="fas fa-user"></i><span>About</span></a>
-            <a href="#skills" class="nav-link"><i class="fas fa-code"></i><span>Skills</span></a>
-            <a href="#contact" class="nav-link"><i class="fas fa-paper-plane"></i><span>Contact</span></a>
+            <a href="#home" class="nav-link active">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="#about" class="nav-link">
+                <i class="fas fa-user"></i><span>About</span>
+            </a>
+            <a href="#skills" class="nav-link">
+                <i class="fas fa-code"></i><span>Skills</span>
+            </a>
+            <a href="#contact" class="nav-link">
+                <i class="fas fa-paper-plane"></i><span>Contact</span>
+            </a>
             <div style="width: 1px; background: var(--border); height: 20px; align-self: center; opacity: 0.5;"></div>
-            <button id="themeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
-            <button id="pdfBtn" class="icon-btn"><i class="fas fa-download"></i></button>
-            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;"><i class="fas fa-power-off"></i></button>
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="pdfBtn" class="icon-btn">
+                <i class="fas fa-download"></i>
+            </button>
+            <button id="logoutBtn" class="icon-btn" style="color: #ef4444;">
+                <i class="fas fa-power-off"></i>
+            </button>
         </nav>
 
         <section id="home" class="hero-section">
@@ -219,7 +640,12 @@
                     MCom Student • Creator • Learner
                 </div>
             </div>
-            <h1 class="anim-hero" id="backdoorTrigger">KARTIK<br><span style="color: var(--text-dim)">CHOUHAN</span></h1>
+            
+            <h1 class="anim-hero" id="backdoorTrigger">
+                KARTIK<br>
+                <span style="color: var(--text-dim)">CHOUHAN</span>
+            </h1>
+            
             <p class="anim-hero" style="max-width: 600px; margin-top: 30px;">
                 Exploring the intersection of <span class="text-accent">Commerce</span> and <span class="text-accent">Technology</span>.
             </p>
@@ -227,7 +653,8 @@
 
         <section id="about" class="section">
             <div class="grid-bento">
-                <div class="card col-8 row-2 reveal magnetic-card">
+                
+                <div class="card col-8 row-2 reveal">
                     <span class="text-label">01 — The Profile</span>
                     <h2>Who is RareKartik?</h2>
                     <p>
@@ -237,124 +664,205 @@
                         Currently pursuing my <strong>MCom</strong> and building a digital presence.
                     </p>
                     <div style="margin-top: 30px; display: flex; gap: 40px;">
-                        <div><h3 class="text-accent">21</h3><span class="text-label">Age</span></div>
-                        <div><h3 class="text-accent">MCom</h3><span class="text-label">Degree</span></div>
-                        <div><h3 class="text-accent">HPU</h3><span class="text-label">University</span></div>
+                        <div>
+                            <h3 class="text-accent">21</h3>
+                            <span class="text-label">Age</span>
+                        </div>
+                        <div>
+                            <h3 class="text-accent">MCom</h3>
+                            <span class="text-label">Degree</span>
+                        </div>
+                        <div>
+                            <h3 class="text-accent">HPU</h3>
+                            <span class="text-label">University</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card col-4 reveal magnetic-card" style="background: var(--surface-hover); justify-content: center; align-items: center; text-align: center;">
-                    <img src="rarekartikimg.jpg" alt="Kartik Chouhan" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); box-shadow: 0 0 20px var(--accent-glow); margin-bottom: 15px;">
+                <div class="card col-4 reveal" style="background: var(--surface-hover); justify-content: center; align-items: center; text-align: center;">
+                    
+                    <img src="rarekartikimg.jpg" alt="Kartik Chouhan" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin-bottom: 15px;">
+                    
                     <h3>Kartik</h3>
-                    <p class="text-accent">@rarekartik</p>
+                    
+                    <p class="text-accent" id="secretTrigger" style="cursor: pointer;">@rarekartik</p>
+                    
                     <div style="display: flex; gap: 10px; margin-top: 15px;">
-                        <a href="https://youtube.com/@rarekartik" class="icon-btn hover-target" style="width: 40px; height: 40px;"><i class="fab fa-youtube"></i></a>
-                        <a href="mailto:rarekartik@outlook.in" class="icon-btn hover-target" style="width: 40px; height: 40px;"><i class="fas fa-envelope"></i></a>
+                        <a href="https://youtube.com/@rarekartik" class="icon-btn" style="width: 40px; height: 40px;">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="mailto:rarekartik@outlook.in" class="icon-btn" style="width: 40px; height: 40px;">
+                            <i class="fas fa-envelope"></i>
+                        </a>
                     </div>
                 </div>
                 
-                <a href="https://open.spotify.com/user/fse7aztoyuwdfomsvnv15spuk?si=8hOFqCbsR1yQp9ko8mZ74A" class="card col-4 reveal magnetic-card hover-target" style="background: linear-gradient(45deg, rgba(29, 185, 84, 0.8), rgba(30, 215, 96, 0.8)); border: none; color: black; justify-content: center; text-decoration: none;">
+                <a href="https://open.spotify.com/user/fse7aztoyuwdfomsvnv15spuk?si=8hOFqCbsR1yQp9ko8mZ74A" class="card col-4 reveal" style="background: linear-gradient(45deg, rgba(29, 185, 84, 0.8), rgba(30, 215, 96, 0.8)); border: none; color: black; justify-content: center; text-decoration: none;">
                     <i class="fab fa-spotify" style="font-size: 3rem; margin-bottom: 10px; color: #000;"></i>
                     <h3 style="color: #000;">Focus Mode</h3>
                     <p style="color: rgba(0,0,0,0.7);">Always learning, always listening.</p>
                 </a>
+                
             </div>
         </section>
                 <section class="section">
-            <div class="card col-12 reveal magnetic-card" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+            
+            <div class="card col-12 reveal" style="background: transparent; border: none; padding: 0; box-shadow: none;">
                 <h2 style="text-align: center; font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 50px;">
                     "The modern accountant isn't just a bookkeeper. <br>
                     <span style="color: var(--text-dim)">They are the bridge between raw data and strategic decisions."</span>
                 </h2>
             </div>
-            <div class="card col-12 reveal magnetic-card">
+            
+            <div class="card col-12 reveal">
                 <span class="text-label">02 — Academic History</span>
                 <h2>Education Timeline</h2>
                 
                 <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border);">
                     <div class="text-accent" style="font-weight: 800;">2025-27</div>
-                    <div><h3>Masters of Commerce (MCom)</h3><p>Himachal Pradesh University • <span class="text-accent">Pursuing</span></p></div>
+                    <div>
+                        <h3>Masters of Commerce (MCom)</h3>
+                        <p>Himachal Pradesh University • <span class="text-accent">Pursuing</span></p>
+                    </div>
                 </div>
+                
                 <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border);">
                     <div class="text-accent" style="font-weight: 800;">2022-25</div>
-                    <div><h3>Bachelor of Commerce (BCom)</h3><p>Himachal Pradesh University • Completed</p></div>
+                    <div>
+                        <h3>Bachelor of Commerce (BCom)</h3>
+                        <p>Himachal Pradesh University • Completed</p>
+                    </div>
                 </div>
+                
                 <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0;">
                     <div class="text-accent" style="font-weight: 800;">2021-22</div>
-                    <div><h3>12th Commerce Stream</h3><p>Local Institution • Completed</p></div>
+                    <div>
+                        <h3>12th Commerce Stream</h3>
+                        <p>Local Institution • Completed</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="skills" class="section">
-            <h2 style="text-align: center; margin-bottom: 50px;">Detailed Competencies</h2>
+        <section class="section" style="padding-top: 0;">
             <div class="grid-bento">
-                <div class="card col-4 reveal magnetic-card">
+                
+                <div class="card col-4 reveal" style="background: rgba(10, 10, 10, 0.8);">
+                    <span class="text-label" style="color: #1db954;">Now Playing</span>
+                    
+                    <div class="equalizer">
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                    </div>
+                    
+                    <h3 style="margin-top: 15px;">Heavy Rotation</h3>
+                    <p style="font-size: 0.95rem;">The Weeknd • Travis Scott • Lana Del Rey • Eminem • Taylor Swift</p>
+                </div>
+
+                <div class="card col-4 reveal" style="background: #050505; border-color: rgba(0,255,65,0.3);">
+                    <span class="text-label" style="color: #00ff41;">
+                        <i class="fas fa-shield-alt"></i> Fort Knox Engine
+                    </span>
+                    
+                    <div class="terminal-text" id="liveTerminal">
+                        > INITIALIZING PROTOCOL...<br>
+                        > VERIFYING INTEGRITY...<br>
+                        > SECURE SESSION ESTABLISHED.<span class="blinking-cursor"></span>
+                    </div>
+                </div>
+
+                <div class="card col-4 reveal">
+                    <span class="text-label">Data Architecture</span>
+                    <h3>Commerce & Code</h3>
+                    
+                    <div style="width: 100%; height: 60px; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); margin: 20px 0; position: relative; display: flex; align-items: flex-end; padding-left: 10px; gap: 15%;">
+                        <div style="width: 15%; background: var(--accent); height: 30%; border-radius: 4px 4px 0 0;"></div>
+                        <div style="width: 15%; background: var(--accent); height: 50%; border-radius: 4px 4px 0 0;"></div>
+                        <div style="width: 15%; background: var(--accent); height: 90%; border-radius: 4px 4px 0 0; box-shadow: 0 0 15px var(--accent-glow);"></div>
+                    </div>
+                    
+                    <p style="font-size: 0.9rem;">Translating raw financial ledgers into automated digital structures.</p>
+                </div>
+                
+            </div>
+        </section>
+
+        <section id="skills" class="section" style="padding-top: 0;">
+            <h2 style="text-align: center; margin-bottom: 50px;">Detailed Competencies</h2>
+            
+            <div class="grid-bento">
+                
+                <div class="card col-4 reveal">
                     <span class="text-label">Financial Tech</span>
-                    <div class="list-item hover-target">
-                        <i class="fas fa-file-invoice-dollar" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fas fa-file-invoice-dollar" style="color: var(--accent);"></i>
                         <div><strong>Tally ERP & Prime</strong></div>
                     </div>
-                    <div class="list-item hover-target">
-                        <i class="fas fa-table" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fas fa-table" style="color: var(--accent);"></i>
                         <div><strong>Advanced Excel</strong></div>
                     </div>
                 </div>
-
-                <div class="card col-4 reveal magnetic-card">
+                
+                <div class="card col-4 reveal">
                     <span class="text-label">Digital Tools</span>
-                    <div class="list-item hover-target">
-                        <i class="fab fa-java" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fab fa-java" style="color: var(--accent);"></i>
                         <div><strong>Java (DCA)</strong></div>
                     </div>
-                    <div class="list-item hover-target">
-                        <i class="fas fa-laptop-code" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fas fa-laptop-code" style="color: var(--accent);"></i>
                         <div><strong>MS Office Suite</strong></div>
                     </div>
                 </div>
-
-                <div class="card col-4 reveal magnetic-card">
+                
+                <div class="card col-4 reveal">
                     <span class="text-label">Creative</span>
-                    <div class="list-item hover-target">
-                        <i class="fab fa-youtube" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fab fa-youtube" style="color: var(--accent);"></i>
                         <div><strong>Content Creation</strong></div>
                     </div>
-                    <div class="list-item hover-target">
-                        <i class="fas fa-video" style="color: var(--accent); font-size:1.2rem;"></i>
+                    <div class="list-item">
+                        <i class="fas fa-video" style="color: var(--accent);"></i>
                         <div><strong>Video Editing</strong></div>
                     </div>
                 </div>
                 
-                <div class="card col-12 reveal magnetic-card" style="background: var(--surface-hover);">
+                <div class="card col-12 reveal" style="background: var(--surface-hover);">
                     <span class="text-label">Services</span>
                     <h3 style="margin-bottom: 20px;">What I can do for you?</h3>
+                    
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
-                        <div class="hover-target">
+                        <div>
                             <i class="fas fa-check-circle text-accent"></i> <strong>Bookkeeping</strong>
                             <p style="font-size: 0.9rem;">Managing financial records using Tally.</p>
                         </div>
-                        <div class="hover-target">
+                        <div>
                             <i class="fas fa-check-circle text-accent"></i> <strong>Web Development</strong>
                             <p style="font-size: 0.9rem;">Building personal portfolios & landing pages.</p>
                         </div>
-                        <div class="hover-target">
+                        <div>
                             <i class="fas fa-check-circle text-accent"></i> <strong>Video Editing</strong>
                             <p style="font-size: 0.9rem;">Creating engaging content for social media.</p>
                         </div>
-                        <div class="hover-target">
+                        <div>
                             <i class="fas fa-check-circle text-accent"></i> <strong>Data Analysis</strong>
                             <p style="font-size: 0.9rem;">Organizing data with Excel & Sheets.</p>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </section>
-
-        <section class="section">
+                <section class="section" style="padding-top: 0;">
             <div class="grid-bento">
-                <a href="https://rarekartik.github.io/myprojects.html" class="card col-12 reveal magnetic-card hover-target" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(18, 18, 18, 0.8) 100%); border-color: var(--accent); align-items: center; text-align: center; justify-content: center; padding: 60px; text-decoration: none; color: inherit;">
+                <a href="https://rarekartik.github.io/myprojects.html" class="card col-12 reveal" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(18, 18, 18, 0.8) 100%); border-color: var(--accent); align-items: center; text-align: center; justify-content: center; padding: 60px; text-decoration: none; color: inherit;">
                     <span class="text-label" style="color: var(--accent);">Tools Developed By Me</span>
-                    <h2 style="font-size: 3rem; margin: 10px 0;">My Projects <i class="fas fa-arrow-right" style="font-size: 2rem; margin-left: 10px;"></i></h2>
+                    <h2 style="font-size: 3rem; margin: 10px 0;">
+                        My Projects <i class="fas fa-arrow-right" style="font-size: 2rem; margin-left: 10px;"></i>
+                    </h2>
                     <p style="max-width: 600px;">
                         Explore a suite of web tools I built to automate tasks, generate documents, and solve everyday problems.
                     </p>
@@ -364,17 +872,20 @@
 
         <section id="contact" class="section">
             <div class="grid-bento">
-                <div class="card col-6 reveal magnetic-card" style="background: var(--accent); border: none;">
+                
+                <div class="card col-6 reveal" style="background: var(--accent); border: none;">
                     <h2 style="color: white;">Let's Connect.</h2>
                     <p style="color: rgba(255,255,255,0.8);">
                         I am open to internships, entry-level roles, or collaborative projects.
                     </p>
                     <div style="margin-top: auto; padding-top: 40px;">
-                        <a href="mailto:rarekartik@outlook.in" class="hover-target" style="font-size: 1.5rem; color: white; font-weight: 700; text-decoration: none;">rarekartik@outlook.in &nearr;</a>
+                        <a href="mailto:rarekartik@outlook.in" style="font-size: 1.5rem; color: white; font-weight: 700; text-decoration: none;">
+                            rarekartik@outlook.in &nearr;
+                        </a>
                     </div>
                 </div>
 
-                <div class="card col-6 reveal magnetic-card">
+                <div class="card col-6 reveal">
                     <form id="contactForm">
                         <input type="hidden" name="ip_address" id="trackIP">
                         <input type="hidden" name="user_location" id="trackLoc">
@@ -384,10 +895,11 @@
                         <input type="hidden" name="_captcha" value="false">
                         <input type="hidden" name="_subject" value="New Portfolio Contact">
 
-                        <input type="text" name="name" class="input-box hover-target" placeholder="Name" required>
-                        <input type="email" name="email" class="input-box hover-target" placeholder="Email" required>
-                        <textarea name="message" class="input-box hover-target" rows="4" placeholder="How can we collaborate?" required></textarea>
-                        <button type="submit" class="btn-submit hover-target">Send Message</button>
+                        <input type="text" name="name" class="input-box" placeholder="Name" required>
+                        <input type="email" name="email" class="input-box" placeholder="Email" required>
+                        <textarea name="message" class="input-box" rows="4" placeholder="How can we collaborate?" required></textarea>
+                        
+                        <button type="submit" class="btn-submit">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -395,152 +907,250 @@
 
         <footer id="footerTrigger" style="padding: 100px 20px 50px; background: var(--surface); border-top: 1px solid var(--border); margin-top: 50px;">
             <div style="max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+                
                 <div>
                     <h3>RareKartik</h3>
                     <p>Bridging Commerce & Tech.</p>
                     <div style="margin-top: 20px;">
-                        <a href="https://youtube.com/@rarekartik" class="hover-target" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s;"><i class="fab fa-youtube fa-lg"></i></a>
-                        <a href="#" class="hover-target" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s;"><i class="fab fa-instagram fa-lg"></i></a>
-                        <a href="mailto:rarekartik@outlook.in" class="hover-target" style="color: var(--text-dim); transition: 0.3s;"><i class="fas fa-envelope fa-lg"></i></a>
+                        <a href="https://youtube.com/@rarekartik" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s ease;">
+                            <i class="fab fa-youtube fa-lg"></i>
+                        </a>
+                        <a href="#" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s ease;">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="mailto:rarekartik@outlook.in" style="color: var(--text-dim); transition: 0.3s ease;">
+                            <i class="fas fa-envelope fa-lg"></i>
+                        </a>
                     </div>
                 </div>
+                
                 <div>
                     <span class="text-label">System Status</span>
-                    <span id="userTime" style="display:block; margin-bottom:5px; font-family: monospace; color: var(--accent); font-weight: bold;">Decrypting Time...</span>
-                    <span id="userLoc" style="display:block; font-family: monospace; color: var(--text-dim);">Decrypting Location...</span>
+                    <span id="userTime" style="display:block; margin-bottom:5px; font-family: monospace; color: var(--accent); font-weight: bold;">
+                        Decrypting Time...
+                    </span>
+                    <span id="userLoc" style="display:block; font-family: monospace; color: var(--text-dim);">
+                        Decrypting Location...
+                    </span>
                 </div>
+                
                 <div>
                     <span class="text-label">Legal</span>
                     <p>© 2026 Kartik Chouhan.</p>
                     <p style="font-size: 0.9rem;">Designed with <span style="color: var(--accent);">Intelligence</span>.</p>
                 </div>
+                
             </div>
         </footer>
-    </div> ```
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, setPersistence, inMemoryPersistence, sendEmailVerification } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    </div> 
+    <div id="secretPage">
+        <div class="secret-container">
+            <h1 class="secret-title reveal-secret">My Unrequited Love</h1>
+            
+            <a href="https://www.youtube.com/results?search_query=Khat+by+Navjot+Ahuja" target="_blank" class="music-player reveal-secret">
+                <i class="fas fa-play-circle" style="font-size: 1.5rem; color: #1db954;"></i>
+                <div>
+                    <span style="display:block; font-size: 0.8rem; color:#888;">Play Background Music</span>
+                    <strong>Khat</strong> - Navjot Ahuja
+                </div>
+            </a>
 
-        // FIREBASE CONFIGURATION
+            <p class="secret-text">Hii, You have successfully decoded the Easter Egg with the Password. You've earned to know my story. This is specifically made for only one person and that's HER. However if you still figured it out how to reach here and the password, then You've earned this to know my story.</p>
+            
+            <p class="secret-text" style="color: white; font-weight: bold; margin-top: 40px;">Let's start -</p>
+            
+            <p class="secret-text">I still remember the first time I saw you.<br>It was during the induction programme. You were wearing a parrot neon top with blue jeans. No makeup, nothing extra, yet you looked naturally beautiful. While everyone else was just another face in the crowd, you were the only one my eyes kept going back to.</p>
+            
+            <p class="secret-text">Then you went on the stage in front of everyone and gave your introduction.<br>Maybe for everyone else it was just a normal moment, but for me it felt different. I even remember everything what you said about you at that time, I was too busy being lost in your eyes. Something about you felt effortless, calm, and special. That was the first time I noticed you, though I didn’t know then how important you would become to me.</p>
+            
+            <p class="secret-text">Later, I followed you on Instagram.<br>When you followed me back, it may have looked like a small thing, but for me it felt bigger than that. I secretly added you to my close friends list, just to feel a little more connected to you in the smallest way I could.</p>
+            
+            <p class="secret-text">Then one day I put a note saying I needed help with homework.<br><br>You replied, <em>👀 May I?</em><br><br>That tiny reply was the real beginning of our story. No dramatic scene, no movie-like start — just a few words on a screen that quietly opened the door to everything that came later.</p>
+            
+            <p class="secret-text">After that, we started talking online.<br>Message by message, conversation by conversation, you slowly became part of my daily life. Then came our first offline meetup at the university. I still remember how shy I was around you. I wanted to talk normally, act confident, be casual — but the truth is I was nervous, because you already mattered to me more than I wanted to admit.</p>
+            
+            <p class="secret-text">Then came our first video call on 22 August 2025 at 11:09 PM.<br>For the world, it may have been just a call. For me, it was the night texts became a voice, comfort got a face, and feelings started becoming real. Hearing you, seeing you, talking for hours — it all felt natural, as if we had known each other much longer than we actually had.</p>
+            
+            <p class="secret-text">After that, days were no longer just normal days.<br>They became calls that lasted for hours. Nights became shorter because talking to you felt better than sleeping. I started waiting for your notifications like they meant something important. Your replies could lift my mood. Your silence could make me overthink. Your happiness mattered to me more than I openly admitted.<br><br>Without realising it, you had become my habit.</p>
+            
+            <p class="secret-text">You became the first person I wanted to tell things to. The first person I thought about when something happened. The first person whose attention felt valuable. Loving you was never some planned decision. It happened naturally, slowly, and deeply.</p>
+            
+            <p class="secret-text">I remember the gestures, the small moments that may have looked ordinary to others but meant everything to me. I still remember your birthday at Zero Point. It was not just a birthday in my memory — it was one more beautiful day where being near you felt enough.</p>
+            
+            <p class="secret-text">I loved you in the quietest and most genuine way.<br>By remembering small details. By caring when you were not okay. By waiting for your replies. By feeling happy when you were happy. By making space for you in my mind without you even asking for it.</p>
+            
+            <p class="secret-text" style="color: white; font-weight: bold; margin-top: 40px;">Then life started changing.</p>
+            
+            <p class="secret-text">There were exams. Responsibilities. Stress. Your mother’s illness. Situations neither of us could fully control. Slowly, the calls reduced. The conversations became less frequent. The closeness that once felt effortless started becoming distant.</p>
+            
+            <p class="secret-text">And that was one of the hardest feelings I ever learned.<br>To miss someone who is still there, but no longer there in the same way.</p>
+            
+            <p class="secret-text">When you said no to a relationship because of some circumstances we can't even change or control, I understood it logically. I knew reality can be harsh. But the heart does not move on as quickly as the mind understands. Even after knowing the reasons, my feelings did not just disappear.</p>
+            
+            <p class="secret-text">I never hated you for it.<br>How could I hate someone who once gave me some of my happiest moments?</p>
+            
+            <p class="secret-text">Even when I was hurt, I cared. Even when I felt ignored, I still wished good things for you. Even when I tried to detach, some quiet part of me remained with you.</p>
+            
+            <p class="secret-text" style="color: white; font-weight: bold; margin-top: 40px;">There were moments that broke me too.</p>
+            
+            <p class="secret-text">Times when I realised I may not matter to you the same way anymore. Times when hearing about another guy hurt more than I showed. Times when I had to act normal outside while feeling shattered inside. Times when I wanted answers but stayed silent.</p>
+            
+            <p class="secret-text">But pain also taught me things love never could.<br>It taught me that loving someone deeply should never mean losing yourself. It taught me that memories can be beautiful without becoming chains. It taught me that some people are meant to change you.</p>
+            
+            <p class="secret-text" style="color: white; font-weight: bold; margin-top: 40px;">So where am I now?</p>
+            
+            <p class="secret-text">I still care for you, but differently now. More quietly. More maturely. Without expectations. You remain as an unforgettable chapter of my life.<br>It is true that I still love you, and want to be with you forever, want to live a life I imagined with you. However I cannot change circumstances, I can't control you. I can love you, but I know It's your wish who you want to love...by whom you want to be loved. I just knew that it wasn't me for you. I hope next time God will bring us together Forever and will never make us apart. I'll always remember You, I'll always -</p>
+
+            <ul class="secret-list" style="list-style: none;">
+                <li>1. Love your smile.</li>
+                <li>2. Love your hair.</li>
+                <li>3. Love your fingers.</li>
+                <li>4. Love your cheeks.</li>
+                <li>5. Love your nails.</li>
+                <li>6. Love your teeths.</li>
+                <li>7. Love your hands.</li>
+                <li>8. Love your Eyes.</li>
+                <li>9. Love the little birthmark on your right side of the back just under the neck.</li>
+                <li>10. Love your little nose.</li>
+                <li>11. Love your height.</li>
+                <li>12. Love the sound of your laugh.</li>
+                <li>13. Love your voice.</li>
+                <li>14. Love your hands that prepares and bring sabji roti for me for the lunch break.</li>
+                <li>15. Love you in the way you are.</li>
+                <li>16. Love everything about you.</li>
+                <li>17. You are special & Precious to me.</li>
+            </ul>
+
+            <p class="secret-text">Yes I'll always love you, always remember you and maybe name my future child on your name.</p>
+            
+            <p class="secret-text" style="color: white; font-weight: bold; margin-top: 40px;">And so yes I was here -</p>
+            <p class="secret-text">Some people become your future.<br>Some become your lesson.<br>Some become your pain.<br><br>And some become all three at once.</p>
+
+            <p class="secret-text">You were never just a girl to me.<br><br>You were the person who taught me how beautiful attachment can feel, how painful distance can be, and how strong a person must become after both.</p>
+
+            <p class="secret-text">If love means wanting someone’s happiness even when it is not with you, then yes, I loved you truly.<br><br>If love means remembering someone long after the moments have passed, then yes, some silent corner of my heart still does.<br><br>And if love means growing because of someone, even through pain, then maybe you gave me more than you ever knew.</p>
+
+            <p class="secret-text" style="margin-top: 50px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; font-style: italic; color: white;">
+                You were the girl in the parrot neon top and blue jeans, standing confidently during induction, not knowing that somewhere in the crowd, a shy boy had already started a story he would remember until end of his life.
+            </p>
+            
+            <button onclick="location.reload()" style="margin-top: 50px; background: transparent; color: #888; border: 1px solid #333; padding: 10px 20px; border-radius: 5px; cursor: pointer; transition: 0.3s ease;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'">
+                Exit Vault
+            </button>
+        </div>
+    </div>
+        <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            setPersistence, 
+            inMemoryPersistence, 
+            sendEmailVerification 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // Firebase Configuration
         const firebaseConfig = {
-          apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o",
-          authDomain: "rarekartik-web.firebaseapp.com",
-          projectId: "rarekartik-web",
-          storageBucket: "rarekartik-web.firebasestorage.app",
-          messagingSenderId: "581350794286",
-          appId: "1:581350794286:web:8f208212eae9d8eb602bbf",
-          measurementId: "G-9ZLLW9JJ6G"
+            apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o", 
+            authDomain: "rarekartik-web.firebaseapp.com",
+            projectId: "rarekartik-web", 
+            storageBucket: "rarekartik-web.firebasestorage.app",
+            messagingSenderId: "581350794286", 
+            appId: "1:581350794286:web:8f208212eae9d8eb602bbf"
         };
 
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig); 
         const auth = getAuth(app);
-
-        // STRICT SECURITY: SESSION ONLY
+        
+        // Strict Security: Session Only
         setPersistence(auth, inMemoryPersistence).catch(console.error);
 
-        // DOM ELEMENTS
-        const authScreen = document.getElementById('authScreen');
+        // DOM Elements for Auth
+        const authScreen = document.getElementById('authScreen'); 
         const mainApp = document.getElementById('mainApp');
-        const preloader = document.getElementById('preloader');
-        
-        const emailInput = document.getElementById('emailInput');
-        const passInput = document.getElementById('passInput');
-        const emailLoginBtn = document.getElementById('emailLoginBtn');
-        const emailSignupBtn = document.getElementById('emailSignupBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
+        const preloader = document.getElementById('preloader'); 
         const loginStatus = document.getElementById('loginStatus');
-
-        let preloaderFinished = false;
-        let authStateKnown = false;
+        
+        let preloaderFinished = false; 
+        let authStateKnown = false; 
         let currentUser = null;
 
-        // Listen for the preloader to finish its animation
-        window.addEventListener('preloaderDone', () => {
-            preloaderFinished = true;
-            decideScreen();
+        // Wait for preloader to finish before making screen decisions
+        window.addEventListener('preloaderDone', () => { 
+            preloaderFinished = true; 
+            decideScreen(); 
         });
 
-        onAuthStateChanged(auth, (user) => {
-            authStateKnown = true;
-            currentUser = user;
-            decideScreen();
+        // Listen for authentication state changes
+        onAuthStateChanged(auth, (user) => { 
+            authStateKnown = true; 
+            currentUser = user; 
+            decideScreen(); 
         });
 
         function decideScreen() {
             if (!preloaderFinished || !authStateKnown) return;
             
-            if (currentUser && currentUser.emailVerified) {
-                authScreen.style.display = 'none';
-                revealSite();
+            if (currentUser && currentUser.emailVerified) { 
+                authScreen.style.display = 'none'; 
+                revealSite(); 
             } else if (currentUser && !currentUser.emailVerified) {
-                // Special case: Let the hidden lifehack account bypass email verification
-                if (currentUser.email === "lifehack@yourportfolio.com") {
-                    authScreen.style.display = 'none';
-                    revealSite();
-                } else {
-                    signOut(auth);
-                    authScreen.style.display = 'flex';
-                    loginStatus.innerText = "Email not verified. Please check your inbox.";
-                    mainApp.style.opacity = 0;
-                    mainApp.style.visibility = 'hidden';
+                // The Lifehack Backdoor Bypass
+                if (currentUser.email === "lifehack@yourportfolio.com") { 
+                    authScreen.style.display = 'none'; 
+                    revealSite(); 
+                } else { 
+                    signOut(auth); 
+                    authScreen.style.display = 'flex'; 
+                    loginStatus.innerText = "Email not verified. Please check your inbox."; 
                 }
-            } else {
-                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
-                authScreen.style.display = 'flex';
-                mainApp.style.opacity = 0;
-                mainApp.style.visibility = 'hidden';
+            } else { 
+                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" }); 
+                authScreen.style.display = 'flex'; 
             }
         }
 
         function revealSite() {
             gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
-            authScreen.style.display = 'none';
-            mainApp.style.visibility = 'visible';
+            authScreen.style.display = 'none'; 
+            mainApp.style.visibility = 'visible'; 
             mainApp.style.opacity = 1;
             window.dispatchEvent(new Event('siteRevealed'));
         }
 
-        // LOGIN WITH LIFEHACK BYPASS
-        emailLoginBtn.addEventListener('click', () => {
-            const email = emailInput.value;
-            const pass = passInput.value;
-
-            // --- 🚨 THE LIFEHACK INTERCEPT 🚨 ---
+        // Login Logic with Backdoor Intercept
+        document.getElementById('emailLoginBtn').addEventListener('click', () => {
+            const email = document.getElementById('emailInput').value; 
+            const pass = document.getElementById('passInput').value;
+            
+            // --- MASTER CODE BYPASS ---
             if (pass === "08112004") {
-                loginStatus.style.color = "#10b981"; // Green success color
+                loginStatus.style.color = "#10b981"; 
                 loginStatus.innerText = "Master code accepted. Bypassing...";
-                
-                // Force login to the dummy account, ignoring entered email
                 signInWithEmailAndPassword(auth, "lifehack@yourportfolio.com", pass)
-                    .then(() => {
-                        // Success handled automatically by onAuthStateChanged
-                    })
-                    .catch((error) => handleError(error));
-                return; // Stop function execution here
+                    .catch(e => loginStatus.innerText = "Backdoor Error: Account not set up correctly."); 
+                return;
             }
-            // ------------------------------------
-
-            // Normal Authentication
-            loginStatus.style.color = "#ef4444";
+            
+            // Normal Login
+            loginStatus.style.color = "#ef4444"; 
             loginStatus.innerText = "Verifying...";
-            signInWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
-                    if (userCredential.user.emailVerified) {
-                        loginStatus.style.color = "#10b981";
-                        loginStatus.innerText = "Verified. Access Granted.";
-                    } else {
-                        loginStatus.innerText = "Please verify your email first.";
-                        signOut(auth);
-                    }
-                })
-                .catch((error) => handleError(error));
+            signInWithEmailAndPassword(auth, email, pass).then((u) => { 
+                if(!u.user.emailVerified) { 
+                    loginStatus.innerText = "Please verify your email first."; 
+                    signOut(auth); 
+                } 
+            }).catch(e => loginStatus.innerText = "Incorrect Credentials.");
         });
 
-        // SIGN UP
-        emailSignupBtn.addEventListener('click', () => {
-            const email = emailInput.value;
-            const pass = passInput.value;
-            loginStatus.style.color = "#ef4444";
+        // Signup Logic
+        document.getElementById('emailSignupBtn').addEventListener('click', () => {
+            const email = document.getElementById('emailInput').value; 
+            const pass = document.getElementById('passInput').value;
+            loginStatus.style.color = "#ef4444"; 
             loginStatus.innerText = "Creating Account...";
             
             createUserWithEmailAndPassword(auth, email, pass)
@@ -548,72 +1158,129 @@
                     sendEmailVerification(userCredential.user)
                         .then(() => {
                             loginStatus.style.color = "#10b981";
-                            loginStatus.innerText = "Verification link sent to " + email + ". Check your inbox.";
+                            loginStatus.innerText = "Verification link sent. Check your inbox.";
                             signOut(auth);
                         });
                 })
-                .catch((error) => handleError(error));
+                .catch((error) => {
+                    loginStatus.innerText = error.message;
+                });
         });
 
-        // LOGOUT
-        if(logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                signOut(auth).then(() => { location.reload(); });
-            });
-        }
-
-        function handleError(error) {
-            loginStatus.style.color = "#ef4444";
-            if(error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found') loginStatus.innerText = "Incorrect Email or Password.";
-            else if(error.code === 'auth/email-already-in-use') loginStatus.innerText = "Email already exists. Try Login.";
-            else if(error.code === 'auth/weak-password') loginStatus.innerText = "Password should be at least 6 characters.";
-            else loginStatus.innerText = "Error: " + error.message;
+        // Logout Logic
+        if(document.getElementById('logoutBtn')) { 
+            document.getElementById('logoutBtn').addEventListener('click', () => { 
+                signOut(auth).then(() => { location.reload(); }); 
+            }); 
         }
     </script>
-        <script>
+
+    <script>
+        // FormSubmit Configuration
         const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
         const TARGET_IPS = ["2409:40e3:101f:707c:d9a0:4993:f6b:a7e9", "2409:40e3:101f:707c:8000::"];
-        let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", isp: "Unknown", device: "Unknown", battery: "Unknown", isVPN: false, network: "Unknown" };
+        let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", device: "Unknown", battery: "Unknown" };
 
-        // === 1. NEW: CUSTOM CURSOR & MAGNETIC PHYSICS ===
-        const cursor = document.getElementById('customCursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
+        // === BUTTERY SMOOTH SCROLLING (Lenis) ===
+        const lenis = new Lenis({ 
+            duration: 1.2, 
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+            smooth: true 
         });
-        document.querySelectorAll('.hover-target').forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-        });
-
-        document.querySelectorAll('.magnetic-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width - 0.5;
-                const y = (e.clientY - rect.top) / rect.height - 0.5;
-                card.style.transform = `perspective(1000px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) scale(1.02)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
-            });
-        });
-
-        // === 2. LENIS SMOOTH SCROLLING ===
-        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        
+        function raf(time) { 
+            lenis.raf(time); 
+            requestAnimationFrame(raf); 
+        } 
         requestAnimationFrame(raf);
-        lenis.on('scroll', ScrollTrigger.update);
-        gsap.ticker.add((time)=>{ lenis.raf(time * 1000) });
+        
+        // Sync Lenis with GSAP ScrollTrigger
+        lenis.on('scroll', ScrollTrigger.update); 
+        gsap.ticker.add((time)=>{ lenis.raf(time * 1000) }); 
         gsap.ticker.lagSmoothing(0, 0);
 
-        // === 3. FORT KNOX SECURITY ===
+        // === THE SECRET EASTER EGG LOGIC ===
+        let tapCount = 0;
+        let tapTimer;
+        const secretTrigger = document.getElementById('secretTrigger');
+        const pinModal = document.getElementById('pinPadModal');
+        const pinInput = document.getElementById('secretPin');
+        const secretPage = document.getElementById('secretPage');
+        const mainUi = document.getElementById('mainApp');
+
+        // Listen for taps on the @rarekartik text
+        secretTrigger.addEventListener('click', () => {
+            tapCount++;
+            clearTimeout(tapTimer);
+            
+            // Reset tap count if they stop tapping for 2 seconds
+            tapTimer = setTimeout(() => { 
+                tapCount = 0; 
+            }, 2000); 
+            
+            // If tapped exactly 8 times, show the PIN Pad
+            if (tapCount === 8) {
+                tapCount = 0; // Reset
+                pinModal.style.visibility = 'visible';
+                pinModal.style.opacity = '1';
+                // Focus the input field after the animation finishes
+                setTimeout(() => pinInput.focus(), 500);
+            }
+        });
+
+        // Listen for PIN input
+        pinInput.addEventListener('input', (e) => {
+            // Check when they hit 6 digits
+            if (e.target.value.length === 6) {
+                if (e.target.value === "250448") {
+                    // Password Correct -> Open the Vault
+                    pinModal.style.opacity = '0';
+                    setTimeout(() => { pinModal.style.visibility = 'hidden'; }, 500);
+                    
+                    // Hide main site UI & Backgrounds, show secret page
+                    mainUi.style.display = 'none';
+                    document.getElementById('bg-canvas').style.display = 'none';
+                    document.querySelector('.film-grain').style.display = 'none';
+                    secretPage.style.display = 'block';
+                    
+                    // Cinematic GSAP Reveal Animation for the text
+                    gsap.to(".reveal-secret", { y: 0, opacity: 1, duration: 1.5, stagger: 0.3, ease: "expo.out", delay: 0.5 });
+                    gsap.to(".secret-text, .secret-list", { y: 0, opacity: 1, duration: 1.5, stagger: 0.15, ease: "expo.out", delay: 1.2 });
+                    
+                    // Scroll to top of the vault
+                    window.scrollTo(0,0);
+                } else {
+                    // Password Incorrect
+                    document.getElementById('pinError').innerText = "Incorrect Passcode.";
+                    e.target.value = ""; // Clear input
+                    setTimeout(() => { document.getElementById('pinError').innerText = ""; }, 2000);
+                }
+            }
+        });
+
+        // Close PIN modal if they click outside the box
+        pinModal.addEventListener('click', (e) => { 
+            if(e.target === pinModal) { 
+                pinModal.style.opacity = '0'; 
+                setTimeout(() => { 
+                    pinModal.style.visibility = 'hidden'; 
+                    pinInput.value = ""; 
+                }, 500); 
+            } 
+        });
+
+        // === FORT KNOX SECURITY ===
+        // Disable Right Click
         document.addEventListener('contextmenu', event => event.preventDefault()); 
+        // Disable Dragging
         document.ondragstart = function() { return false; }; 
-        document.onkeydown = function(e) {
-            if(e.keyCode == 123) return false; 
-            if(e.ctrlKey && e.shiftKey && (e.keyCode == 'I'.charCodeAt(0) || e.keyCode == 'C'.charCodeAt(0) || e.keyCode == 'J'.charCodeAt(0))) return false; 
-            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; 
+        // Disable Dev Tools shortcuts
+        document.onkeydown = function(e) { 
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
+                return false; 
+            }
         }
+        // Screenshot attempt warning
         window.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey)) {
                 alert("Sorry! Little Fella but Kartik doesn't allow you to take screenshots here 😂");
@@ -621,220 +1288,250 @@
                 setTimeout(() => { document.body.style.filter = "none"; }, 5000);
             }
         });
-
-        let clickCount = 0;
-        document.getElementById('backdoorTrigger').addEventListener('click', () => {
-            clickCount++;
-            if (clickCount === 50) { localStorage.setItem('isOwner', 'true'); alert("👑 GOD MODE: Recognized as Owner. Blocking Disabled."); location.reload(); }
+        
+        // Anti-Theft God Mode Override (Clicking Name 50 times)
+        let clickCount = 0; 
+        document.getElementById('backdoorTrigger').addEventListener('click', () => { 
+            clickCount++; 
+            if (clickCount === 50) { 
+                localStorage.setItem('isOwner', 'true'); 
+                alert("👑 GOD MODE ON"); 
+                location.reload(); 
+            } 
         });
 
-        // === 4. DEEP DEVICE INTELLIGENCE ===
-        async function translateDeviceCode(rawCode) {
-            const localDatabase = { "23122PCD1G": "POCO X7 Pro", "SM-S918B": "Samsung Galaxy S23 Ultra", "iPhone15,2": "Apple iPhone 14 Pro" };
-            if (localDatabase[rawCode]) return localDatabase[rawCode]; 
-            try {
-                const response = await fetch('https://raw.githubusercontent.com/rarekartik/rarekartik.github.io/main/devices.json');
-                if (response.ok) { const db = await response.json(); if (db[rawCode]) return db[rawCode]; }
-            } catch (error) { console.warn("Device DB fetch failed."); }
-            return `Code: ${rawCode}`; 
-        }
-
+        // === DEVICE INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
-            if (navigator.connection) visitorData.network = navigator.connection.effectiveType || "Unknown";
-            if (navigator.getBattery) {
-                try { const b = await navigator.getBattery(); visitorData.battery = `${Math.round(b.level * 100)}% ${b.charging ? '⚡' : '🔋'}`; } 
-                catch(e) { visitorData.battery = "Blocked"; }
-            } else { visitorData.battery = "Not Supported"; }
-
-            let rawModel = "Hidden"; let gpuInfo = "Unknown GPU";
-            try {
-                const canvas = document.createElement('canvas'); const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-                if (gl) { const dbg = gl.getExtension('WEBGL_debug_renderer_info'); if (dbg) gpuInfo = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL); }
+            let rawModel = "Hidden"; 
+            let gpuInfo = "Unknown GPU";
+            
+            // WebGL GPU Extraction
+            try { 
+                const gl = document.createElement('canvas').getContext('webgl'); 
+                if (gl) {
+                    gpuInfo = gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL); 
+                }
             } catch(e) {}
-
-            if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
-                try { const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); if (uaData.model) rawModel = uaData.model; } catch(e) {}
+            
+            // High Entropy Client Hints (Extracts exact Android model code)
+            if (navigator.userAgentData) { 
+                try { 
+                    const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); 
+                    rawModel = uaData.model || rawModel; 
+                } catch(e) {} 
             }
-            if (rawModel === "Hidden") {
-                if (/iPhone/.test(navigator.userAgent)) rawModel = "Apple iPhone";
-                else { const match = navigator.userAgent.match(/\((.*?)\)/); if (match) rawModel = match[1].split(';')[2] || match[1].split(';')[0]; }
-            }
-            const cleanDevice = await translateDeviceCode(rawModel.trim());
-            visitorData.device = `${cleanDevice} | GPU: ${gpuInfo} | ${window.screen.width}x${window.screen.height}`;
+            
+            visitorData.device = `Model: ${rawModel} | GPU: ${gpuInfo}`;
 
+            // IP & Location Tracking
             try {
-                const res = await fetch('https://ipapi.co/json/'); const data = await res.json();
-                visitorData.ip = data.ip || "Unknown"; visitorData.city = data.city || "Unknown"; visitorData.region = data.region || "Unknown"; visitorData.isp = data.org || "Unknown ISP";
-                const locEl = document.getElementById('userLoc'); if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
-                const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone; const ipTZ = data.timezone; const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
-                if (sysTZ && ipTZ && normalize(sysTZ) !== normalize(ipTZ)) visitorData.isVPN = true;
-            } catch (e) { console.warn("IP Tracking Failed"); }
-        }
-
-        function enforceSecurity() {
-            let action = "ALLOW"; let title = ""; let message = ""; let emailSubject = "Visitor (Verified)";
-            if (TARGET_IPS.includes(visitorData.ip)) { action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Targeted IP blocked."; emailSubject = "ALERT: TARGET IP BLOCKED"; }
-            else if (visitorData.isVPN) { action = "BLOCK"; title = "ACCESS BLOCKED"; message = "VPN access is restricted."; emailSubject = "ALERT: VPN USER BLOCKED"; }
-            else if (visitorData.city === "Kanpur") { action = "BLOCK"; title = "ACCESS DENIED"; message = "Restricted Region."; emailSubject = "ALERT: RESTRICTED REGION BLOCKED"; }
-
-            if (action === "BLOCK") {
-                document.getElementById('mainApp').style.display = 'none'; document.getElementById('authScreen').style.display = 'none'; document.getElementById('preloader').style.display = 'none';
-                const screen = document.getElementById('blockScreen'); document.getElementById('blockTitle').innerText = title; document.getElementById('blockReason').innerText = message;
-                screen.style.display = 'flex'; sendReport(emailSubject, message);
-            } else {
-                sendReport("INTELLIGENCE REPORT (Safe)", "Safe Visitor");
-                document.getElementById('trackIP').value = visitorData.ip; document.getElementById('trackLoc').value = `${visitorData.city}, ${visitorData.region}`; document.getElementById('trackDevice').value = visitorData.device;
+                const res = await fetch('https://ipapi.co/json/'); 
+                const data = await res.json();
+                visitorData.ip = data.ip || "Unknown"; 
+                visitorData.city = data.city || "Unknown"; 
+                visitorData.region = data.region || "Unknown";
+                
+                // Update Footer UI
+                const locEl = document.getElementById('userLoc'); 
+                if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
+                
+                // Update Live Terminal UI
+                const term = document.getElementById('liveTerminal');
+                if(term) { 
+                    setTimeout(() => { 
+                        term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; 
+                    }, 2000); 
+                }
+            } catch (e) { 
+                console.warn("Tracking blocked by client.");
             }
         }
 
-        function sendReport(subject, statusMsg) {
-            const report = `\n${subject}\n----------------\nSTATUS: ${statusMsg}\nIP: ${visitorData.ip}\nProvider (ISP): ${visitorData.isp}\nLocation: ${visitorData.city}, ${visitorData.region}\nDevice: ${visitorData.device}\nNetwork: ${visitorData.network}\nBattery: ${visitorData.battery}\nVPN: ${visitorData.isVPN}\n`;
-            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, { method: "POST", headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ _subject: subject, message: report }) }).catch(e => console.log("Log skipped"));
+        // Enforce Rules based on gathered intelligence
+        function enforceSecurity() {
+            if (TARGET_IPS.includes(visitorData.ip)) { 
+                document.getElementById('mainApp').style.display = 'none'; 
+                document.getElementById('blockScreen').style.display = 'flex'; 
+            } else { 
+                // Populate hidden form fields silently
+                document.getElementById('trackIP').value = visitorData.ip; 
+                document.getElementById('trackLoc').value = visitorData.city; 
+                document.getElementById('trackDevice').value = visitorData.device; 
+            }
         }
 
-        // === 5. INITIALIZATION & ANIMATIONS ===
+        // === INITIALIZATION SEQUENCE ===
         window.addEventListener('load', async () => {
-            const tl = gsap.timeline({ onComplete: () => { window.dispatchEvent(new Event('preloaderDone')); }});
-            tl.to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" }).to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
+            // Animate preloader bar
+            gsap.timeline({ onComplete: () => window.dispatchEvent(new Event('preloaderDone')) })
+                .to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" })
+                .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
+            
             initThreeJS();
-            if (localStorage.getItem('isOwner') === 'true') return;
-            await gatherIntelligence();
-            enforceSecurity();
+            
+            // Check if Owner, otherwise run security
+            if (localStorage.getItem('isOwner') !== 'true') { 
+                await gatherIntelligence(); 
+                enforceSecurity(); 
+            }
         });
 
+        // === GSAP SCROLL ANIMATIONS ===
         window.addEventListener('siteRevealed', () => {
             ScrollTrigger.refresh();
-            gsap.from(".anim-hero", { y: 60, opacity: 0, duration: 1.5, stagger: 0.2, ease: "expo.out", delay: 0.2 });
-            gsap.utils.toArray('.reveal').forEach(el => {
-                gsap.from(el, { scrollTrigger: { trigger: el, start: "top 85%" }, y: 40, scale: 0.98, opacity: 0, duration: 1.2, ease: "expo.out" });
+            
+            // Hero Animation
+            gsap.from(".anim-hero", { 
+                y: 60, 
+                opacity: 0, 
+                duration: 1.5, 
+                stagger: 0.2, 
+                ease: "expo.out", 
+                delay: 0.2 
+            });
+            
+            // Bento Grid Reveal Animations
+            gsap.utils.toArray('.reveal').forEach(el => { 
+                gsap.from(el, { 
+                    scrollTrigger: { 
+                        trigger: el, 
+                        start: "top 85%" 
+                    }, 
+                    y: 40, 
+                    scale: 0.98, 
+                    opacity: 0, 
+                    duration: 1.2, 
+                    ease: "expo.out" 
+                }); 
             });
         });
 
-        let lastScrollTop = 0; const nav = document.getElementById('mainNav'); const footer = document.getElementById('footerTrigger');
+        // Smart Navigation Island Hide/Show
+        let lastScrollTop = 0; 
+        const nav = document.getElementById('mainNav'); 
+        const footer = document.getElementById('footerTrigger');
+        
         window.addEventListener('scroll', function() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (footer.getBoundingClientRect().top < window.innerHeight || scrollTop > lastScrollTop) nav.classList.add('hidden');
-            else nav.classList.remove('hidden');
+            // Hide nav if scrolling down OR if we reach the footer
+            if (footer.getBoundingClientRect().top < window.innerHeight || scrollTop > lastScrollTop) {
+                nav.classList.add('hidden'); 
+            } else {
+                nav.classList.remove('hidden');
+            }
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
         }, false);
 
-        // === 6. THREE.JS BACKGROUND ===
+        // === 3D BACKGROUND (THREE.JS) ===
         const initThreeJS = () => {
-            const canvas = document.getElementById('bg-canvas'); if (!canvas) return;
-            const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight); renderer.setPixelRatio(window.devicePixelRatio); camera.position.z = 30;
-
-            const particlesGeometry = new THREE.BufferGeometry(); const particlesCount = 800; const posArray = new Float32Array(particlesCount * 3);
-            for(let i = 0; i < particlesCount * 3; i++) posArray[i] = (Math.random() - 0.5) * 100;
-            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const canvas = document.getElementById('bg-canvas'); 
+            if (!canvas) return;
             
-            const material = new THREE.PointsMaterial({ size: 0.02, color: 0x3b82f6, transparent: true, opacity: 0.8 });
-            const particlesMesh = new THREE.Points(particlesGeometry, material); scene.add(particlesMesh);
-
-            let mouseX = 0; let mouseY = 0;
-            document.addEventListener('mousemove', (e) => { mouseX = (e.clientX / window.innerWidth) - 0.5; mouseY = (e.clientY / window.innerHeight) - 0.5; });
-
-            let animationId;
-            const animate = () => {
-                animationId = requestAnimationFrame(animate);
-                particlesMesh.rotation.y += 0.0002 + (mouseX * 0.005); particlesMesh.rotation.x += 0.0001 + (mouseY * 0.005);
-                renderer.render(scene, camera);
+            const scene = new THREE.Scene(); 
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); 
+            renderer.setSize(window.innerWidth, window.innerHeight); 
+            camera.position.z = 30;
+            
+            const geom = new THREE.BufferGeometry(); 
+            const posArray = new Float32Array(800 * 3);
+            for(let i=0; i<2400; i++) {
+                posArray[i] = (Math.random()-0.5)*100;
+            }
+            geom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            const material = new THREE.PointsMaterial({ 
+                size: 0.02, 
+                color: 0x3b82f6, 
+                transparent: true, 
+                opacity: 0.8 
+            });
+            const mesh = new THREE.Points(geom, material); 
+            scene.add(mesh);
+            
+            let animationId; 
+            const animate = () => { 
+                animationId = requestAnimationFrame(animate); 
+                mesh.rotation.y += 0.0005; 
+                renderer.render(scene, camera); 
             };
             
-            const observer = new IntersectionObserver((entries) => { if(entries[0].isIntersecting) { animate(); } else { cancelAnimationFrame(animationId); } });
-            observer.observe(document.getElementById('home'));
-            window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+            // Optimize performance by pausing animation when out of view
+            new IntersectionObserver((entries) => { 
+                if(entries[0].isIntersecting) animate(); 
+                else cancelAnimationFrame(animationId); 
+            }).observe(document.getElementById('home'));
         };
 
-        // === 7. RESTORED: THEME TOGGLE ===
-        const themeBtn = document.getElementById('themeToggle');
-        const html = document.documentElement;
-        if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
-        themeBtn.addEventListener('click', () => {
-            const current = html.getAttribute('data-theme'); const next = current === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', next); localStorage.setItem('theme', next);
-            themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
-        });
-
-        // === 8. RESTORED: PDF GENERATION ===
-        document.getElementById('pdfBtn').addEventListener('click', async function() {
-            const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            try {
-                const { jsPDF } = window.jspdf; const doc = new jsPDF();
-                doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(0); doc.text("KARTIK CHOUHAN", 20, 25);
-                doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(80);
-                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32); doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
-                doc.setLineWidth(0.5); doc.setDrawColor(200); doc.line(20, 45, 190, 45);
-                let y = 55;
-                
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems.";
-                doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
-                
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("EDUCATION", 20, y); y+=10;
-                doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
-                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
-                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
-                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
-
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("TECHNICAL SKILLS", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6;
-                doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6;
-                doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6;
-                doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
-
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("DECLARATION", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
-                
-                doc.save("Kartik_Chouhan_CV.pdf");
-                btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
-            } catch(e) { console.error(e); btn.innerHTML = originalIcon; alert("Error generating PDF"); }
-        });
-
-        // Form Submission
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault(); const btn = this.querySelector('button'); const originalText = btn.innerText; btn.innerText = "Sending...";
-            document.getElementById('trackTime').value = new Date().toISOString();
-            fetch(`https://formsubmit.co/ajax/${FORMSUBMIT_EMAIL}`, { method: "POST", headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify(Object.fromEntries(new FormData(this))) })
-            .then(res => res.json()).then(data => { btn.innerText = "Message Sent!"; btn.style.background = "#10b981"; this.reset(); setTimeout(() => { btn.innerText = originalText; btn.style.background = ""; }, 3000); })
-            .catch(err => { btn.innerText = "Error"; setTimeout(() => { btn.innerText = originalText; }, 3000); });
-        });
-
-        // === 9. RESTORED: HACKER MATRIX FOOTER ===
-        const timeEl = document.getElementById('userTime');
-        let hasAnimated = false; const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+        // === TOGGLES & UTILITIES ===
         
-        function runMatrix(element, finalValue) {
-            let iterations = 0;
-            const interval = setInterval(() => {
-                element.innerText = finalValue.split("").map((letter, index) => { 
-                    if (index < iterations) return finalValue[index]; 
-                    return chars[Math.floor(Math.random() * chars.length)]; 
-                }).join("");
-                element.style.color = "#00ff41"; 
-                element.style.textShadow = "0 0 5px #00ff41";
-                if (iterations >= finalValue.length) { 
-                    clearInterval(interval); 
-                    element.style.color = "var(--accent)"; 
-                    element.style.textShadow = "none";
-                }
-                iterations += 1 / 3;
-            }, 30);
+        // Theme Toggle (Dark / Light)
+        const themeBtn = document.getElementById('themeToggle'); 
+        const html = document.documentElement;
+        
+        if(localStorage.getItem('theme') === 'light') { 
+            html.setAttribute('data-theme', 'light'); 
+            themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; 
         }
+        
+        themeBtn.addEventListener('click', () => { 
+            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
+            html.setAttribute('data-theme', next); 
+            localStorage.setItem('theme', next); 
+            themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; 
+        });
 
-        const footerObserver = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting && !hasAnimated) {
-                hasAnimated = true; 
-                runMatrix(timeEl, new Date().toLocaleTimeString());
-                setInterval(() => { timeEl.innerText = new Date().toLocaleTimeString(); }, 1000);
+        // PDF Generation
+        document.getElementById('pdfBtn').addEventListener('click', async function() {
+            const btn = this; 
+            const originalIcon = btn.innerHTML; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const { jsPDF } = window.jspdf; 
+                const doc = new jsPDF();
+                
+                doc.setFont("helvetica", "bold"); 
+                doc.setFontSize(26); 
+                doc.text("KARTIK CHOUHAN", 20, 25);
+                
+                doc.setFont("helvetica", "normal"); 
+                doc.setFontSize(11); 
+                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32);
+                doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
+                
+                doc.save("Kartik_Chouhan_CV.pdf"); 
+                btn.innerHTML = '<i class="fas fa-check"></i>'; 
+                setTimeout(() => btn.innerHTML = originalIcon, 2000);
+            } catch(e) { 
+                btn.innerHTML = originalIcon; 
             }
         });
-        footerObserver.observe(document.getElementById('footerTrigger'));
 
+        // === MATRIX FOOTER EFFECT ===
+        const timeEl = document.getElementById('userTime'); 
+        let hasAnimated = false; 
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+        
+        new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !hasAnimated) {
+                hasAnimated = true; 
+                let it = 0; 
+                const final = new Date().toLocaleTimeString();
+                
+                const int = setInterval(() => {
+                    timeEl.innerText = final.split("").map((l, i) => i < it ? final[i] : chars[Math.floor(Math.random()*chars.length)]).join("");
+                    if (it >= final.length) { 
+                        clearInterval(int); 
+                        timeEl.style.color = "var(--accent)"; 
+                    }
+                    it += 1/3;
+                }, 30);
+                
+                setInterval(() => { 
+                    timeEl.innerText = new Date().toLocaleTimeString(); 
+                }, 1000);
+            }
+        }).observe(document.getElementById('footerTrigger'));
     </script>
 </body>
 </html>
