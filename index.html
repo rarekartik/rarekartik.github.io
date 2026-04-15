@@ -1387,44 +1387,7 @@
         }
         
 
-            // IP & Location Tracking
-            try {
-                const res = await fetch('https://ipapi.co/json/'); 
-                const data = await res.json();
-                visitorData.ip = data.ip || "Unknown"; 
-                visitorData.city = data.city || "Unknown"; 
-                visitorData.region = data.region || "Unknown";
-                
-                // Update Footer UI
-                const locEl = document.getElementById('userLoc'); 
-                if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
-                
-                // Update Live Terminal UI
-                const term = document.getElementById('liveTerminal');
-                if(term) { 
-                    setTimeout(() => { 
-                        term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; 
-                    }, 2000); 
-                }
-            } catch (e) { 
-                console.warn("Tracking blocked by client.");
-            }
-        }
-
-        // Enforce Rules based on gathered intelligence
-        function enforceSecurity() {
-            if (TARGET_IPS.includes(visitorData.ip)) { 
-                document.getElementById('mainApp').style.display = 'none'; 
-                document.getElementById('blockScreen').style.display = 'flex'; 
-            } else { 
-                // Populate hidden form fields silently
-                document.getElementById('trackIP').value = visitorData.ip; 
-                document.getElementById('trackLoc').value = visitorData.city; 
-                document.getElementById('trackDevice').value = visitorData.device; 
-            }
-        }
-
-        // === INITIALIZATION SEQUENCE ===
+            // === INITIALIZATION SEQUENCE ===
         window.addEventListener('load', async () => {
             // Animate preloader bar
             gsap.timeline({ onComplete: () => window.dispatchEvent(new Event('preloaderDone')) })
