@@ -1039,436 +1039,290 @@
             </button>
         </div>
     </div>
-            <script>
-        // FormSubmit Configuration
+                <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signOut, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            setPersistence, 
+            inMemoryPersistence, 
+            sendEmailVerification 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o", 
+            authDomain: "rarekartik-web.firebaseapp.com",
+            projectId: "rarekartik-web", 
+            storageBucket: "rarekartik-web.firebasestorage.app",
+            messagingSenderId: "581350794286", 
+            appId: "1:581350794286:web:8f208212eae9d8eb602bbf"
+        };
+
+        const app = initializeApp(firebaseConfig); 
+        const auth = getAuth(app);
+        setPersistence(auth, inMemoryPersistence).catch(console.error);
+
+        const authScreen = document.getElementById('authScreen'); 
+        const mainApp = document.getElementById('mainApp');
+        const preloader = document.getElementById('preloader'); 
+        const loginStatus = document.getElementById('loginStatus');
+        
+        let preloaderFinished = false; 
+        let authStateKnown = false; 
+        let currentUser = null;
+
+        window.addEventListener('preloaderDone', () => { 
+            preloaderFinished = true; 
+            decideScreen(); 
+        });
+
+        // The Engine Failsafe: Force reveal if network blocks Firebase
+        setTimeout(() => {
+            if (!authStateKnown) {
+                console.warn("Firebase timeout. Forcing UI reveal.");
+                authStateKnown = true;
+                decideScreen();
+            }
+        }, 3500);
+
+        onAuthStateChanged(auth, (user) => { 
+            authStateKnown = true; 
+            currentUser = user; 
+            decideScreen(); 
+        });
+
+        function decideScreen() {
+            if (!preloaderFinished || !authStateKnown) return;
+            
+            if (currentUser && currentUser.emailVerified) { 
+                authScreen.style.display = 'none'; 
+                revealSite(); 
+            } else if (currentUser && !currentUser.emailVerified) {
+                if (currentUser.email === "lifehack@yourportfolio.com") { 
+                    authScreen.style.display = 'none'; 
+                    revealSite(); 
+                } else { 
+                    signOut(auth); 
+                    authScreen.style.display = 'flex'; 
+                    loginStatus.innerText = "Email not verified. Please check your inbox."; 
+                }
+            } else { 
+                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" }); 
+                authScreen.style.display = 'flex'; 
+            }
+        }
+
+        function revealSite() {
+            gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
+            authScreen.style.display = 'none'; 
+            mainApp.style.visibility = 'visible'; 
+            mainApp.style.opacity = 1;
+            window.dispatchEvent(new Event('siteRevealed'));
+        }
+
+        document.getElementById('emailLoginBtn').addEventListener('click', () => {
+            const email = document.getElementById('emailInput').value; 
+            const pass = document.getElementById('passInput').value;
+            
+            if (pass === "08112004") {
+                loginStatus.style.color = "#10b981"; 
+                loginStatus.innerText = "Master code accepted. Bypassing...";
+                signInWithEmailAndPassword(auth, "lifehack@yourportfolio.com", pass)
+                    .catch(e => loginStatus.innerText = "Backdoor Error."); 
+                return;
+            }
+            
+            loginStatus.style.color = "#ef4444"; 
+            loginStatus.innerText = "Verifying...";
+            signInWithEmailAndPassword(auth, email, pass).then((u) => { 
+                if(!u.user.emailVerified) { 
+                    loginStatus.innerText = "Please verify your email first."; 
+                    signOut(auth); 
+                } 
+            }).catch(e => loginStatus.innerText = "Incorrect Credentials.");
+        });
+
+        document.getElementById('emailSignupBtn').addEventListener('click', () => {
+            const email = document.getElementById('emailInput').value; 
+            const pass = document.getElementById('passInput').value;
+            loginStatus.style.color = "#ef4444"; 
+            loginStatus.innerText = "Creating Account...";
+            
+            createUserWithEmailAndPassword(auth, email, pass)
+                .then((userCredential) => {
+                    sendEmailVerification(userCredential.user).then(() => {
+                        loginStatus.style.color = "#10b981";
+                        loginStatus.innerText = "Verification link sent. Check your inbox.";
+                        signOut(auth);
+                    });
+                }).catch((error) => { loginStatus.innerText = error.message; });
+        });
+
+        if(document.getElementById('logoutBtn')) { 
+            document.getElementById('logoutBtn').addEventListener('click', () => { signOut(auth).then(() => { location.reload(); }); }); 
+        }
+    </script>
+
+    <script>
         const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
         const TARGET_IPS = ["2409:40e3:101f:707c:d9a0:4993:f6b:a7e9", "2409:40e3:101f:707c:8000::"];
         let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", device: "Unknown", battery: "Unknown" };
 
-        // === BUTTERY SMOOTH SCROLLING (Lenis) ===
-        const lenis = new Lenis({ 
-            duration: 1.2, 
-            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
-            smooth: true 
-        });
-        
-        function raf(time) { 
-            lenis.raf(time); 
-            requestAnimationFrame(raf); 
-        } 
-        requestAnimationFrame(raf);
-        
-        // Sync Lenis with GSAP ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update); 
-        gsap.ticker.add((time)=>{ lenis.raf(time * 1000) }); 
-        gsap.ticker.lagSmoothing(0, 0);
+        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); } requestAnimationFrame(raf);
+        lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add((time)=>{ lenis.raf(time * 1000) }); gsap.ticker.lagSmoothing(0, 0);
 
-        // === THE SECRET EASTER EGG LOGIC ===
-        let tapCount = 0;
-        let tapTimer;
+        let tapCount = 0; let tapTimer;
         const secretTrigger = document.getElementById('secretTrigger');
         const pinModal = document.getElementById('pinPadModal');
         const pinInput = document.getElementById('secretPin');
         const secretPage = document.getElementById('secretPage');
         const mainUi = document.getElementById('mainApp');
 
-        // Listen for taps on the @rarekartik text
         secretTrigger.addEventListener('click', () => {
-            tapCount++;
-            clearTimeout(tapTimer);
-            
-            // Reset tap count if they stop tapping for 2 seconds
-            tapTimer = setTimeout(() => { 
-                tapCount = 0; 
-            }, 2000); 
-            
-            // If tapped exactly 8 times, show the PIN Pad
+            tapCount++; clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => { tapCount = 0; }, 2000); 
             if (tapCount === 8) {
-                tapCount = 0; // Reset
-                pinModal.style.visibility = 'visible';
-                pinModal.style.opacity = '1';
-                // Focus the input field after the animation finishes
+                tapCount = 0; pinModal.style.visibility = 'visible'; pinModal.style.opacity = '1';
                 setTimeout(() => pinInput.focus(), 500);
             }
         });
 
-        // Listen for PIN input
         pinInput.addEventListener('input', (e) => {
-            // Check when they hit 6 digits
             if (e.target.value.length === 6) {
                 if (e.target.value === "250448") {
-                    // Password Correct -> Open the Vault
-                    pinModal.style.opacity = '0';
-                    setTimeout(() => { pinModal.style.visibility = 'hidden'; }, 500);
-                    
-                    // Hide main site UI & Backgrounds, show secret page
-                    mainUi.style.display = 'none';
-                    document.getElementById('bg-canvas').style.display = 'none';
-                    document.querySelector('.film-grain').style.display = 'none';
+                    pinModal.style.opacity = '0'; setTimeout(() => { pinModal.style.visibility = 'hidden'; }, 500);
+                    mainUi.style.display = 'none'; document.getElementById('bg-canvas').style.display = 'none'; document.querySelector('.film-grain').style.display = 'none';
                     secretPage.style.display = 'block';
-                    
-                    // Cinematic GSAP Reveal Animation for the text
                     gsap.to(".reveal-secret", { y: 0, opacity: 1, duration: 1.5, stagger: 0.3, ease: "expo.out", delay: 0.5 });
                     gsap.to(".secret-text, .secret-list", { y: 0, opacity: 1, duration: 1.5, stagger: 0.15, ease: "expo.out", delay: 1.2 });
-                    
-                    // Scroll to top of the vault
                     window.scrollTo(0,0);
                 } else {
-                    // Password Incorrect
-                    document.getElementById('pinError').innerText = "Incorrect Passcode.";
-                    e.target.value = ""; // Clear input
+                    document.getElementById('pinError').innerText = "Incorrect Passcode."; e.target.value = "";
                     setTimeout(() => { document.getElementById('pinError').innerText = ""; }, 2000);
                 }
             }
         });
 
-        // Close PIN modal if they click outside the box
-        pinModal.addEventListener('click', (e) => { 
-            if(e.target === pinModal) { 
-                pinModal.style.opacity = '0'; 
-                setTimeout(() => { 
-                    pinModal.style.visibility = 'hidden'; 
-                    pinInput.value = ""; 
-                }, 500); 
-            } 
-        });
+        pinModal.addEventListener('click', (e) => { if(e.target === pinModal) { pinModal.style.opacity = '0'; setTimeout(() => { pinModal.style.visibility = 'hidden'; pinInput.value = ""; }, 500); } });
 
-        // === FORT KNOX SECURITY ===
-        // Disable Right Click
-        document.addEventListener('contextmenu', event => event.preventDefault()); 
-        // Disable Dragging
-        document.ondragstart = function() { return false; }; 
-        // Disable Dev Tools shortcuts
-        document.onkeydown = function(e) { 
-            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) {
-                return false; 
-            }
-        }
-        // Screenshot attempt warning
+        document.addEventListener('contextmenu', event => event.preventDefault()); document.ondragstart = function() { return false; }; 
+        document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { return false; } }
         window.addEventListener('keyup', (e) => {
             if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey)) {
                 alert("Sorry! Little Fella but Kartik doesn't allow you to take screenshots here 😂");
-                document.body.style.filter = "blur(20px)";
-                setTimeout(() => { document.body.style.filter = "none"; }, 5000);
+                document.body.style.filter = "blur(20px)"; setTimeout(() => { document.body.style.filter = "none"; }, 5000);
             }
         });
         
-        // Anti-Theft God Mode Override (Clicking Name 50 times)
-        let clickCount = 0; 
-        document.getElementById('backdoorTrigger').addEventListener('click', () => { 
-            clickCount++; 
-            if (clickCount === 50) { 
-                localStorage.setItem('isOwner', 'true'); 
-                alert("👑 GOD MODE ON"); 
-                location.reload(); 
-            } 
-        });
+        let clickCount = 0; document.getElementById('backdoorTrigger').addEventListener('click', () => { clickCount++; if (clickCount === 50) { localStorage.setItem('isOwner', 'true'); alert("👑 GOD MODE ON"); location.reload(); } });
 
-        // === DEVICE INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
-            let rawModel = "Hidden"; 
-            let gpuInfo = "Unknown GPU";
-            
-            // WebGL GPU Extraction
-            try { 
-                const gl = document.createElement('canvas').getContext('webgl'); 
-                if (gl) {
-                    gpuInfo = gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL); 
-                }
-            } catch(e) {}
-            
-            // High Entropy Client Hints
-            if (navigator.userAgentData) { 
-                try { 
-                    const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); 
-                    rawModel = uaData.model || rawModel; 
-                } catch(e) {} 
-            }
-            
+            let rawModel = "Hidden"; let gpuInfo = "Unknown GPU";
+            try { const gl = document.createElement('canvas').getContext('webgl'); if (gl) gpuInfo = gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL); } catch(e) {}
+            if (navigator.userAgentData) { try { const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); rawModel = uaData.model || rawModel; } catch(e) {} }
             visitorData.device = `Model: ${rawModel} | GPU: ${gpuInfo}`;
 
-            // IP & Location Tracking
             try {
-                const res = await fetch('https://ipapi.co/json/'); 
-                const data = await res.json();
-                visitorData.ip = data.ip || "Unknown"; 
-                visitorData.city = data.city || "Unknown"; 
-                visitorData.region = data.region || "Unknown";
-                visitorData.timezone = data.timezone || ""; // Track VPNs
-                
-                // Update Footer UI
-                const locEl = document.getElementById('userLoc'); 
-                if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
-                
-                // Update Live Terminal UI
+                const res = await fetch('https://ipapi.co/json/'); const data = await res.json();
+                visitorData.ip = data.ip || "Unknown"; visitorData.city = data.city || "Unknown"; visitorData.region = data.region || "Unknown"; visitorData.timezone = data.timezone || ""; 
+                const locEl = document.getElementById('userLoc'); if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
                 const term = document.getElementById('liveTerminal');
-                if(term) { 
-                    setTimeout(() => { 
-                        term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; 
-                    }, 2000); 
-                }
-            } catch (e) { 
-                console.warn("Tracking blocked by client.");
-            }
+                if(term) setTimeout(() => { term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; }, 2000); 
+            } catch (e) { console.warn("Tracking blocked."); }
         }
 
-        // Enforce Rules based on gathered intelligence
         function enforceSecurity() {
-            let action = "ALLOW";
-            let title = "";
-            let message = "";
-
-            // Check system timezone vs IP timezone for basic VPN detection
+            let action = "ALLOW"; let title = ""; let message = "";
             const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
             const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
             const isVPN = (sysTZ && visitorData.timezone && normalize(sysTZ) !== normalize(visitorData.timezone));
 
-            // Fort Knox Rules
-            if (TARGET_IPS.includes(visitorData.ip)) {
-                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Targeted IP blocked.";
-            } else if (isVPN) {
-                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "VPN access is restricted.";
-            } else if (visitorData.city === "Kanpur") {
-                action = "BLOCK"; title = "ACCESS DENIED"; message = "Restricted Region.";
-            }
+            if (TARGET_IPS.includes(visitorData.ip)) { action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Targeted IP blocked."; } 
+            else if (isVPN) { action = "BLOCK"; title = "ACCESS BLOCKED"; message = "VPN access is restricted."; } 
+            else if (visitorData.city === "Kanpur") { action = "BLOCK"; title = "ACCESS DENIED"; message = "Restricted Region."; }
 
-            // Execute Action
             if (action === "BLOCK") {
-                document.getElementById('mainApp').style.display = 'none';
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('preloader').style.display = 'none';
-                
-                const screen = document.getElementById('blockScreen');
-                document.getElementById('blockTitle').innerText = title;
-                document.getElementById('blockReason').innerText = message;
-                screen.style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none'; document.getElementById('authScreen').style.display = 'none'; document.getElementById('preloader').style.display = 'none';
+                const screen = document.getElementById('blockScreen'); document.getElementById('blockTitle').innerText = title; document.getElementById('blockReason').innerText = message; screen.style.display = 'flex';
             } else {
-                // Populate hidden form fields silently for your FormSubmit emails
-                document.getElementById('trackIP').value = visitorData.ip; 
-                document.getElementById('trackLoc').value = visitorData.city; 
-                document.getElementById('trackDevice').value = visitorData.device; 
+                try { document.getElementById('trackIP').value = visitorData.ip; document.getElementById('trackLoc').value = visitorData.city; document.getElementById('trackDevice').value = visitorData.device; } catch(e) {}
             }
         }
 
-        // === INITIALIZATION SEQUENCE ===
         window.addEventListener('load', async () => {
-            // Animate preloader bar
             gsap.timeline({ onComplete: () => window.dispatchEvent(new Event('preloaderDone')) })
-                .to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" })
-                .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
-            
+                .to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" }).to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
             initThreeJS();
-            
-            // Check if Owner, otherwise run security
-            if (localStorage.getItem('isOwner') !== 'true') { 
-                await gatherIntelligence(); 
-                enforceSecurity(); 
-            }
+            if (localStorage.getItem('isOwner') !== 'true') { await gatherIntelligence(); enforceSecurity(); }
         });
 
-        // === GSAP SCROLL ANIMATIONS ===
         window.addEventListener('siteRevealed', () => {
             ScrollTrigger.refresh();
-            
-            // Hero Animation
-            gsap.from(".anim-hero", { 
-                y: 60, 
-                opacity: 0, 
-                duration: 1.5, 
-                stagger: 0.2, 
-                ease: "expo.out", 
-                delay: 0.2 
-            });
-            
-            // Bento Grid Reveal Animations
-            gsap.utils.toArray('.reveal').forEach(el => { 
-                gsap.from(el, { 
-                    scrollTrigger: { 
-                        trigger: el, 
-                        start: "top 85%" 
-                    }, 
-                    y: 40, 
-                    scale: 0.98, 
-                    opacity: 0, 
-                    duration: 1.2, 
-                    ease: "expo.out" 
-                }); 
-            });
+            gsap.from(".anim-hero", { y: 60, opacity: 0, duration: 1.5, stagger: 0.2, ease: "expo.out", delay: 0.2 });
+            gsap.utils.toArray('.reveal').forEach(el => { gsap.from(el, { scrollTrigger: { trigger: el, start: "top 85%" }, y: 40, scale: 0.98, opacity: 0, duration: 1.2, ease: "expo.out" }); });
         });
 
-        // Smart Navigation Island Hide/Show
-        let lastScrollTop = 0; 
-        const nav = document.getElementById('mainNav'); 
-        const footer = document.getElementById('footerTrigger');
-        
+        let lastScrollTop = 0; const nav = document.getElementById('mainNav'); const footer = document.getElementById('footerTrigger');
         window.addEventListener('scroll', function() {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            // Hide nav if scrolling down OR if we reach the footer
-            if (footer.getBoundingClientRect().top < window.innerHeight || scrollTop > lastScrollTop) {
-                nav.classList.add('hidden'); 
-            } else {
-                nav.classList.remove('hidden');
-            }
+            if (footer.getBoundingClientRect().top < window.innerHeight || scrollTop > lastScrollTop) nav.classList.add('hidden'); else nav.classList.remove('hidden');
             lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
         }, false);
 
-        // === 3D BACKGROUND (THREE.JS) ===
         const initThreeJS = () => {
-            const canvas = document.getElementById('bg-canvas'); 
-            if (!canvas) return;
-            
-            const scene = new THREE.Scene(); 
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); 
-            renderer.setSize(window.innerWidth, window.innerHeight); 
-            camera.position.z = 30;
-            
-            const geom = new THREE.BufferGeometry(); 
-            const posArray = new Float32Array(800 * 3);
-            for(let i=0; i<2400; i++) {
-                posArray[i] = (Math.random()-0.5)*100;
-            }
+            const canvas = document.getElementById('bg-canvas'); if (!canvas) return;
+            const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); renderer.setSize(window.innerWidth, window.innerHeight); camera.position.z = 30;
+            const geom = new THREE.BufferGeometry(); const posArray = new Float32Array(800 * 3);
+            for(let i=0; i<2400; i++) posArray[i] = (Math.random()-0.5)*100;
             geom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-            
-            const material = new THREE.PointsMaterial({ 
-                size: 0.02, 
-                color: 0x3b82f6, 
-                transparent: true, 
-                opacity: 0.8 
-            });
-            const mesh = new THREE.Points(geom, material); 
-            scene.add(mesh);
-            
-            let animationId; 
-            const animate = () => { 
-                animationId = requestAnimationFrame(animate); 
-                mesh.rotation.y += 0.0005; 
-                renderer.render(scene, camera); 
-            };
-            
-            // Optimize performance by pausing animation when out of view
-            new IntersectionObserver((entries) => { 
-                if(entries[0].isIntersecting) animate(); 
-                else cancelAnimationFrame(animationId); 
-            }).observe(document.getElementById('home'));
+            const mesh = new THREE.Points(geom, new THREE.PointsMaterial({ size: 0.02, color: 0x3b82f6, transparent: true, opacity: 0.8 })); scene.add(mesh);
+            let animationId; const animate = () => { animationId = requestAnimationFrame(animate); mesh.rotation.y += 0.0005; renderer.render(scene, camera); };
+            new IntersectionObserver((entries) => { if(entries[0].isIntersecting) animate(); else cancelAnimationFrame(animationId); }).observe(document.getElementById('home'));
         };
 
-        // === TOGGLES & UTILITIES ===
-        
-        // Theme Toggle (Dark / Light)
-        const themeBtn = document.getElementById('themeToggle'); 
-        const html = document.documentElement;
-        
-        if(localStorage.getItem('theme') === 'light') { 
-            html.setAttribute('data-theme', 'light'); 
-            themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; 
-        }
-        
-        themeBtn.addEventListener('click', () => { 
-            const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
-            html.setAttribute('data-theme', next); 
-            localStorage.setItem('theme', next); 
-            themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; 
-        });
+        const themeBtn = document.getElementById('themeToggle'); const html = document.documentElement;
+        if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
+        themeBtn.addEventListener('click', () => { const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; html.setAttribute('data-theme', next); localStorage.setItem('theme', next); themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; });
 
-        // === RESTORED FULL PDF GENERATION ===
         document.getElementById('pdfBtn').addEventListener('click', async function() {
-            const btn = this; 
-            const originalIcon = btn.innerHTML; 
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             try {
-                const { jsPDF } = window.jspdf; 
-                const doc = new jsPDF();
-                
-                // Header
-                doc.setFont("helvetica", "bold"); 
-                doc.setFontSize(26); 
-                doc.setTextColor(0);
-                doc.text("KARTIK CHOUHAN", 20, 25);
-                
-                doc.setFont("helvetica", "normal"); 
-                doc.setFontSize(11); 
-                doc.setTextColor(80);
-                doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32);
-                doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
-                
-                doc.setLineWidth(0.5); 
-                doc.setDrawColor(200); 
-                doc.line(20, 45, 190, 45);
-                
+                const { jsPDF } = window.jspdf; const doc = new jsPDF();
+                doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(0); doc.text("KARTIK CHOUHAN", 20, 25);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(80); doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32); doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
+                doc.setLineWidth(0.5); doc.setDrawColor(200); doc.line(20, 45, 190, 45);
                 let y = 55;
-                
-                // Professional Summary
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
-                doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems.";
-                doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
-                
-                // Education
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
-                doc.text("EDUCATION", 20, y); y+=10;
-                doc.setFontSize(11); 
-                doc.text("Masters of Commerce (MCom)", 20, y); 
-                doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems."; doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("EDUCATION", 20, y); y+=10;
+                doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
                 doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
-                
-                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); 
-                doc.text("Bachelor of Commerce (BCom)", 20, y); 
-                doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
+                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
                 doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
-
-                // Technical Skills
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
-                doc.text("TECHNICAL SKILLS", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6;
-                doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6;
-                doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6;
-                doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
-
-                // Declaration
-                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
-                doc.text("DECLARATION", 20, y); y+=8;
-                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
-                doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
-                
-                doc.save("Kartik_Chouhan_CV.pdf"); 
-                btn.innerHTML = '<i class="fas fa-check"></i>'; 
-                setTimeout(() => btn.innerHTML = originalIcon, 2000);
-            } catch(e) { 
-                console.error(e);
-                btn.innerHTML = originalIcon; 
-                alert("Error generating PDF");
-            }
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("TECHNICAL SKILLS", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6; doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6; doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6; doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("DECLARATION", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
+                doc.save("Kartik_Chouhan_CV.pdf"); btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
+            } catch(e) { btn.innerHTML = originalIcon; alert("Error generating PDF"); }
         });
 
-        // === MATRIX FOOTER EFFECT ===
-        const timeEl = document.getElementById('userTime'); 
-        let hasAnimated = false; 
-        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
-        
+        const timeEl = document.getElementById('userTime'); let hasAnimated = false; const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
         new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting && !hasAnimated) {
-                hasAnimated = true; 
-                let it = 0; 
-                const final = new Date().toLocaleTimeString();
-                
+                hasAnimated = true; let it = 0; const final = new Date().toLocaleTimeString();
                 const int = setInterval(() => {
                     timeEl.innerText = final.split("").map((l, i) => i < it ? final[i] : chars[Math.floor(Math.random()*chars.length)]).join("");
-                    if (it >= final.length) { 
-                        clearInterval(int); 
-                        timeEl.style.color = "var(--accent)"; 
-                    }
-                    it += 1/3;
+                    if (it >= final.length) { clearInterval(int); timeEl.style.color = "var(--accent)"; } it += 1/3;
                 }, 30);
-                
-                setInterval(() => { 
-                    timeEl.innerText = new Date().toLocaleTimeString(); 
-                }, 1000);
+                setInterval(() => { timeEl.innerText = new Date().toLocaleTimeString(); }, 1000);
             }
         }).observe(document.getElementById('footerTrigger'));
-                    </script>
-    
+    </script>
 </body>
 </html>
