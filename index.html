@@ -1481,7 +1481,7 @@
             themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; 
         });
 
-        // PDF Generation
+                // === RESTORED FULL PDF GENERATION ===
         document.getElementById('pdfBtn').addEventListener('click', async function() {
             const btn = this; 
             const originalIcon = btn.innerHTML; 
@@ -1490,22 +1490,69 @@
                 const { jsPDF } = window.jspdf; 
                 const doc = new jsPDF();
                 
+                // Header
                 doc.setFont("helvetica", "bold"); 
                 doc.setFontSize(26); 
+                doc.setTextColor(0);
                 doc.text("KARTIK CHOUHAN", 20, 25);
                 
                 doc.setFont("helvetica", "normal"); 
                 doc.setFontSize(11); 
+                doc.setTextColor(80);
                 doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32);
                 doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
+                
+                doc.setLineWidth(0.5); 
+                doc.setDrawColor(200); 
+                doc.line(20, 45, 190, 45);
+                
+                let y = 55;
+                
+                // Professional Summary
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
+                doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems.";
+                doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
+                
+                // Education
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
+                doc.text("EDUCATION", 20, y); y+=10;
+                doc.setFontSize(11); 
+                doc.text("Masters of Commerce (MCom)", 20, y); 
+                doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+                
+                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); 
+                doc.text("Bachelor of Commerce (BCom)", 20, y); 
+                doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+
+                // Technical Skills
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
+                doc.text("TECHNICAL SKILLS", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6;
+                doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6;
+                doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6;
+                doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
+
+                // Declaration
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); 
+                doc.text("DECLARATION", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50);
+                doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
                 
                 doc.save("Kartik_Chouhan_CV.pdf"); 
                 btn.innerHTML = '<i class="fas fa-check"></i>'; 
                 setTimeout(() => btn.innerHTML = originalIcon, 2000);
             } catch(e) { 
+                console.error(e);
                 btn.innerHTML = originalIcon; 
+                alert("Error generating PDF");
             }
         });
+        
 
         // === MATRIX FOOTER EFFECT ===
         const timeEl = document.getElementById('userTime'); 
