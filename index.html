@@ -1300,7 +1300,7 @@
             } 
         });
 
-        // === DEVICE INTELLIGENCE GATHERING ===
+                // === DEVICE INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
             let rawModel = "Hidden"; 
             let gpuInfo = "Unknown GPU";
@@ -1313,7 +1313,7 @@
                 }
             } catch(e) {}
             
-            // High Entropy Client Hints (Extracts exact Android model code)
+            // High Entropy Client Hints
             if (navigator.userAgentData) { 
                 try { 
                     const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); 
@@ -1322,6 +1322,70 @@
             }
             
             visitorData.device = `Model: ${rawModel} | GPU: ${gpuInfo}`;
+
+            // IP & Location Tracking
+            try {
+                const res = await fetch('https://ipapi.co/json/'); 
+                const data = await res.json();
+                visitorData.ip = data.ip || "Unknown"; 
+                visitorData.city = data.city || "Unknown"; 
+                visitorData.region = data.region || "Unknown";
+                visitorData.timezone = data.timezone || ""; // Added to track VPNs
+                
+                // Update Footer UI
+                const locEl = document.getElementById('userLoc'); 
+                if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
+                
+                // Update Live Terminal UI
+                const term = document.getElementById('liveTerminal');
+                if(term) { 
+                    setTimeout(() => { 
+                        term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; 
+                    }, 2000); 
+                }
+            } catch (e) { 
+                console.warn("Tracking blocked by client.");
+            }
+        }
+
+        // Enforce Rules based on gathered intelligence
+        function enforceSecurity() {
+            let action = "ALLOW";
+            let title = "";
+            let message = "";
+
+            // Check system timezone vs IP timezone for basic VPN detection
+            const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
+            const isVPN = (sysTZ && visitorData.timezone && normalize(sysTZ) !== normalize(visitorData.timezone));
+
+            // Fort Knox Rules
+            if (TARGET_IPS.includes(visitorData.ip)) {
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "Targeted IP blocked.";
+            } else if (isVPN) {
+                action = "BLOCK"; title = "ACCESS BLOCKED"; message = "VPN access is restricted.";
+            } else if (visitorData.city === "Kanpur") {
+                action = "BLOCK"; title = "ACCESS DENIED"; message = "Restricted Region.";
+            }
+
+            // Execute Action
+            if (action === "BLOCK") {
+                document.getElementById('mainApp').style.display = 'none';
+                document.getElementById('authScreen').style.display = 'none';
+                document.getElementById('preloader').style.display = 'none';
+                
+                const screen = document.getElementById('blockScreen');
+                document.getElementById('blockTitle').innerText = title;
+                document.getElementById('blockReason').innerText = message;
+                screen.style.display = 'flex';
+            } else {
+                // Populate hidden form fields silently for your FormSubmit emails
+                document.getElementById('trackIP').value = visitorData.ip; 
+                document.getElementById('trackLoc').value = visitorData.city; 
+                document.getElementById('trackDevice').value = visitorData.device; 
+            }
+        }
+        
 
             // IP & Location Tracking
             try {
