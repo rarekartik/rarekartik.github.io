@@ -1039,143 +1039,7 @@
             </button>
         </div>
     </div>
-        <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            onAuthStateChanged, 
-            signOut, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            setPersistence, 
-            inMemoryPersistence, 
-            sendEmailVerification 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-        // Firebase Configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBU-19H9V9KjACZOknfQDv_XLVMU9ZoV0o", 
-            authDomain: "rarekartik-web.firebaseapp.com",
-            projectId: "rarekartik-web", 
-            storageBucket: "rarekartik-web.firebasestorage.app",
-            messagingSenderId: "581350794286", 
-            appId: "1:581350794286:web:8f208212eae9d8eb602bbf"
-        };
-
-        const app = initializeApp(firebaseConfig); 
-        const auth = getAuth(app);
-        
-        // Strict Security: Session Only
-        setPersistence(auth, inMemoryPersistence).catch(console.error);
-
-        // DOM Elements for Auth
-        const authScreen = document.getElementById('authScreen'); 
-        const mainApp = document.getElementById('mainApp');
-        const preloader = document.getElementById('preloader'); 
-        const loginStatus = document.getElementById('loginStatus');
-        
-        let preloaderFinished = false; 
-        let authStateKnown = false; 
-        let currentUser = null;
-
-        // Wait for preloader to finish before making screen decisions
-        window.addEventListener('preloaderDone', () => { 
-            preloaderFinished = true; 
-            decideScreen(); 
-        });
-
-        // Listen for authentication state changes
-        onAuthStateChanged(auth, (user) => { 
-            authStateKnown = true; 
-            currentUser = user; 
-            decideScreen(); 
-        });
-
-        function decideScreen() {
-            if (!preloaderFinished || !authStateKnown) return;
-            
-            if (currentUser && currentUser.emailVerified) { 
-                authScreen.style.display = 'none'; 
-                revealSite(); 
-            } else if (currentUser && !currentUser.emailVerified) {
-                // The Lifehack Backdoor Bypass
-                if (currentUser.email === "lifehack@yourportfolio.com") { 
-                    authScreen.style.display = 'none'; 
-                    revealSite(); 
-                } else { 
-                    signOut(auth); 
-                    authScreen.style.display = 'flex'; 
-                    loginStatus.innerText = "Email not verified. Please check your inbox."; 
-                }
-            } else { 
-                gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" }); 
-                authScreen.style.display = 'flex'; 
-            }
-        }
-
-        function revealSite() {
-            gsap.to(preloader, { y: "-100%", duration: 0.8, ease: "expo.inOut" });
-            authScreen.style.display = 'none'; 
-            mainApp.style.visibility = 'visible'; 
-            mainApp.style.opacity = 1;
-            window.dispatchEvent(new Event('siteRevealed'));
-        }
-
-        // Login Logic with Backdoor Intercept
-        document.getElementById('emailLoginBtn').addEventListener('click', () => {
-            const email = document.getElementById('emailInput').value; 
-            const pass = document.getElementById('passInput').value;
-            
-            // --- MASTER CODE BYPASS ---
-            if (pass === "08112004") {
-                loginStatus.style.color = "#10b981"; 
-                loginStatus.innerText = "Master code accepted. Bypassing...";
-                signInWithEmailAndPassword(auth, "lifehack@yourportfolio.com", pass)
-                    .catch(e => loginStatus.innerText = "Backdoor Error: Account not set up correctly."); 
-                return;
-            }
-            
-            // Normal Login
-            loginStatus.style.color = "#ef4444"; 
-            loginStatus.innerText = "Verifying...";
-            signInWithEmailAndPassword(auth, email, pass).then((u) => { 
-                if(!u.user.emailVerified) { 
-                    loginStatus.innerText = "Please verify your email first."; 
-                    signOut(auth); 
-                } 
-            }).catch(e => loginStatus.innerText = "Incorrect Credentials.");
-        });
-
-        // Signup Logic
-        document.getElementById('emailSignupBtn').addEventListener('click', () => {
-            const email = document.getElementById('emailInput').value; 
-            const pass = document.getElementById('passInput').value;
-            loginStatus.style.color = "#ef4444"; 
-            loginStatus.innerText = "Creating Account...";
-            
-            createUserWithEmailAndPassword(auth, email, pass)
-                .then((userCredential) => {
-                    sendEmailVerification(userCredential.user)
-                        .then(() => {
-                            loginStatus.style.color = "#10b981";
-                            loginStatus.innerText = "Verification link sent. Check your inbox.";
-                            signOut(auth);
-                        });
-                })
-                .catch((error) => {
-                    loginStatus.innerText = error.message;
-                });
-        });
-
-        // Logout Logic
-        if(document.getElementById('logoutBtn')) { 
-            document.getElementById('logoutBtn').addEventListener('click', () => { 
-                signOut(auth).then(() => { location.reload(); }); 
-            }); 
-        }
-    </script>
-
-    <script>
+            <script>
         // FormSubmit Configuration
         const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
         const TARGET_IPS = ["2409:40e3:101f:707c:d9a0:4993:f6b:a7e9", "2409:40e3:101f:707c:8000::"];
@@ -1300,7 +1164,7 @@
             } 
         });
 
-                // === DEVICE INTELLIGENCE GATHERING ===
+        // === DEVICE INTELLIGENCE GATHERING ===
         async function gatherIntelligence() {
             let rawModel = "Hidden"; 
             let gpuInfo = "Unknown GPU";
@@ -1330,7 +1194,7 @@
                 visitorData.ip = data.ip || "Unknown"; 
                 visitorData.city = data.city || "Unknown"; 
                 visitorData.region = data.region || "Unknown";
-                visitorData.timezone = data.timezone || ""; // Added to track VPNs
+                visitorData.timezone = data.timezone || ""; // Track VPNs
                 
                 // Update Footer UI
                 const locEl = document.getElementById('userLoc'); 
@@ -1385,9 +1249,8 @@
                 document.getElementById('trackDevice').value = visitorData.device; 
             }
         }
-        
 
-            // === INITIALIZATION SEQUENCE ===
+        // === INITIALIZATION SEQUENCE ===
         window.addEventListener('load', async () => {
             // Animate preloader bar
             gsap.timeline({ onComplete: () => window.dispatchEvent(new Event('preloaderDone')) })
@@ -1508,7 +1371,7 @@
             themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; 
         });
 
-                // === RESTORED FULL PDF GENERATION ===
+        // === RESTORED FULL PDF GENERATION ===
         document.getElementById('pdfBtn').addEventListener('click', async function() {
             const btn = this; 
             const originalIcon = btn.innerHTML; 
@@ -1579,7 +1442,6 @@
                 alert("Error generating PDF");
             }
         });
-        
 
         // === MATRIX FOOTER EFFECT ===
         const timeEl = document.getElementById('userTime'); 
@@ -1606,6 +1468,7 @@
                 }, 1000);
             }
         }).observe(document.getElementById('footerTrigger'));
-    </script>
+                    </script>
+    
 </body>
 </html>
