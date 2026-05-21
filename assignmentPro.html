@@ -54,6 +54,21 @@
             transition: 0.3s;
         }
         .nav-back:hover { color: var(--accent); }
+        
+        /* Rarekartik Watermark */
+.watermark-rk {
+    position: absolute;
+    top: -12px; 
+    right: 0; 
+    font-size: 7px; /* Reduced from 9px to make it very small */
+    color: #888; 
+    opacity: 0.9; /* Makes it blend in more */
+    font-family: 'Satoshi', sans-serif;
+    letter-spacing: 0.5px;
+    user-select: none;
+    z-index: 10;
+    font-style: italic;
+}
 
         /* Branding */
         .brand-box {
@@ -262,6 +277,7 @@
         
         <div class="a4-page f-garamond" id="pageCover">
             <div class="page-border cover-layout">
+            <div class="watermark-rk">Made using - <u>rarekartik.github.io</u></div>
                 <div class="cp-top-group">
                     <div class="cp-uni" contenteditable="true" id="outUni">YOUR UNIVERSITY</div>
                     <div class="cp-addr" contenteditable="true">CITY, STATE, 12345</div>
@@ -301,6 +317,7 @@
 
         <div class="a4-page f-garamond" id="pageCert">
             <div class="page-border cover-layout">
+            <div class="watermark-rk">Made using - <u>rarekartik.github.io</u></div>
                 <div class="inner-heading" contenteditable="true">CERTIFICATE</div>
                 <div class="inner-body" contenteditable="true">
                     This is to certify that <strong><span class="d-name">STUDENT NAME</span></strong>, a student of <strong>CLASS/SEM</strong> (Roll No: <span class="d-roll">XXXXXX</span>), has successfully completed the assignment on the topic <strong>"SUBJECT NAME"</strong> under my guidance during the academic session 2025-2026.
@@ -316,6 +333,7 @@
 
         <div class="a4-page f-garamond" id="pageAck">
             <div class="page-border cover-layout">
+            <div class="watermark-rk">Made using - <u>rarekartik.github.io</u></div>
                 <div class="inner-heading" contenteditable="true">ACKNOWLEDGEMENT</div>
                 <div class="inner-body" contenteditable="true">
                     I would like to take this opportunity to thank everyone who offered their gracious support and guidance during the preparation of this assignment. Firstly, I thank my professor who guided me throughout from choosing the right questions.
@@ -331,6 +349,7 @@
 
         <div class="a4-page f-garamond" id="pageRef">
             <div class="page-border top-layout">
+            <div class="watermark-rk">Made using - <u>rarekartik.github.io</u></div>
                 <div class="inner-heading" contenteditable="true">BIBLIOGRAPHY</div>
                 <div class="bib-body" contenteditable="true">
                     The following sources were consulted for this assignment:
