@@ -3,298 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docify | Academic PDF Formatter</title>
+    <title>Docify | Modern Academic Formatter</title>
     <style>
         /* =========================================================
-           1. APP UI - TRUE BENTO GRID, DARK THEME, GLASSMORPHISM
+           1. APP UI - ULTRA-MODERN DARK BENTO GRID (Vercel/Apple Vibe)
            ========================================================= */
         :root {
-            --bg-color: #050505;
-            --glass-bg: rgba(20, 20, 25, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.06);
-            --glass-hover: rgba(255, 255, 255, 0.1);
-            --accent: #58a6ff;
-            --accent-glow: rgba(88, 166, 255, 0.2);
-            --text-main: #f0f6fc;
-            --text-muted: #8b949e;
-            --border-radius: 24px;
+            --bg-base: #000000;
+            --card-bg: #0a0a0c;
+            --card-border: #1f1f22;
+            --card-hover: #2d2d30;
+            --accent: #0070f3; /* Electric Blue */
+            --accent-glow: rgba(0, 112, 243, 0.4);
+            --text-main: #ededed;
+            --text-muted: #a1a1aa;
+            --radius: 24px;
         }
 
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-base);
             background-image: 
-                radial-gradient(circle at 0% 0%, rgba(88, 166, 255, 0.08), transparent 40%),
-                radial-gradient(circle at 100% 100%, rgba(137, 87, 229, 0.08), transparent 40%);
+                radial-gradient(circle at 50% 0%, rgba(0, 112, 243, 0.1), transparent 50%);
             color: var(--text-main);
             margin: 0;
-            padding: 40px 20px;
+            padding: 50px 20px;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* The True Bento Grid Structure */
+        /* The Bento Grid */
         .bento-grid {
-            max-width: 850px;
+            max-width: 900px;
             width: 100%;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            gap: 20px;
         }
 
-        /* Universal Bento Card Styling */
+        /* Modern Bento Cards */
         .bento-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius);
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
             padding: 32px;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         .bento-card:hover {
-            border-color: var(--glass-hover);
+            border-color: var(--card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.8);
         }
 
-        .col-span-2 {
-            grid-column: span 2;
-        }
+        .col-span-2 { grid-column: span 2; }
+        .align-center { align-items: center; text-align: center; }
 
-        .align-center {
-            align-items: center;
-            text-align: center;
-        }
-
-        /* Header Card */
-        .header-card h1 {
+        /* Typography */
+        h1 {
             margin: 0 0 8px 0;
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 800;
-            letter-spacing: -0.5px;
-            background: linear-gradient(to right, #ffffff, #8b949e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            color: #ffffff;
         }
-        .header-card p { margin: 0; color: var(--text-muted); font-size: 15px; }
+        p { margin: 0; color: var(--text-muted); font-size: 15px; line-height: 1.5; }
 
-        /* AI Prompt Note Card */
-        .prompt-card {
-            background: rgba(88, 166, 255, 0.03);
-            border-left: 4px solid var(--accent);
-            padding: 24px;
-        }
-        .prompt-card h3 { margin: 0 0 10px 0; font-size: 16px; color: var(--accent); display: flex; align-items: center; gap: 8px;}
-        .prompt-card p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+        /* AI Prompt Card */
+        .prompt-card { border-top: 4px solid var(--accent); }
+        .prompt-card h3 { margin: 0 0 12px 0; font-size: 16px; color: #fff; }
         .prompt-code {
-            background: rgba(0,0,0,0.4);
-            padding: 12px;
-            border-radius: 8px;
+            background: #000000;
+            padding: 16px;
+            border-radius: 12px;
             margin-top: 12px;
-            font-family: monospace;
-            color: #a5d6ff;
+            font-family: 'JetBrains Mono', monospace;
+            color: #a1a1aa;
             font-size: 13px;
-            border: 1px solid var(--glass-border);
+            line-height: 1.6;
+            border: 1px solid var(--card-border);
+            user-select: all;
         }
+        .prompt-code b { color: var(--text-main); }
 
-        /* Input Card (Textarea + Upload) */
+        /* Inputs */
         textarea {
             width: 100%;
-            height: 180px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
+            height: 200px;
+            background: #000000;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
             color: var(--text-main);
-            padding: 16px;
+            padding: 20px;
             font-family: inherit;
             font-size: 14px;
             resize: vertical;
             outline: none;
             box-sizing: border-box;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color 0.3s;
         }
-        textarea:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
-        }
+        textarea:focus { border-color: var(--accent); }
         
         .upload-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--text-muted);
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 16px; font-size: 14px; color: var(--text-muted); width: 100%;
         }
 
         input[type="file"] { display: none; }
-
         .custom-file-upload {
-            border: 1px dashed var(--accent);
-            padding: 10px 20px;
-            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            background: #000;
+            padding: 12px 24px;
+            border-radius: 12px;
             cursor: pointer;
-            color: var(--accent);
+            color: var(--text-main);
             font-weight: 500;
-            transition: all 0.3s;
-            background: rgba(88, 166, 255, 0.05);
-            display: inline-block;
+            transition: all 0.2s;
         }
-        .custom-file-upload:hover {
-            background: rgba(88, 166, 255, 0.1);
-        }
+        .custom-file-upload:hover { border-color: var(--text-muted); }
 
         /* Buttons */
         .btn-primary {
-            background: var(--accent);
-            color: #fff;
-            border: none;
-            padding: 16px 32px;
-            border-radius: 16px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(88, 166, 255, 0.2);
+            background: var(--text-main); color: #000; border: none; padding: 18px 32px;
+            border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: 0.3s; width: 100%;
         }
-        .btn-primary:hover:not(:disabled) {
-            background: #478bda;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(88, 166, 255, 0.4);
-        }
-        .btn-primary:disabled {
-            background: #21262d;
-            color: #8b949e;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
+        .btn-primary:hover:not(:disabled) { background: #fff; transform: scale(1.02); box-shadow: 0 0 20px var(--accent-glow); }
+        .btn-primary:disabled { background: #1f1f22; color: #52525b; cursor: not-allowed; }
 
         .btn-secondary {
-            background: transparent;
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
-            padding: 16px 32px;
-            border-radius: 16px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-decoration: none;
+            background: transparent; color: var(--text-main); border: 1px solid var(--card-border);
+            padding: 18px 32px; border-radius: 16px; font-size: 15px; font-weight: 500;
+            cursor: pointer; transition: 0.3s; width: 100%; text-decoration: none;
+            display: flex; justify-content: center; align-items: center; box-sizing: border-box;
         }
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
+        .btn-secondary:hover { background: #1f1f22; border-color: var(--text-muted); }
 
-        /* Footer */
-        .footer-card { padding: 20px; font-size: 13px; color: #6e7681; text-align: center; }
+        .footer-card { padding: 24px; font-size: 13px; color: #52525b; text-align: center; }
 
-        /* Hidden PDF Content */
-        #pdf-content, .watermark { display: none; }
+        /* Hidden Printable Content */
+        #print-wrapper { display: none; }
 
-        /* Responsive */
-        @media (max-width: 650px) {
+        @media (max-width: 700px) {
             .bento-grid { grid-template-columns: 1fr; }
             .col-span-2 { grid-column: span 1; }
+            .upload-row { flex-direction: column; gap: 15px; align-items: flex-start; }
         }
 
         /* =========================================================
-           2. PRINT / PDF STYLING (Cream/Blue Theme + Watermark)
+           2. PRINT / PDF STYLING (The Overlap Bug Fix & Heavy Bolding)
            ========================================================= */
         @media print {
-            body * { visibility: hidden; }
-            body { background-color: #FFFCF2 !important; background-image: none; margin: 0; padding: 0; }
-            #pdf-content, #pdf-content *, .watermark { visibility: visible; }
-
-            .watermark {
-                display: block; position: fixed; top: 50%; left: 50%;
-                transform: translate(-50%, -50%) rotate(-45deg);
-                font-size: 130px; color: rgba(29, 53, 87, 0.05) !important;
-                z-index: 1; pointer-events: none; font-family: 'Helvetica', sans-serif;
-                font-weight: 900; text-transform: uppercase; letter-spacing: 15px; white-space: nowrap;
+            
+            /* Hide the web UI elements entirely */
+            body > *:not(#print-wrapper) { display: none !important; }
+            
+            /* FIX 1: Strip background gradients that cause blue fading */
+            body { 
+                background-color: #ffffff !important; 
+                background-image: none !important; 
+                margin: 0; 
+                padding: 0; 
+            }
+            
+            /* Show Print Wrapper */
+            #print-wrapper {
+                display: block !important; 
+                position: absolute; left: 0; top: 0; width: 100%;
+                color: #222222 !important; /* Base color: Deep Charcoal */
+                font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                font-size: 11.5pt; line-height: 1.6; padding: 0;
             }
 
-            #pdf-content {
-                display: block; position: absolute; left: 0; top: 0; width: 100%;
-                color: #2B2D42 !important; font-family: 'Georgia', serif; font-size: 12pt;
-                line-height: 1.6; padding: 0; z-index: 2;
+            /* Ensure nested elements inherit the deep charcoal instead of UI grey */
+            #print-wrapper * {
+                visibility: visible;
+                color: inherit;
             }
 
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
-            #pdf-content h2 { color: #1D3557 !important; border-bottom: 2px solid #457B9D !important; padding-bottom: 5px; margin-top: 30px; font-family: 'Helvetica', sans-serif; page-break-after: avoid; }
-            #pdf-content h3 { color: #2A9D8F !important; font-family: 'Helvetica', sans-serif; margin-top: 20px; margin-bottom: 8px; page-break-after: avoid; }
-            #pdf-content p { margin-bottom: 12px; text-align: justify; }
-            #pdf-content ul { margin-top: 5px; margin-bottom: 15px; padding-left: 25px; }
-            #pdf-content li { margin-bottom: 6px; }
+            /* FIX 3: Shrink browser default margins to make the table wider */
+            @page {
+                margin: 12mm 15mm !important; 
+            }
+
+            /* -----------------------------------------------------
+               THE OVERLAP FIX: HTML Table Method
+               This guarantees headers/footers never touch the text
+            ------------------------------------------------------ */
+            .print-table { width: 100%; border-collapse: collapse; border: none; }
+            .print-table td, .print-table th { border: none; padding: 0; }
             
-            .question { background-color: #457B9D !important; color: #FFFFFF !important; padding: 15px 20px; border-radius: 6px; font-size: 14pt; font-weight: bold; margin-top: 40px; margin-bottom: 15px; font-family: 'Helvetica', sans-serif; page-break-after: avoid; }
-            .conclusion { background-color: #E0F2FE !important; border-left: 5px solid #1D3557 !important; padding: 12px 18px; margin-top: 20px; margin-bottom: 20px; font-weight: 500; font-family: 'Helvetica', sans-serif; page-break-inside: avoid; }
+            /* These create physical blank space on every page */
+            .header-space { height: 25px; }
+            .footer-space { height: 25px; }
+
+            /* These sit inside the reserved blank space */
+            .print-header {
+                position: fixed; top: 0; right: 0; width: 100%; height: 25px;
+                font-size: 9pt; color: #777777 !important; font-weight: 500; text-align: right;
+            }
+            .print-footer {
+                position: fixed; bottom: 0; left: 0; width: 100%; height: 25px;
+                font-size: 9pt; color: #777777 !important; font-weight: 500; text-align: left;
+            }
+
+            /* Giant Diagonal Watermark */
+            .watermark {
+                display: block; position: fixed; top: 50%; left: 50%;
+                transform: translate(-50%, -50%) rotate(-45deg);
+                font-size: 140px; color: rgba(0, 0, 0, 0.04) !important;
+                z-index: -1; pointer-events: none; font-weight: 900;
+                text-transform: uppercase; letter-spacing: 15px; white-space: nowrap;
+            }
+
+            /* Automated Cover Page Styling */
+            .cover-page {
+                display: flex; flex-direction: column; justify-content: center; align-items: center;
+                height: 85vh; text-align: center; page-break-after: always;
+                padding: 40px; box-sizing: border-box;
+            }
+            .cover-title { font-size: 50pt; font-weight: 900; letter-spacing: -2px; margin-bottom: 10px; border-bottom: 5px solid #000000; padding-bottom: 10px; color: #000000 !important;}
+            .cover-subtitle { font-size: 16pt; color: #444444 !important; margin-bottom: 50px; font-weight: bold;}
+            .cover-section { max-width: 600px; margin-bottom: 30px; text-align: justify; }
+            .cover-heading { font-size: 14pt; font-weight: 900; text-decoration: underline; text-align: center; margin-bottom: 10px; color: #000000 !important;}
+            .cover-links { margin-top: 50px; font-weight: bold; font-size: 12pt; display: flex; flex-direction: column; gap: 10px; color: #000000 !important;}
+
+            /* FIX 2: Document Formatting (Pure Black Headers, Deep Charcoal Text) */
+            #pdf-content h2 { 
+                font-size: 18pt; 
+                font-weight: 900 !important; /* Proper Extra Bold */
+                text-decoration: underline; 
+                margin-top: 40px; 
+                margin-bottom: 15px; 
+                color: #000000 !important; /* Pure Black */
+                page-break-after: avoid; 
+            }
+            #pdf-content h3 { 
+                font-size: 14pt; 
+                font-weight: 800 !important; /* Proper Bold */
+                border-bottom: 1px solid #dddddd !important; 
+                padding-bottom: 4px; 
+                margin-top: 25px; 
+                margin-bottom: 10px; 
+                color: #000000 !important; /* Pure Black */
+                page-break-after: avoid; 
+            }
+            #pdf-content p { margin-bottom: 14px; text-align: justify; color: #222222 !important; }
+            #pdf-content ul { margin-top: 5px; margin-bottom: 20px; padding-left: 25px; list-style-type: square; color: #222222 !important; }
+            #pdf-content li { margin-bottom: 8px; color: #222222 !important; }
+            
+            /* Clean Question & Conclusion Blocks */
+            .question { 
+                background-color: #f4f4f5 !important; border-left: 5px solid #000000 !important;
+                padding: 16px 20px; font-size: 15pt; font-weight: 900 !important; 
+                margin-top: 45px; margin-bottom: 20px; page-break-after: avoid; color: #000000 !important;
+            }
+            .conclusion { 
+                background-color: #fafafa !important; border: 1px solid #e5e5e5 !important;
+                padding: 15px 20px; margin-top: 25px; margin-bottom: 25px; 
+                font-weight: 600 !important; font-style: italic; page-break-inside: avoid; color: #111111 !important;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- Web UI Content -->
     <div class="bento-grid">
-        <!-- Card 1: Header -->
-        <div class="bento-card header-card align-center col-span-2">
+        <div class="bento-card col-span-2 align-center">
             <h1>Docify</h1>
-            <p>Easily convert .txt files or pasted text into professionally formatted PDFs.</p>
+            <p>Instantly convert raw notes into beautifully formatted academic PDFs.</p>
         </div>
 
-        <!-- Card 2: AI Prompt Guide -->
         <div class="bento-card prompt-card col-span-2">
-            <h3>💡 Setup Guide for AI Chatbots</h3>
-            <p>Docify relies on specific keywords to automatically format your document. Paste this exact prompt into your AI (ChatGPT, Gemini, Claude) before generating your notes:</p>
+            <h3>💡 AI Formatting Prompt</h3>
+            <p>Paste this prompt into your chatbot before asking for notes to ensure perfect styling:</p>
             <div class="prompt-code">
-                "Format the response precisely. Start all main questions with <b>Q.</b> and start conclusions with <b>Conclusion:</b>. Use keywords like <b>Characteristics:</b>, <b>Importance:</b>, or <b>Steps:</b> for sub-headings. Keep bullet points as short lines without periods at the end."
+                "Format responses precisely:<br>
+                1. Start main questions with <b>Q.</b><br>
+                2. Start final summaries with <b>Conclusion:</b><br>
+                3. Put major sections (e.g., (a), Introduction) on a new line.<br>
+                4. Put subheadings (like Characteristics:, Importance:) on a new line ending with a colon (:).<br>
+                5. Do NOT use markdown asterisks (**) for bolding.<br>
+                6. Keep bullet items short without periods (.) at the end."
             </div>
         </div>
 
-        <!-- Card 3: Dual Input Area -->
         <div class="bento-card col-span-2" style="padding-bottom: 24px;">
             <textarea id="textInput" placeholder="Paste your raw text here..."></textarea>
-            
             <div class="upload-row">
-                <span>Or load from a file:</span>
+                <span style="display: flex; align-items: center; gap: 8px;">Or load from file:</span>
                 <label class="custom-file-upload">
                     <input type="file" id="fileInput" accept=".txt">
-                    📁 Upload .txt
+                    📁 Browse .txt
                 </label>
             </div>
         </div>
 
-        <!-- Card 4: Action Button -->
         <div class="bento-card align-center">
             <button id="generateBtn" class="btn-primary" disabled>Generate PDF</button>
-            <span style="margin-top: 12px; font-size: 12px; color: var(--text-muted);">Ensure destination is "Save to PDF"</span>
+            <span style="margin-top: 14px; font-size: 13px; color: var(--text-muted); font-weight: 500;">Select "Save to PDF" in print menu</span>
         </div>
 
-        <!-- Card 5: Return Link -->
         <div class="bento-card align-center">
-            <a href="https://rarekartik.github.io" class="btn-secondary">← Return to Website</a>
+            <a href="https://rarekartik.github.io" class="btn-secondary">← Return to Portfolio</a>
         </div>
 
-        <!-- Card 6: Footer -->
         <div class="bento-card footer-card col-span-2">
             © 2026 copyright, All rights reserved. Developed by Kartik Chouhan.
         </div>
     </div>
 
-    <!-- Hidden Printable Content (Watermark + Document) -->
-    <div class="watermark">rarekartik</div>
-    <div id="pdf-content"></div>
+    <!-- Hidden Printable Content (Assembled automatically during print) -->
+    <div id="print-wrapper">
+        
+        <!-- The Giant Watermark -->
+        <div class="watermark">rarekartik</div>
+
+        <!-- The Holy Grail Table (Prevents overlap of headers/footers) -->
+        <table class="print-table">
+            <thead>
+                <tr>
+                    <td>
+                        <div class="header-space"></div>
+                        <div class="print-header">Generated from - rarekartik.github.io</div>
+                    </td>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td>
+                        <!-- Automated Cover Page -->
+                        <div class="cover-page">
+                            <div class="cover-title">DOCIFY</div>
+                            <div class="cover-subtitle">Automated Academic Documentation</div>
+                            
+                            <div class="cover-section">
+                                <div class="cover-heading">About the Creator</div>
+                                <div>Hi, I'm Kartik Chouhan. I am a developer and digital creator passionate about building intuitive, high-performance tools that simplify complex workflows and help students and professionals manage information efficiently.</div>
+                            </div>
+
+                            <div class="cover-section">
+                                <div class="cover-heading">The Goal</div>
+                                <div>The mission behind my platform and tools like Docify is to provide users with free, unlimited, and accessible utility software. I believe in removing frustrating restrictions, character limits, and paywalls so you can focus entirely on productivity and learning.</div>
+                            </div>
+
+                            <div class="cover-links">
+                                <div>Website: rarekartik.github.io</div>
+                                <div>Connect: linktr.ee/rarekartik</div>
+                            </div>
+                        </div>
+
+                        <!-- The Parsed Text Content -->
+                        <div id="pdf-content"></div>
+                    </td>
+                </tr>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td>
+                        <div class="footer-space"></div>
+                        <div class="print-footer">Made from Docify (A tool developed by rarekartik)</div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 
     <script>
         const fileInput = document.getElementById('fileInput');
@@ -302,16 +388,10 @@
         const generateBtn = document.getElementById('generateBtn');
         const pdfContent = document.getElementById('pdf-content');
 
-        // Enable button when user types/pastes text
         textInput.addEventListener('input', function() {
-            if (textInput.value.trim().length > 0) {
-                generateBtn.disabled = false;
-            } else {
-                generateBtn.disabled = true;
-            }
+            generateBtn.disabled = textInput.value.trim().length === 0;
         });
 
-        // Load file contents into the textarea
         fileInput.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -319,12 +399,11 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 textInput.value = event.target.result;
-                generateBtn.disabled = false; // Enable button
+                generateBtn.disabled = false;
             };
             reader.readAsText(file);
         });
 
-        // The Formatting Engine
         function formatTextToHTML(text) {
             const lines = text.split('\n');
             let htmlString = '';
@@ -332,13 +411,15 @@
 
             lines.forEach(line => {
                 line = line.trim();
+                line = line.replace(/\*\*/g, ''); // Remove markdown bolding
+                
                 if (!line || line === '---' || line === 'Answers -') return;
 
                 if (line.startsWith('Q.')) {
                     if (inList) { htmlString += '</ul>'; inList = false; }
                     htmlString += `<div class="question">${line}</div>`;
                 } 
-                else if (line.match(/^\([a-z]\)\s/) || line.match(/^(Introduction|Steps to|Structure of)/i)) {
+                else if (line.match(/^\([a-z]\)\s/) || line.match(/^(Introduction|Background|Overview|Structure of)/i)) {
                     if (inList) { htmlString += '</ul>'; inList = false; }
                     htmlString += `<h2>${line}</h2>`;
                 }
@@ -347,11 +428,11 @@
                     let cleanLine = line.replace('Conclusion:', '').trim();
                     htmlString += `<div class="conclusion"><strong>Conclusion:</strong> ${cleanLine}</div>`;
                 }
-                else if (line.match(/^(Characteristics|Importance|Types|Features|Advantages|Limitations|Steps|Objectives|Main Parts|Key Features):/i) || line.match(/^\d+\.\s/)) {
+                else if (line.match(/^[A-Za-z\s]+:$/) || line.match(/^\d+\.\s/)) {
                     if (inList) { htmlString += '</ul>'; inList = false; }
                     htmlString += `<h3>${line}</h3>`;
                 }
-                else if (line.length > 0 && line.length < 80 && !line.endsWith('.') && !line.includes(':')) {
+                else if (line.length > 0 && line.length < 90 && !line.endsWith('.')) {
                     if (!inList) { htmlString += '<ul>'; inList = true; }
                     htmlString += `<li>${line}</li>`;
                 }
@@ -365,9 +446,7 @@
             pdfContent.innerHTML = htmlString;
         }
 
-        // Generate PDF
         generateBtn.addEventListener('click', function() {
-            // Take the text from the text box, format it, push to hidden div, and print
             formatTextToHTML(textInput.value);
             window.print();
         });
