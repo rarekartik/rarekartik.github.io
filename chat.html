@@ -114,7 +114,7 @@
         .msg-bubble.received { background-color: #1f2937; align-self: flex-start; border-bottom-left-radius: 4px; }
         .msg-meta { display: block; font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); margin-top: 4px; text-align: right; }
 
-        .input-bar { padding: 16px 20px; background: var(--bg-surface); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .input-bar { padding: 16px 20px; background: var(--bg-surface); border-top: 1px solid var(--border); display: flex; gap: 8px; align-items: center; }
         .message-form { flex: 1; display: flex; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 30px; padding: 4px 6px 4px 18px; }
         .message-form input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 0.95rem; }
         .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -182,8 +182,13 @@
             <div class="messages-area" id="msgViewport"></div>
 
             <footer class="input-bar">
+                <!-- Multimedia Inputs -->
                 <input type="file" id="imageInput" style="display:none;" accept="image/*" onchange="handleImageInjection(event)">
-                <button class="icon-btn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-camera"></i></button>
+                <input type="file" id="whatsappInput" style="display:none;" accept=".txt" onchange="handleWhatsAppImport(event)">
+                
+                <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Send Image"><i class="fas fa-camera"></i></button>
+                <button class="icon-btn" onclick="document.getElementById('whatsappInput').click()" title="Import WhatsApp Chat"><i class="fas fa-file-import"></i></button>
+                
                 <form class="message-form" id="chatForm">
                     <input type="text" id="msgField" placeholder="Send secure statement..." autocomplete="off">
                     <button type="submit" class="icon-btn send-btn"><i class="fas fa-arrow-up"></i></button>
@@ -378,6 +383,46 @@
             input.value = "";
         });
 
+        /* --- WHATSAPP TEXT PARSING & BULK INJECTION --- */
+        window.handleWhatsAppImport = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                
+                // Matches standard Android/iOS exports e.g., "dd/mm/yy, hh:mm - Name: Message"
+                const messageRegex = /^\[?(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s(\d{1,2}:\d{2}(?::\d{2})?\s?[APMapm]?)\]?\s-\s([^:]+):\s(.*)$/;
+                let importCount = 0;
+
+                for (let line of lines) {
+                    const match = line.match(messageRegex);
+                    if (match) {
+                        const [,, senderName, messageBody] = match;
+                        
+                        // Clean up text and omit system automated logs
+                        if (messageBody.includes("<Media omitted>") || messageBody.includes("Messages and calls are end-to-end encrypted")) {
+                            continue;
+                        }
+
+                        // Batch-push to Firestore collection
+                        await addDoc(collection(db, "messages"), {
+                            sender: senderName.trim(),
+                            body: messageBody.trim(),
+                            type: "text",
+                            timestamp: Date.now() + importCount // micro-offset to preserve sequence sorting
+                        });
+                        importCount++;
+                    }
+                }
+                alert(`Successfully imported ${importCount} historical messages into your vault!`);
+            };
+            reader.readAsText(file);
+        };
+
+        /* --- BASE64 MULTIMEDIA STRIPPING ENGINE --- */
         window.handleImageInjection = function(event) {
             const file = event.target.files[0];
             if (!file) return;
