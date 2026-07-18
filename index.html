@@ -1219,6 +1219,48 @@
                 setInterval(() => { timeEl.innerText = new Date().toLocaleTimeString(); }, 1000);
             }
         }).observe(document.getElementById('footerTrigger'));
-    </script>
+        // ================= CONTACT FORM AJAX SUBMISSION =================
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Prevents the website from reloading!
+                
+                const submitBtn = contactForm.querySelector('.btn-submit');
+                const originalText = submitBtn.innerText;
+                submitBtn.innerText = "Sending...";
+                submitBtn.disabled = true;
+
+                // Create the form payload dynamically
+                const formData = new FormData(contactForm);
+                
+                try {
+                    // Send the message in the background using FormSubmit AJAX endpoint
+                    const response = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        submitBtn.innerText = "Message Sent! ✓";
+                        submitBtn.style.background = "#10b981"; // Turns button green on success
+                        contactForm.reset(); // Clears the inputs
+                    } else {
+                        throw new Error('Submission failure');
+                    }
+                } catch (error) {
+                    submitBtn.innerText = "Error! Try Again";
+                    submitBtn.style.background = "#ef4444"; // Turns button red on error
+                    submitBtn.disabled = false;
+                }
+
+                // Reset the button appearance back to normal after 4 seconds
+                setTimeout(() => {
+                    submitBtn.innerText = originalText;
+                    submitBtn.style.background = ""; 
+                    submitBtn.disabled = false;
+                }, 4000);
+            });
+        }      
+        </script>
 </body>
 </html>
