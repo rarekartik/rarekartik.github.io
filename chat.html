@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Calculator</title>
+    
+    <!-- External Graphic and Icon Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-calc: #111112;
+            --bg-calc-screen: #1c1c1e;
+            --btn-gray: #3a3a3c;
+            --btn-orange: #ff9f0a;
+            --btn-light-gray: #a5a5a5;
+            
+            --bg-app: #050505;
+            --bg-surface: rgba(18, 18, 18, 0.7);
+            --border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --accent: #3b82f6;
+            --font-sans: 'Satoshi', sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-sans); }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #000; }
+
+        /* --- DECOY CALCULATOR SHELL --- */
+        #decoy-shell {
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-calc);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            position: absolute;
+            top: 0; left: 0; z-index: 10;
+            transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .calc-screen {
+            flex: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 20px;
+            color: #fff;
+            font-size: 5rem;
+            font-weight: 300;
+            overflow: hidden;
+            word-break: break-all;
+            text-align: right;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .calc-btn {
+            border: none;
+            outline: none;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            font-size: 2rem;
+            font-weight: 500;
+            color: #fff;
+            background-color: var(--btn-gray);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: filter 0.2s;
+        }
+
+        .calc-btn:active { filter: brightness(1.3); }
+        .calc-btn.orange { background-color: var(--btn-orange); }
+        .calc-btn.light { background-color: var(--btn-light-gray); color: #000; }
+        .calc-btn.zero { grid-column: span 2; aspect-ratio: auto; border-radius: 40px; padding-left: 30px; justify-content: flex-start; }
+
+        /* --- SECRET CHAT VAULT WORKSPACE --- */
+        #vault-shell {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0; z-index: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-app);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+
+        .chat-viewport { flex: 1; display: flex; flex-direction: column; background: rgba(5, 5, 5, 0.3); backdrop-filter: blur(20px); }
+        .chat-header { height: 70px; padding: 0 20px; background: var(--bg-surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+        .identity-cluster { display: flex; align-items: center; gap: 14px; }
+        .avatar-frame { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; overflow: hidden; border: 2px solid var(--border); }
+        .avatar-frame img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .messages-area { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg-bubble { max-width: 75%; padding: 12px 16px; border-radius: 20px; font-size: 0.95rem; line-height: 1.5; animation: pop 0.25s ease forwards; }
+        .msg-bubble.sent { background-color: #1e3a8a; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-bubble.received { background-color: #1f2937; align-self: flex-start; border-bottom-left-radius: 4px; }
+        .msg-meta { display: block; font-size: 0.7rem; color: rgba(255, 255, 255, 0.3); margin-top: 4px; text-align: right; }
+
+        .input-bar { padding: 16px 20px; background: var(--bg-surface); border-top: 1px solid var(--border); display: flex; gap: 12px; }
+        .message-form { flex: 1; display: flex; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 30px; padding: 4px 6px 4px 18px; }
+        .message-form input { flex: 1; background: transparent; border: none; outline: none; color: #fff; font-size: 0.95rem; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .icon-btn.send-btn { background: var(--accent); color: #fff; }
+
+        /* --- ONBOARDING SETUP OVERLAY --- */
+        #profile-setup {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #050505; z-index: 100;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px;
+            transform: translateY(100%); transition: transform 0.5s ease;
+        }
+        .setup-box { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 15px; }
+        .setup-box input { width: 100%; padding: 12px; background: #1c1c1e; border: 1px solid var(--border); border-radius: 8px; color: #fff; outline: none; }
+        .setup-box button { width: 100%; padding: 12px; background: var(--accent); border: none; border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer; }
+
+        @keyframes pop { from { transform: translateY(5px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <!-- 1. DECOY EXTERNAL SHELL -->
+    <div id="decoy-shell">
+        <div class="calc-screen" id="calcDisplay">0</div>
+        <div class="calc-grid">
+            <button class="calc-btn light" onclick="clearCalc()">AC</button>
+            <button class="calc-btn light" onclick="pressKey('/')">÷</button>
+            <button class="calc-btn light" onclick="pressKey('*')">×</button>
+            <button class="calc-btn orange" onclick="pressKey('-')">−</button>
+            
+            <button class="calc-btn" onclick="pressKey('7')">7</button>
+            <button class="calc-btn" onclick="pressKey('8')">8</button>
+            <button class="calc-btn" onclick="pressKey('9')">9</button>
+            <button class="calc-btn orange" onclick="pressKey('+')">+</button>
+            
+            <button class="calc-btn" onclick="pressKey('4')">4</button>
+            <button class="calc-btn" onclick="pressKey('5')">5</button>
+            <button class="calc-btn" onclick="pressKey('6')">6</button>
+            <button class="calc-btn orange" onclick="evalCalc()">=</button>
+            
+            <button class="calc-btn" onclick="pressKey('1')">1</button>
+            <button class="calc-btn" onclick="pressKey('2')">2</button>
+            <button class="calc-btn" onclick="pressKey('3')">3</button>
+            <button class="calc-btn zero" onclick="pressKey('0')">0</button>
+        </div>
+    </div>
+
+    <!-- 2. PRIVATE VAULT SYSTEM -->
+    <div id="vault-shell">
+        <canvas id="bg-canvas"></canvas>
+        <div class="chat-viewport">
+            <header class="chat-header">
+                <div class="identity-cluster">
+                    <div class="avatar-frame" id="chatAvatar">A</div>
+                    <div>
+                        <h3 id="chatPartnerName">Workspace Partner</h3>
+                        <span style="font-size:0.75rem; color:#10b981;"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Active Now</span>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="lockVault()"><i class="fas fa-sign-out-alt"></i></button>
+            </header>
+
+            <div class="messages-area" id="msgViewport"></div>
+
+            <footer class="input-bar">
+                <input type="file" id="imageInput" style="display:none;" accept="image/*" onchange="handleImageInjection(event)">
+                <button class="icon-btn" onclick="document.getElementById('imageInput').click()"><i class="fas fa-camera"></i></button>
+                <form class="message-form" id="chatForm">
+                    <input type="text" id="msgField" placeholder="Send secure statement..." autocomplete="off">
+                    <button type="submit" class="icon-btn send-btn"><i class="fas fa-arrow-up"></i></button>
+                </form>
+            </footer>
+        </div>
+    </div>
+
+    <!-- 3. PROFILE INITIALIZER ONBOARDING -->
+    <div id="profile-setup">
+        <div class="setup-box">
+            <h2 style="color:#fff; text-align:center; margin-bottom:10px;">Workspace Profiles</h2>
+            <input type="text" id="usernameInput" placeholder="Enter display username">
+            <input type="text" id="profilePicInput" placeholder="Paste Profile Image URL (or leave blank)">
+            <button onclick="saveWorkspaceProfile()">Initialize Profile Identity</button>
+        </div>
+    </div>
+
+    <!-- Firebase Connection Engine Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { initializeFirestore, doc, setDoc, collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Verified Firebase configuration parameters
+        const firebaseConfig = {
+          apiKey: "AIzaSyAFwnFKnoV7mYi0hm5fikzzjX_WfINss-k",
+          authDomain: "roll-no-48.firebaseapp.com",
+          projectId: "roll-no-48",
+          storageBucket: "roll-no-48.firebasestorage.app",
+          messagingSenderId: "734946482686",
+          appId: "1:734946482686:web:2521a0ab55194a8dac88af"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = initializeFirestore(app, {});
+
+        let currentUser = localStorage.getItem('workspace_user') || '';
+        const SECRET_PASSCODE = "0848"; // Updated custom secret bypass combo
+
+        // Request standard desktop notification authorization
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
+
+        /* --- CALCULATOR LOGIC & SECRET TRIGGERS --- */
+        let displayStr = "";
+        window.pressKey = function(key) {
+            displayStr += key;
+            document.getElementById('calcDisplay').innerText = displayStr;
+        };
+        window.clearCalc = function() {
+            displayStr = "";
+            document.getElementById('calcDisplay').innerText = "0";
+        };
+        window.evalCalc = function() {
+            if (displayStr === SECRET_PASSCODE) {
+                clearCalc();
+                unlockVault();
+                return;
+            }
+            try {
+                let res = eval(displayStr);
+                document.getElementById('calcDisplay').innerText = res;
+                displayStr = res.toString();
+            } catch {
+                document.getElementById('calcDisplay').innerText = "Error";
+                displayStr = "";
+            }
+        };
+
+        /* --- VAULT TRANSITIONS & SYNC ENGINE --- */
+        function unlockVault() {
+            document.getElementById('decoy-shell').style.transform = "translateY(-100%)";
+            document.getElementById('vault-shell').style.opacity = "1";
+            document.getElementById('vault-shell').style.pointerEvents = "all";
+            
+            if (!currentUser) {
+                document.getElementById('profile-setup').style.transform = "translateY(0)";
+            } else {
+                bootSecureChatStream();
+            }
+        }
+
+        window.lockVault = function() {
+            document.getElementById('decoy-shell').style.transform = "translateY(0)";
+            document.getElementById('vault-shell').style.opacity = "0";
+            document.getElementById('vault-shell').style.pointerEvents = "none";
+        };
+
+        window.saveWorkspaceProfile = async function() {
+            const name = document.getElementById('usernameInput').value.trim();
+            const pic = document.getElementById('profilePicInput').value.trim() || `https://api.dicebear.com/7.x/bottts/svg?seed=${name}`;
+            
+            if (!name) return alert("Please specify profile tag");
+            
+            currentUser = name;
+            localStorage.setItem('workspace_user', name);
+            
+            await setDoc(doc(db, "users", name), { username: name, avatar: pic, timestamp: Date.now() });
+            document.getElementById('profile-setup').style.transform = "translateY(100%)";
+            bootSecureChatStream();
+        };
+
+        /* --- FIREBASE MESSAGE ENGINE & DECOY NOTIFICATIONS --- */
+        let initialLoad = true;
+        function bootSecureChatStream() {
+            const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const viewport = document.getElementById('msgViewport');
+                let rawChanges = snapshot.docChanges();
+                
+                snapshot.forEach((docSnap) => {
+                    if (document.getElementById(docSnap.id)) return;
+                    
+                    const data = docSnap.data();
+                    const bubble = document.createElement('div');
+                    bubble.id = docSnap.id;
+                    bubble.className = `msg-bubble ${data.sender === currentUser ? 'sent' : 'received'}`;
+                    
+                    if (data.type === "image") {
+                        bubble.innerHTML = `<img src="${data.body}" style="width:100%; border-radius:10px; margin-bottom:5px;"><span class="msg-meta">${data.sender}</span>`;
+                    } else {
+                        bubble.innerHTML = `${data.body}<span class="msg-meta">${data.sender}</span>`;
+                    }
+                    
+                    viewport.appendChild(bubble);
+                    viewport.scrollTop = viewport.scrollHeight;
+                });
+
+                // Decoy Notification System
+                if (!initialLoad && rawChanges.length > 0) {
+                    rawChanges.forEach(change => {
+                        if (change.type === "added" && change.doc.data().sender !== currentUser) {
+                            triggerDecoyBanner();
+                        }
+                    });
+                }
+                initialLoad = false;
+            });
+        }
+
+        function triggerDecoyBanner() {
+            if (Notification.permission === "granted") {
+                new Notification("Weather Alert System", {
+                    body: "Weather is so good, let's go for a ride",
+                    icon: "https://cdn-icons-png.flaticon.com/512/869/869869.png"
+                });
+            }
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('msgField');
+            if (!input.value.trim()) return;
+
+            await addDoc(collection(db, "messages"), {
+                sender: currentUser,
+                body: input.value.trim(),
+                type: "text",
+                timestamp: Date.now()
+            });
+            input.value = "";
+        });
+
+        /* --- BASE64 MULTIMEDIA STRIPPING ENGINE --- */
+        window.handleImageInjection = function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64String = e.target.result;
+                await addDoc(collection(db, "messages"), {
+                    sender: currentUser,
+                    body: base64String,
+                    type: "image",
+                    timestamp: Date.now()
+                });
+            };
+            reader.readAsDataURL(file);
+        };
+
+        /* --- BACKGROUND DOT ANIMATION --- */
+        const canvas = document.getElementById('bg-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.position.z = 30;
+
+        const geom = new THREE.BufferGeometry();
+        const posArray = new Float32Array(200 * 3);
+        for(let i=0; i<600; i++) posArray[i] = (Math.random()-0.5)*100;
+        geom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const mesh = new THREE.Points(geom, new THREE.PointsMaterial({ size: 0.05, color: 0x3b82f6, transparent: true, opacity: 0.3 }));
+        scene.add(mesh);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            mesh.rotation.y += 0.0003;
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+</html>
