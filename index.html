@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartik Chouhan | rarekartik</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ================= VARIABLES & THEMES ================= */
+        :root {
+            --bg: #050505; 
+            --surface: rgba(18, 18, 18, 0.6); 
+            --surface-hover: rgba(30, 30, 30, 0.8); 
+            --border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff; 
+            --text-dim: #a1a1aa; 
+            --accent: #3b82f6; 
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --radius: 24px;
+            --ease: cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        [data-theme="light"] {
+            --bg: #f0f4f8; 
+            --surface: rgba(255, 255, 255, 0.7); 
+            --surface-hover: rgba(255, 255, 255, 0.9); 
+            --border: rgba(0, 0, 0, 0.1);
+            --text: #0f172a; 
+            --text-dim: #64748b; 
+            --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.2);
+        }
+
+        /* ================= CORE STYLES ================= */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-user-select: none; 
+            user-select: none; 
+            -webkit-touch-callout: none; 
+        }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Satoshi', sans-serif; 
+            overflow-x: hidden; 
+            -webkit-font-smoothing: antialiased; 
+            transition: background-color 0.5s ease, color 0.5s ease; 
+        }
+
+        /* Hardware Acceleration for GSAP Animations */
+        .anim-hero, .reveal, .card { 
+            will-change: transform, opacity; 
+        }
+
+        /* Lenis Smooth Scroll Fixes */
+        html.lenis { height: auto; }
+        .lenis.lenis-smooth { scroll-behavior: auto; }
+        .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+
+        /* Cinematic Film Grain Overlay */
+        .film-grain { 
+            display: none; 
+        }
+
+        /* 3D Particle Canvas */
+        #bg-canvas { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            z-index: -1; 
+            pointer-events: none; 
+        }
+
+        /* Typography - UPDATED FOR BOLD CINEMATIC DESIGN */
+        h1 { 
+            font-size: clamp(3.5rem, 11vw, 9.5rem); 
+            font-weight: 900; 
+            line-height: 0.85; 
+            letter-spacing: -0.05em; 
+            margin-bottom: 20px;
+        }
+        
+        h2 { 
+            font-size: clamp(2.5rem, 7vw, 4.5rem); 
+            font-weight: 800; 
+            letter-spacing: -0.04em; 
+            line-height: 1.05;
+            margin-bottom: 24px; 
+        }
+        
+        h3 { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            margin-bottom: 0.5rem; 
+        }
+        
+        p { 
+            color: var(--text-dim); 
+            line-height: 1.7; 
+            font-size: 1.1rem; 
+        }
+        
+        .text-accent { 
+            color: var(--accent); 
+        }
+        
+        .text-label { 
+            font-size: 0.85rem; 
+            text-transform: uppercase; 
+            letter-spacing: 0.1em; 
+            color: var(--text-dim); 
+            font-weight: 700; 
+            margin-bottom: 15px; 
+            display: block; 
+        }
+
+        /* ================= VISITOR TOAST UI ================= */
+        #visitorToast {
+            position: fixed; 
+            top: 30px; 
+            right: -400px; 
+            background: rgba(18, 18, 18, 0.8); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border); 
+            padding: 15px 25px; 
+            border-radius: 50px; 
+            z-index: 10000; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            transition: right 0.6s var(--ease), opacity 0.6s var(--ease); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #visitorToast.show { 
+            right: 30px; 
+            opacity: 1; 
+        }
+
+        /* ================= NAVIGATION ISLAND ================= */
+        .nav-island { 
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--surface); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--border); 
+            padding: 8px 10px; 
+            border-radius: 50px; 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            z-index: 1000; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+            transition: transform 0.4s var(--ease), opacity 0.4s var(--ease); 
+            max-width: 95vw; 
+        }
+        
+        .nav-island.hidden { 
+            transform: translateX(-50%) translateY(200%); 
+            opacity: 0; 
+            pointer-events: none; 
+        } 
+        
+        .nav-link { 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            font-weight: 600; 
+            font-size: 0.9rem; 
+            padding: 12px 24px; 
+            border-radius: 40px; 
+            transition: 0.3s ease; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        
+        .nav-link:hover, .nav-link.active { 
+            color: white; 
+            background: var(--accent); 
+        }
+        
+        .icon-btn { 
+            width: 44px; 
+            height: 44px; 
+            flex-shrink: 0; 
+            border-radius: 50%; 
+            border: 1px solid var(--border); 
+            background: transparent; 
+            color: var(--text); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .icon-btn:hover { 
+            background: var(--text); 
+            color: var(--bg); 
+            transform: scale(1.1); 
+        }
+
+        /* ================= BENTO GRID SYSTEM ================= */
+        .section { 
+            padding: 120px 20px; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        
+        .hero-section { 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        
+        .grid-bento { 
+            display: grid; 
+            grid-template-columns: 1fr; 
+            gap: 24px; 
+            width: 100%; 
+        }
+        
+        @media (min-width: 1024px) {
+            .grid-bento { grid-template-columns: repeat(12, 1fr); }
+            .col-12 { grid-column: span 12; } 
+            .col-8 { grid-column: span 8; } 
+            .col-6 { grid-column: span 6; } 
+            .col-4 { grid-column: span 4; } 
+            .row-2 { grid-row: span 2; }
+        }
+
+        .card { 
+            background: var(--surface); 
+            backdrop-filter: blur(16px); 
+            -webkit-backdrop-filter: blur(16px); 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius); 
+            padding: 2.5rem; 
+            position: relative; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease); 
+        }
+        
+        .card:hover { 
+            border-color: var(--accent); 
+            z-index: 2; 
+            box-shadow: 0 20px 40px -10px var(--accent-glow); 
+        }
+
+        /* ================= NEW CARD SPECIFIC STYLES ================= */
+        /* Spotify Equalizer */
+        .equalizer { 
+            display: flex; 
+            gap: 4px; 
+            align-items: flex-end; 
+            height: 30px; 
+            margin-bottom: 15px; 
+        }
+        
+        .eq-bar { 
+            width: 6px; 
+            background: #1db954; 
+            border-radius: 3px; 
+            animation: eq 1s ease-in-out infinite alternate; 
+        }
+        
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; } 
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; } 
+        .eq-bar:nth-child(4) { animation-delay: 0.1s; }
+        
+        @keyframes eq { 
+            0% { height: 5px; } 
+            100% { height: 30px; } 
+        }
+        
+        /* Fort Knox Terminal */
+        .terminal-text { 
+            font-family: monospace; 
+            color: #00ff41; 
+            line-height: 1.5; 
+            font-size: 0.9rem; 
+        }
+        
+        .blinking-cursor { 
+            display: inline-block; 
+            width: 8px; 
+            height: 15px; 
+            background: #00ff41; 
+            animation: blink 1s step-end infinite; 
+        }
+        
+        @keyframes blink { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0; } 
+        }
+
+        /* ================= FAQ ACCORDION ================= */
+        .faq-item {
+            border-bottom: 1px solid var(--border);
+            padding: 25px 0;
+            cursor: pointer;
+        }
+        .faq-item:last-child { border-bottom: none; }
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            transition: 0.3s ease;
+        }
+        .faq-question:hover { color: var(--accent); }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s var(--ease), padding-top 0.4s var(--ease);
+            color: var(--text-dim);
+            padding-top: 0;
+            line-height: 1.7;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-top: 15px;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+            color: var(--accent);
+        }
+        .faq-icon {
+            transition: 0.3s ease;
+            font-size: 1.2rem;
+            color: var(--text-dim);
+        }
+
+        /* ================= INPUTS & LISTS ================= */
+        .list-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+            padding: 15px; 
+            background: rgba(128,128,128,0.05); 
+            border-radius: 12px; 
+            border: 1px solid transparent; 
+            transition: 0.3s ease; 
+        }
+        
+        .list-item:hover { 
+            border-color: var(--border); 
+            transform: translateX(5px); 
+        }
+        
+        .input-box { 
+            width: 100%; 
+            padding: 20px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            color: var(--text); 
+            margin-bottom: 15px; 
+            outline: none; 
+            transition: 0.3s ease; 
+            font-family: 'Satoshi', sans-serif; 
+        }
+        
+        .input-box:focus { 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 4px var(--accent-glow); 
+        }
+        
+        .btn-submit { 
+            background: var(--text); 
+            color: var(--bg); 
+            width: 100%; 
+            padding: 20px; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            border: none; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .btn-submit:hover { 
+            transform: scale(1.02); 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); 
+        }
+
+        /* ================= SECURITY SCREENS & PRELOADER ================= */
+        #blockScreen, #authScreen, .preloader { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+        }
+        
+        #blockScreen { background: #000; display: none; z-index: 100000; padding: 40px; color: white; } 
+        #authScreen { background: #000; display: none; z-index: 999; padding: 40px; color: white; } 
+        .preloader { background: var(--bg); z-index: 9999; }
+        
+        .auth-form { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            width: 100%; 
+            max-width: 350px; 
+            margin-top: 20px; 
+        }
+        
+        .auth-input { 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid #333; 
+            color: white; 
+            border-radius: 8px; 
+            outline: none; 
+        }
+        
+        .auth-input:focus { border-color: var(--accent); }
+        
+        .btn-auth { 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            border: none; 
+            transition: 0.3s ease; 
+            cursor: pointer; 
+        }
+        
+        .btn-primary { background: white; color: black; } 
+        .btn-secondary { background: #333; color: white; }
+        
+        .preloader-text { 
+            font-size: 3rem; 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            color: var(--text); 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .progress-bar { 
+            width: 200px; 
+            height: 2px; 
+            background: #333; 
+            margin-top: 20px; 
+            border-radius: 2px; 
+            overflow: hidden; 
+        }
+        
+        .progress-fill { 
+            width: 0%; 
+            height: 100%; 
+            background: var(--accent); 
+        }
+        
+        #mainApp { 
+            opacity: 0; 
+            visibility: hidden;  
+        }
+
+        /* ================= SECRET VAULT UI ================= */
+        #pinPadModal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.8); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 20000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: 0.5s ease; 
+        }
+        
+        .pin-box { 
+            background: rgba(25,25,25,0.9); 
+            padding: 40px; 
+            border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            text-align: center; 
+            max-width: 400px; 
+            width: 90%; 
+        }
+        
+        .pin-input { 
+            width: 100%; 
+            background: transparent; 
+            border: none; 
+            border-bottom: 2px solid #555; 
+            color: white; 
+            font-size: 2rem; 
+            text-align: center; 
+            letter-spacing: 15px; 
+            outline: none; 
+            margin: 30px 0; 
+            font-family: monospace; 
+            transition: 0.3s ease; 
+        }
+        
+        .pin-input:focus { border-color: white; }
+        
+        #secretPage { 
+            display: none; 
+            min-height: 100vh; 
+            background: #020202; 
+            color: #d4d4d4; 
+            padding: 100px 20px; 
+            position: relative; 
+            z-index: 100; 
+            font-family: 'Satoshi', serif; 
+        }
+        
+        .secret-container { 
+            max-width: 700px; 
+            margin: 0 auto; 
+            line-height: 1.9; 
+            font-size: 1.15rem; 
+        }
+        
+        .secret-title { 
+            font-size: 3.5rem; 
+            color: white; 
+            margin-bottom: 50px; 
+            font-weight: 900; 
+            letter-spacing: -1px; 
+            line-height: 1.1; 
+        }
+        
+        .secret-text { 
+            margin-bottom: 25px; 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .secret-list { 
+            margin-bottom: 25px; 
+            padding-left: 20px; 
+            opacity: 0; 
+            transform: translateY(20px); 
+        }
+        
+        .secret-list li { margin-bottom: 8px; }
+        
+        .music-player { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 15px 25px; 
+            border-radius: 50px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin: 40px 0; 
+            color: white; 
+            text-decoration: none; 
+            transition: 0.3s ease; 
+        }
+        
+        .music-player:hover { 
+            background: rgba(255,255,255,0.1); 
+            transform: scale(1.02); 
+        }
+
+        /* ================= RESPONSIVE MEDIA QUERIES ================= */
+        @media (max-width: 768px) {
+            .nav-island { 
+                padding: 8px; 
+                bottom: 20px; 
+                width: auto; 
+            }
+            .nav-link span { display: none; } 
+            .nav-link { 
+                padding: 10px; 
+                background: transparent !important; 
+                color: var(--text-dim) !important; 
+            }
+            .nav-link.active { color: var(--accent) !important; }
+            h1 { font-size: 3.5rem; } 
+            .grid-bento { grid-template-columns: 1fr; gap: 24px; } /* Ensures correct spacing on mobile */
+            .col-12, .col-8, .col-6, .col-4 { grid-column: span 1; }
+            .secret-title { font-size: 2.5rem; }
+            #visitorToast { top: 20px; right: -100%; max-width: 90vw; padding: 15px; }
+            #visitorToast.show { right: 5vw; }
+        }
+    </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://rarekartik.github.io/#person",
+      "name": "Kartik Chouhan",
+      "alternateName": "rarekartik",
+      "url": "https://rarekartik.github.io/",
+      "description": "rarekartik is the online identity of Kartik Chouhan, a student, creator, and developer from Himachal Pradesh, India. He builds websites, web tools, experiments, and digital projects.",
+      "jobTitle": "Student, Creator & Developer",
+      "nationality": "Indian",
+      "sameAs": [
+        "https://github.com/rarekartik",
+        "https://youtube.com/@rarekartik",
+        "https://instagram.com/rarekartik",
+        "https://x.com/rarekartik",
+        "https://t.me/rarekartik",
+        "https://snapchat.com/add/rarekartik",
+        "https://open.spotify.com/user/fse7aztoyuwdfomsvnv15spuk?si=SFWbAbTJREOG2CzovQJWdw&utm_source=copy-link"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://rarekartik.github.io/#website",
+      "url": "https://rarekartik.github.io/",
+      "name": "rarekartik",
+      "description": "Official website of rarekartik (Kartik Chouhan). Explore web tools, projects, experiments, articles, and creative work.",
+      "publisher": {
+        "@id": "https://rarekartik.github.io/#person"
+      },
+      "inLanguage": "en"
+    }
+  ]
+}
+</script>
+</head>
+<body oncontextmenu="return false;" ondragstart="return false;" ondrop="return false;">
+
+    <div class="film-grain"></div>
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- VISITOR TOAST NOTIFICATION -->
+    <div id="visitorToast">
+        <i class="fas fa-eye text-accent" style="font-size: 1.2rem;"></i>
+        <div style="font-family: 'Satoshi', sans-serif; font-weight: 600; font-size: 0.95rem; color: white;">
+            You are the <span id="visitorNumber" style="color: var(--accent); font-weight: 900; font-size: 1.1rem;">---</span>th visitor.
+        </div>
+    </div>
+
+    <div id="blockScreen">
+        <h1 id="blockTitle" style="color:#ef4444; font-size:3rem;">ACCESS DENIED</h1>
+        <p id="blockReason" style="font-family:monospace;">Security Protocol Initiated.</p>
+    </div>
+
+    <div class="preloader" id="preloader">
+        <div class="preloader-text">rarekartik</div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div id="pinPadModal">
+        <div class="pin-box">
+            <i class="fas fa-lock" style="font-size: 2rem; color: #a1a1aa; margin-bottom: 20px;"></i>
+            <h3 style="color: white; margin-bottom: 10px;">Encrypted Vault</h3>
+            <p style="font-size: 0.9rem; color: #888;">Enter Passcode to unlock.</p>
+            <input type="password" id="secretPin" class="pin-input" maxlength="6" autocomplete="off" inputmode="numeric">
+            <p id="pinError" style="color: #ef4444; font-size: 0.85rem; height: 20px;"></p>
+        </div>
+    </div>
+
+    <div id="mainApp">
+        
+        <nav class="nav-island" id="mainNav">
+            <a href="#home" class="nav-link active">
+                <i class="fas fa-home"></i>
+            </a>
+            <a href="#about" class="nav-link">
+                <i class="fas fa-user"></i><span>About</span>
+            </a>
+            <a href="#skills" class="nav-link">
+                <i class="fas fa-code"></i><span>Skills</span>
+            </a>
+            <a href="#contact" class="nav-link">
+                <i class="fas fa-paper-plane"></i><span>Contact</span>
+            </a>
+            <div style="width: 1px; background: var(--border); height: 20px; align-self: center; opacity: 0.5;"></div>
+            <button id="themeToggle" class="icon-btn">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button id="pdfBtn" class="icon-btn">
+                <i class="fas fa-download"></i>
+            </button>
+        </nav>
+
+        <section id="home" class="hero-section">
+            <div class="anim-hero">
+                <div style="display: inline-block; padding: 8px 16px; border: 1px solid var(--border); border-radius: 50px; margin-bottom: 30px; color: var(--accent); background: var(--surface);">
+                    MCom Student • Creator • Learner
+                </div>
+            </div>
+            
+            <h1 class="anim-hero" id="backdoorTrigger">
+                KARTIK<br>
+                <span style="color: var(--text-dim)">CHOUHAN</span>
+            </h1>
+            
+            <p class="anim-hero" style="max-width: 600px; margin-top: 30px;">
+                Exploring the intersection of <span class="text-accent">Commerce</span> and <span class="text-accent">Technology</span>.
+            </p>
+        </section>
+
+        <section id="about" class="section">
+            <div class="grid-bento">
+                
+                <div class="card col-8 row-2 reveal">
+                    <span class="text-label">01 — The Profile</span>
+                    <h2>Who is rarekartik?</h2>
+                    <p>
+                        I am a 21-year-old student born on <strong>3rd Sep 2004</strong> in <strong>Himachal Pradesh</strong>. 
+                        Unlike the typical commerce student, I don't just stop at the balance sheet. I am teaching myself how to leverage technology to solve different problems.
+                        <br><br>
+                        Currently pursuing my <strong>MCom</strong> and building a digital presence.
+                    </p>
+                    <div style="margin-top: 30px; display: flex; gap: 40px;">
+                        <div>
+                            <h3 class="text-accent">21</h3>
+                            <span class="text-label">Age</span>
+                        </div>
+                        <div>
+                            <h3 class="text-accent">MCom</h3>
+                            <span class="text-label">Degree</span>
+                        </div>
+                        <div>
+                            <h3 class="text-accent">HPU</h3>
+                            <span class="text-label">University</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card col-4 reveal" style="background: var(--surface-hover); justify-content: center; align-items: center; text-align: center;">
+                    
+                    <img src="rarekartikimg.jpg" alt="Kartik Chouhan" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); margin-bottom: 15px;">
+                    
+                    <h3>Kartik</h3>
+                    
+                    <p class="text-accent" id="secretTrigger" style="cursor: pointer;">@rarekartik</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <a href="https://youtube.com/@rarekartik" class="icon-btn" style="width: 40px; height: 40px; text-decoration: none;">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="mailto:rarekartik@outlook.in" class="icon-btn" style="width: 40px; height: 40px; text-decoration: none;">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <a href="https://open.spotify.com/user/fse7aztoyuwdfomsvnv15spuk?si=8hOFqCbsR1yQp9ko8mZ74A" class="card col-4 reveal" style="background: linear-gradient(45deg, rgba(29, 185, 84, 0.8), rgba(30, 215, 96, 0.8)); border: none; color: black; justify-content: center; text-decoration: none;">
+                    <i class="fab fa-spotify" style="font-size: 3rem; margin-bottom: 10px; color: #000;"></i>
+                    <h3 style="color: #000;">Focus Mode</h3>
+                    <p style="color: rgba(0,0,0,0.7);">Always learning, always listening.</p>
+                </a>
+                
+            </div>
+        </section>
+                <section class="section">
+            
+            <div class="card col-12 reveal" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+                <h2 style="text-align: center; font-size: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 50px;">
+                    "The modern accountant isn't just a bookkeeper. <br>
+                    <span style="color: var(--text-dim)">They are the bridge between raw data and strategic decisions."</span>
+                </h2>
+            </div>
+            
+            <div class="card col-12 reveal">
+                <span class="text-label">02 — Academic History</span>
+                <h2>Education Timeline</h2>
+                
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border);">
+                    <div class="text-accent" style="font-weight: 800;">2025-27</div>
+                    <div>
+                        <h3>Masters of Commerce (MCom)</h3>
+                        <p>Himachal Pradesh University • <span class="text-accent">Pursuing</span></p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--border);">
+                    <div class="text-accent" style="font-weight: 800;">2022-25</div>
+                    <div>
+                        <h3>Bachelor of Commerce (BCom)</h3>
+                        <p>Himachal Pradesh University • Completed</p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 100px 1fr; gap: 20px; padding: 20px 0;">
+                    <div class="text-accent" style="font-weight: 800;">2021-22</div>
+                    <div>
+                        <h3>12th Commerce Stream</h3>
+                        <p>Local Institution • Completed</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEPARATED AND ENHANCED STUDENT TOOLS SECTION -->
+        <section class="section" style="padding-top: 0;">
+            <div class="card col-12 reveal" style="background: transparent; border: none; padding: 0; box-shadow: none; margin-bottom: 24px;">
+                <span class="text-label" style="color: var(--accent);">Development & Systems</span>
+                <h2 style="margin-bottom: 10px;">Student tools that don't feel like student tools.</h2>
+                <p style="max-width: 800px;">
+                    Beyond the commerce curriculum, I engineer browser-first utilities and interactive web experiences.
+                </p>
+            </div>
+
+            <div class="grid-bento">
+                <div class="card col-4 reveal" style="background: var(--surface-hover);">
+                    <i class="fas fa-layer-group text-accent" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3 style="color: white; font-size: 1.3rem; margin-bottom: 10px;">Docify & Assignment</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-dim); margin: 0;">Academic formatting & presentation workflows.</p>
+                </div>
+
+                <div class="card col-4 reveal" style="background: var(--surface-hover);">
+                    <i class="fas fa-comment-dots text-accent" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3 style="color: white; font-size: 1.3rem; margin-bottom: 10px;">Project "Roll no 48"</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-dim); margin: 0;">Custom Firebase-backed private messaging systems.</p>
+                </div>
+
+                <div class="card col-4 reveal" style="background: var(--surface-hover);">
+                    <i class="fas fa-brain text-accent" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3 style="color: white; font-size: 1.3rem; margin-bottom: 10px;">AI & Media</h3>
+                    <p style="font-size: 0.95rem; color: var(--text-dim); margin: 0;">Veo 3.1 prototyping & original audio generation.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="padding-top: 0;">
+            <div class="grid-bento">
+                
+                <div class="card col-4 reveal" style="background: rgba(10, 10, 10, 0.8);">
+                    <span class="text-label" style="color: #1db954;">Now Playing</span>
+                    
+                    <div class="equalizer">
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                        <div class="eq-bar"></div>
+                    </div>
+                    
+                    <h3 style="margin-top: 15px;">Heavy Rotation</h3>
+                    <p style="font-size: 0.95rem;">The Weeknd • Travis Scott • Lana Del Rey • Eminem • Kendrick Lamar</p>
+                </div>
+
+                <div class="card col-4 reveal" style="background: #050505; border-color: rgba(0,255,65,0.3);">
+                    <span class="text-label" style="color: #00ff41;">
+                        <i class="fas fa-shield-alt"></i> SECURITY ENGINE
+                    </span>
+                    
+                    <div class="terminal-text" id="liveTerminal">
+                        > INITIALIZING PROTOCOL...<br>
+                        > VERIFYING INTEGRITY...<br>
+                        > SECURE SESSION ESTABLISHED.<span class="blinking-cursor"></span>
+                    </div>
+                </div>
+
+                <div class="card col-4 reveal">
+                    <span class="text-label">Data Architecture</span>
+                    <h3>Commerce & Code</h3>
+                    
+                    <div style="width: 100%; height: 60px; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); margin: 20px 0; position: relative; display: flex; align-items: flex-end; padding-left: 10px; gap: 15%;">
+                        <div style="width: 15%; background: var(--accent); height: 30%; border-radius: 4px 4px 0 0;"></div>
+                        <div style="width: 15%; background: var(--accent); height: 50%; border-radius: 4px 4px 0 0;"></div>
+                        <div style="width: 15%; background: var(--accent); height: 90%; border-radius: 4px 4px 0 0; box-shadow: 0 0 15px var(--accent-glow);"></div>
+                    </div>
+                    
+                    <p style="font-size: 0.9rem;">Translating raw financial ledgers into automated digital structures.</p>
+                </div>
+                
+            </div>
+        </section>
+
+        <section id="skills" class="section" style="padding-top: 0;">
+            <h2 style="text-align: center; margin-bottom: 50px;">Detailed Competencies</h2>
+            
+            <div class="grid-bento">
+                
+                <div class="card col-4 reveal">
+                    <span class="text-label">Financial Tech</span>
+                    <div class="list-item">
+                        <i class="fas fa-file-invoice-dollar" style="color: var(--accent);"></i>
+                        <div><strong>Tally ERP & Prime</strong></div>
+                    </div>
+                    <div class="list-item">
+                        <i class="fas fa-table" style="color: var(--accent);"></i>
+                        <div><strong>Advanced Excel</strong></div>
+                    </div>
+                </div>
+                
+                <div class="card col-4 reveal">
+                    <span class="text-label">Digital Tools</span>
+                    <div class="list-item">
+                        <i class="fab fa-java" style="color: var(--accent);"></i>
+                        <div><strong>Java (DCA)</strong></div>
+                    </div>
+                    <div class="list-item">
+                        <i class="fas fa-laptop-code" style="color: var(--accent);"></i>
+                        <div><strong>MS Office Suite</strong></div>
+                    </div>
+                </div>
+                
+                <div class="card col-4 reveal">
+                    <span class="text-label">Creative</span>
+                    <div class="list-item">
+                        <i class="fab fa-youtube" style="color: var(--accent);"></i>
+                        <div><strong>Content Creation</strong></div>
+                    </div>
+                    <div class="list-item">
+                        <i class="fas fa-video" style="color: var(--accent);"></i>
+                        <div><strong>Video Editing</strong></div>
+                    </div>
+                </div>
+                
+                <div class="card col-12 reveal" style="background: var(--surface-hover);">
+                    <span class="text-label">Services</span>
+                    <h3 style="margin-bottom: 20px;">What I can do for you?</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div>
+                            <i class="fas fa-check-circle text-accent"></i> <strong>Bookkeeping</strong>
+                            <p style="font-size: 0.9rem;">Managing financial records using Tally.</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle text-accent"></i> <strong>Web Development</strong>
+                            <p style="font-size: 0.9rem;">Building personal portfolios & landing pages.</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle text-accent"></i> <strong>Video Editing</strong>
+                            <p style="font-size: 0.9rem;">Creating engaging content for social media.</p>
+                        </div>
+                        <div>
+                            <i class="fas fa-check-circle text-accent"></i> <strong>Data Analysis</strong>
+                            <p style="font-size: 0.9rem;">Organizing data with Excel & Sheets.</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- THE FAQ ACCORDION IS HERE -->
+        <section class="section" style="padding-top: 0;">
+            <div class="grid-bento">
+                <div class="card col-12 reveal">
+                    <span class="text-label">Queries</span>
+                    <h2 style="margin-bottom: 40px;">Frequently Asked Questions</h2>
+
+                    <div class="faq-container">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What is your primary tech stack?
+                                <i class="fas fa-plus faq-icon"></i>
+                            </div>
+                            <div class="faq-answer">
+                                I focus on front-end interactivity and single-file web applications using HTML, CSS, native JavaScript, and libraries like Three.js and GSAP for animations. For backend structuring, I utilize Firebase.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Are you available for freelance work?
+                                <i class="fas fa-plus faq-icon"></i>
+                            </div>
+                            <div class="faq-answer">
+                                Yes, I am open to freelance web development projects, UI design, and academic tool creation. Feel free to reach out via the contact form below to discuss your requirements.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How does commerce tie into your development?
+                                <i class="fas fa-plus faq-icon"></i>
+                            </div>
+                            <div class="faq-answer">
+                                My background in M.Com gives me a deep understanding of structured data, bookkeeping (Tally ERP), and logical architecture. I apply these analytical principles directly into building digital tools and automated web systems.
+                            </div>
+                        </div>
+
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What kind of content do you produce?
+                                <i class="fas fa-plus faq-icon"></i>
+                            </div>
+                            <div class="faq-answer">
+                                I produce original audio tracks, edit cinematic short-form video reels, and experiment with AI video generation tools like Veo 3.1 for storytelling.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" style="padding-top: 0;">
+            <div class="grid-bento">
+                <a href="https://rarekartik.github.io/myprojects.html" class="card col-12 reveal" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(18, 18, 18, 0.8) 100%); border-color: var(--accent); align-items: center; text-align: center; justify-content: center; padding: 60px; text-decoration: none; color: inherit;">
+                    <span class="text-label" style="color: var(--accent);">Tools Developed By Me</span>
+                    <h2 style="font-size: 3rem; margin: 10px 0;">
+                        My Projects <i class="fas fa-arrow-right" style="font-size: 2rem; margin-left: 10px;"></i>
+                    </h2>
+                    <p style="max-width: 600px;">
+                        Explore a suite of web tools I built to automate tasks, generate documents, and solve everyday problems.
+                    </p>
+                </a>
+            </div>
+        </section>
+
+        <section id="contact" class="section">
+            <div class="grid-bento">
+                
+                <div class="card col-6 reveal" style="background: var(--accent); border: none;">
+                    <h2 style="color: white;">Let's Connect.</h2>
+                    <p style="color: rgba(255,255,255,0.8);">
+                        I am open to internships and collaborative projects.
+                    </p>
+                    <div style="margin-top: auto; padding-top: 40px;">
+                        <a href="mailto:rarekartik@outlook.in" style="font-size: 1.5rem; color: white; font-weight: 700; text-decoration: none;">
+                            rarekartik@outlook.in &nearr;
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card col-6 reveal">
+                    <form id="contactForm">
+                        <input type="hidden" name="ip_address" id="trackIP">
+                        <input type="hidden" name="user_location" id="trackLoc">
+                        <input type="hidden" name="device_info" id="trackDevice">
+                        <input type="hidden" name="visit_time" id="trackTime">
+                        
+                        <input type="hidden" name="_captcha" value="false">
+                        <input type="hidden" name="_subject" value="New Portfolio Contact">
+
+                        <input type="text" name="name" class="input-box" placeholder="Name" required>
+                        <input type="email" name="email" class="input-box" placeholder="Email" required>
+                        <textarea name="message" class="input-box" rows="4" placeholder="How can we collaborate?" required></textarea>
+                        
+                        <button type="submit" class="btn-submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer id="footerTrigger" style="padding: 100px 20px 50px; background: var(--surface); border-top: 1px solid var(--border); margin-top: 50px;">
+            <div style="max-width: 1400px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+                
+                <div>
+                    <h3>rarekartik</h3>
+                    <p>Bridging Commerce & Tech.</p>
+                    <div style="margin-top: 20px;">
+                        <a href="https://youtube.com/@rarekartik" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s ease; text-decoration: none;">
+                            <i class="fab fa-youtube fa-lg"></i>
+                        </a>
+                        <a href="#" style="color: var(--text-dim); margin-right: 20px; transition: 0.3s ease; text-decoration: none;">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+                        <a href="mailto:rarekartik@outlook.in" style="color: var(--text-dim); transition: 0.3s ease; text-decoration: none;">
+                            <i class="fas fa-envelope fa-lg"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <span class="text-label">System Status</span>
+                    <span id="userTime" style="display:block; margin-bottom:5px; font-family: monospace; color: var(--accent); font-weight: bold;">
+                        Decrypting Time...
+                    </span>
+                    <span id="userLoc" style="display:block; font-family: monospace; color: var(--text-dim);">
+                        Decrypting Location...
+                    </span>
+                </div>
+                
+                <div>
+                    <span class="text-label">Legal</span>
+                    <p>© 2026 Kartik Chouhan.</p>
+                    <p style="font-size: 0.9rem;">Designed with <span style="color: var(--accent);">Intelligence</span>.</p>
+                </div>
+                
+            </div>
+        </footer>
+    </div> 
+   
+    <div id="secretPage" style="display: none; min-height: 100vh; background: #020202; color: #d4d4d4; padding: 100px 20px; position: relative; z-index: 100; font-family: 'Satoshi', serif;">
+        <div class="secret-container" id="vaultContentArea">
+            <!-- The decrypted story will be injected here automatically -->
+        </div>
+    </div>
+                  
+        <script>
+        const FORMSUBMIT_EMAIL = "rarekartik@outlook.in"; 
+        const TARGET_IPS = ["2409:40e3:101f:707c:d9a0:4993:f6b:a7e9", "2409:40e3:101f:707c:8000::"];
+        let visitorData = { ip: "Unknown", city: "Unknown", region: "Unknown", device: "Unknown", battery: "Unknown" };
+
+        // Smooth Scroll Engine
+        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
+        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); } requestAnimationFrame(raf);
+        lenis.on('scroll', ScrollTrigger.update); gsap.ticker.add((time)=>{ lenis.raf(time * 1000) }); gsap.ticker.lagSmoothing(0, 0);
+
+        // Secret Vault System
+        let tapCount = 0; let tapTimer;
+        const secretTrigger = document.getElementById('secretTrigger');
+        const pinModal = document.getElementById('pinPadModal');
+        const pinInput = document.getElementById('secretPin');
+        const secretPage = document.getElementById('secretPage');
+        const mainUi = document.getElementById('mainApp');
+
+        secretTrigger.addEventListener('click', () => {
+            tapCount++; clearTimeout(tapTimer);
+            tapTimer = setTimeout(() => { tapCount = 0; }, 2000); 
+            if (tapCount === 8) {
+                tapCount = 0; pinModal.style.visibility = 'visible'; pinModal.style.opacity = '1';
+                setTimeout(() => pinInput.focus(), 500);
+            }
+        });
+
+        // Paste your gibberish between the quote marks on the line below!
+const ENCRYPTED_STORY = "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"; 
+
+pinInput.addEventListener('input', (e) => {
+    if (e.target.value.length === 6) {
+        const enteredPin = e.target.value;
+        
+        try {
+            // Attempt to unscramble the text using the PIN they typed
+            const bytes = CryptoJS.AES.decrypt(ENCRYPTED_STORY, enteredPin);
+            const decryptedHtml = bytes.toString(CryptoJS.enc.Utf8);
+
+            // If the PIN is wrong, this fails and jumps to the 'catch' block below
+            if (!decryptedHtml) throw new Error("Wrong PIN");
+
+            // Success! Inject the unhidden story into the empty container
+            document.getElementById('vaultContentArea').innerHTML = decryptedHtml;
+
+            // Trigger your UI animations
+            pinModal.style.opacity = '0'; 
+            setTimeout(() => { pinModal.style.visibility = 'hidden'; }, 500);
+            mainUi.style.display = 'none'; 
+            document.getElementById('bg-canvas').style.display = 'none'; 
+            document.querySelector('.film-grain').style.display = 'none';
+            
+            // Note: Keeping the inline styles you had on the original #secretPage
+            secretPage.style.cssText = "display: block; min-height: 100vh; background: #020202; color: #d4d4d4; padding: 100px 20px; position: relative; z-index: 100; font-family: 'Satoshi', serif;";
+            
+            gsap.to(".reveal-secret", { y: 0, opacity: 1, duration: 1.5, stagger: 0.3, ease: "expo.out", delay: 0.5 });
+            gsap.to(".secret-text, .secret-list", { y: 0, opacity: 1, duration: 1.5, stagger: 0.15, ease: "expo.out", delay: 1.2 });
+            window.scrollTo(0,0);
+
+        } catch (err) {
+            // Wrong PIN
+            document.getElementById('pinError').innerText = "Incorrect Passcode."; 
+            e.target.value = "";
+            setTimeout(() => { document.getElementById('pinError').innerText = ""; }, 2000);
+        }
+    }
+});
+
+        pinModal.addEventListener('click', (e) => { if(e.target === pinModal) { pinModal.style.opacity = '0'; setTimeout(() => { pinModal.style.visibility = 'hidden'; pinInput.value = ""; }, 500); } });
+
+        // Security Configurations
+        document.addEventListener('contextmenu', event => event.preventDefault()); document.ondragstart = function() { return false; }; 
+        document.onkeydown = function(e) { if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) { return false; } }
+        window.addEventListener('keyup', (e) => {
+            if (e.key === 'PrintScreen' || (e.metaKey && e.shiftKey)) {
+                alert("Sorry! Little Fella but Kartik doesn't allow you to take screenshots here 😂");
+                document.body.style.filter = "blur(20px)"; setTimeout(() => { document.body.style.filter = "none"; }, 5000);
+            }
+        });
+        
+        let clickCount = 0; document.getElementById('backdoorTrigger').addEventListener('click', () => { clickCount++; if (clickCount === 50) { localStorage.setItem('isOwner', 'true'); alert("👑 GOD MODE ON"); location.reload(); } });
+
+        // Intelligence Gathering (Includes Battery Level)
+        async function gatherIntelligence() {
+            let rawModel = "Hidden"; let gpuInfo = "Unknown GPU";
+            try { const gl = document.createElement('canvas').getContext('webgl'); if (gl) gpuInfo = gl.getParameter(gl.getExtension('WEBGL_debug_renderer_info').UNMASKED_RENDERER_WEBGL); } catch(e) {}
+            if (navigator.userAgentData) { try { const uaData = await navigator.userAgentData.getHighEntropyValues(['model']); rawModel = uaData.model || rawModel; } catch(e) {} }
+            visitorData.device = `Model: ${rawModel} | GPU: ${gpuInfo}`;
+
+            try {
+                if (navigator.getBattery) {
+                    const battery = await navigator.getBattery();
+                    visitorData.battery = `${Math.round(battery.level * 100)}% ${battery.charging ? '(Charging)' : '(Discharging)'}`;
+                } else {
+                    visitorData.battery = "Not Supported";
+                }
+            } catch(e) { visitorData.battery = "Unknown"; }
+
+            try {
+                const res = await fetch('https://ipapi.co/json/'); const data = await res.json();
+                visitorData.ip = data.ip || "Unknown"; visitorData.city = data.city || "Unknown"; visitorData.region = data.region || "Unknown"; visitorData.timezone = data.timezone || ""; 
+                const locEl = document.getElementById('userLoc'); if(locEl) locEl.innerText = `${data.city}, ${data.region}`;
+                const term = document.getElementById('liveTerminal');
+                if(term) setTimeout(() => { term.innerHTML = `> IP SCANNED: ${visitorData.ip}<br>> LOC: ${visitorData.city}<br>> SYSTEM SECURE.<span class="blinking-cursor"></span>`; }, 2000); 
+            } catch (e) { console.warn("Tracking blocked."); }
+        }
+
+        // Execution Loader & Background Logger Pipeline
+        window.addEventListener('load', async () => {
+            initThreeJS();
+            
+            // Animate progress bar visually instantly
+            gsap.timeline({ 
+                onComplete: async () => {
+                    // Remove loading screen immediately so it doesn't wait for network lag
+                    gsap.to("#preloader", { y: "-100%", duration: 0.8, ease: "expo.inOut" });
+                    mainUi.style.visibility = 'visible'; 
+                    mainUi.style.opacity = 1;
+                    window.dispatchEvent(new Event('siteRevealed'));
+
+                    // Run tracking logs quietly in the background after page displays
+                    if (localStorage.getItem('isOwner') !== 'true') {
+                        await gatherIntelligence();
+                        
+                        // Regional Geoblocking Rules Evaluation
+                        const sysTZ = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                        const normalize = (tz) => tz ? tz.replace("Calcutta", "Kolkata") : "";
+                        const isVPN = (sysTZ && visitorData.timezone && normalize(sysTZ) !== normalize(visitorData.timezone));
+
+                        if (TARGET_IPS.includes(visitorData.ip) || isVPN || visitorData.city === "Kanpur") {
+                            mainUi.style.display = 'none';
+                            const screen = document.getElementById('blockScreen'); 
+                            document.getElementById('blockTitle').innerText = "ACCESS RESTRICTED"; 
+                            document.getElementById('blockReason').innerText = visitorData.city === "Kanpur" ? "Restricted Region." : "Security Exception."; 
+                            screen.style.display = 'flex';
+                            return;
+                        }
+
+                        // Send complete logs including battery info silently to FormSubmit via AJAX
+                        try {
+                            await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                                body: JSON.stringify({
+                                    _subject: "New Portfolio Visitor Alert Log",
+                                    _captcha: "false",
+                                    "IP Address": visitorData.ip,
+                                    "City": visitorData.city,
+                                    "Region": visitorData.region,
+                                    "Battery Level": visitorData.battery,
+                                    "Device": visitorData.device,
+                                    "Time": new Date().toLocaleString()
+                                })
+                            });
+                        } catch(e) {}
+                    }
+                } 
+            })
+            .to("#progressFill", { width: "100%", duration: 2.0, ease: "expo.inOut" })
+            .to(".preloader-text", { opacity: 1, y: 0, duration: 0.5 });
+        });
+
+        window.addEventListener('siteRevealed', () => {
+            ScrollTrigger.refresh();
+            gsap.from(".anim-hero", { y: 60, opacity: 0, duration: 1.5, stagger: 0.2, ease: "expo.out", delay: 0.2 });
+            gsap.utils.toArray('.reveal').forEach(el => { gsap.from(el, { scrollTrigger: { trigger: el, start: "top 85%" }, y: 40, scale: 0.98, opacity: 0, duration: 1.2, ease: "expo.out" }); });
+            
+            // ================= ROBUST VISITOR COUNTER LOGIC =================
+            setTimeout(async () => {
+                const numEl = document.getElementById('visitorNumber');
+                const toast = document.getElementById('visitorToast');
+                if(!numEl || !toast) return;
+                
+                let count = 778; // Base offset requested
+                
+                try {
+                    // Tier 1: Try highly reliable adblock-resistant API
+                    let res = await fetch('https://count.jasoncameron.dev/hit/rarekartik/portfolio');
+                    if (!res.ok) throw new Error("API 1 Failed");
+                    let data = await res.json();
+                    
+                    if (data && typeof data.value === 'number' && !isNaN(data.value)) {
+                        count = 778 + data.value; 
+                    } else {
+                        throw new Error("Invalid data from API 1");
+                    }
+                } catch(e1) {
+                    try {
+                        // Tier 2: Try counterapi.dev
+                        let res2 = await fetch('https://api.counterapi.dev/v1/rarekartik/portfolio/up');
+                        if (!res2.ok) throw new Error("API 2 Failed");
+                        let data2 = await res2.json();
+                        
+                        if (data2 && typeof data2.count === 'number' && !isNaN(data2.count)) {
+                            count = 778 + data2.count;
+                        } else {
+                            throw new Error("Invalid data from API 2");
+                        }
+                    } catch(e2) {
+                        // Tier 3: Flawless LocalStorage Fallback (Never shows NaN)
+                        let localCount = parseInt(localStorage.getItem('rarekartik_site_visits_v3'));
+                        if(isNaN(localCount)) {
+                            localCount = 778;
+                        } else {
+                            localCount++;
+                        }
+                        localStorage.setItem('rarekartik_site_visits_v3', localCount);
+                        count = localCount;
+                    }
+                }
+                
+                numEl.innerText = count;
+                toast.classList.add('show');
+                
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3500);
+            }, 1500); 
+        });
+
+        // ================= FAQ ACCORDION LOGIC =================
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+                if (!isActive) item.classList.add('active');
+            });
+        });
+
+        let lastScrollTop = 0; const nav = document.getElementById('mainNav'); const footer = document.getElementById('footerTrigger');
+        window.addEventListener('scroll', function() {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (footer.getBoundingClientRect().top < window.innerHeight || scrollTop > lastScrollTop) nav.classList.add('hidden'); else nav.classList.remove('hidden');
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop; 
+        }, false);
+
+        const initThreeJS = () => {
+            const canvas = document.getElementById('bg-canvas'); if (!canvas) return;
+            const scene = new THREE.Scene(); const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true }); renderer.setSize(window.innerWidth, window.innerHeight); camera.position.z = 30;
+            const geom = new THREE.BufferGeometry(); const posArray = new Float32Array(800 * 3);
+            for(let i=0; i<2400; i++) posArray[i] = (Math.random()-0.5)*100;
+            geom.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const mesh = new THREE.Points(geom, new THREE.PointsMaterial({ size: 0.02, color: 0x3b82f6, transparent: true, opacity: 0.8 })); scene.add(mesh);
+            let animationId; const animate = () => { animationId = requestAnimationFrame(animate); mesh.rotation.y += 0.0005; renderer.render(scene, camera); };
+            new IntersectionObserver((entries) => { if(entries[0].isIntersecting) animate(); else cancelAnimationFrame(animationId); }).observe(document.getElementById('home'));
+        };
+
+        const themeBtn = document.getElementById('themeToggle'); const html = document.documentElement;
+        if(localStorage.getItem('theme') === 'light') { html.setAttribute('data-theme', 'light'); themeBtn.innerHTML = '<i class="fas fa-sun"></i>'; }
+        themeBtn.addEventListener('click', () => { const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; html.setAttribute('data-theme', next); localStorage.setItem('theme', next); themeBtn.innerHTML = next === 'dark' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>'; });
+
+        document.getElementById('pdfBtn').addEventListener('click', async function() {
+            const btn = this; const originalIcon = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            try {
+                const { jsPDF } = window.jspdf; const doc = new jsPDF();
+                doc.setFont("helvetica", "bold"); doc.setFontSize(26); doc.setTextColor(0); doc.text("KARTIK CHOUHAN", 20, 25);
+                doc.setFont("helvetica", "normal"); doc.setFontSize(11); doc.setTextColor(80); doc.text("Himachal Pradesh, India | rarekartik@outlook.in", 20, 32); doc.text("MCom Student | Financial Tech Enthusiast | Developer", 20, 38);
+                doc.setLineWidth(0.5); doc.setDrawColor(200); doc.line(20, 45, 190, 45);
+                let y = 55;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("PROFESSIONAL SUMMARY", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); const summary = "A 21-year-old commerce specialist bridging financial analysis with digital creativity. Currently pursuing MCom at HPU. Skilled in Tally ERP, Tax Management, Java, and Video Editing. I build tools that solve business problems."; doc.text(doc.splitTextToSize(summary, 170), 20, y); y+=20;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("EDUCATION", 20, y); y+=10;
+                doc.setFontSize(11); doc.text("Masters of Commerce (MCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2025 - Present", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+                doc.setFont("helvetica", "bold"); doc.setTextColor(0); doc.setFontSize(11); doc.text("Bachelor of Commerce (BCom)", 20, y); doc.setFont("helvetica", "normal"); doc.text("2022 - 2025", 160, y);
+                doc.setFontSize(10); doc.setTextColor(80); doc.text("Himachal Pradesh University", 20, y+5); y+=15;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("TECHNICAL SKILLS", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); doc.text("• Accounting: Tally ERP 9, Tally Prime (GST, Payroll, Inventory)", 20, y); y+=6; doc.text("• Development: HTML5, CSS3, JavaScript, Java (Diploma)", 20, y); y+=6; doc.text("• Tools: MS Excel (Advanced), MS Word, PowerPoint", 20, y); y+=6; doc.text("• Creative: Adobe Premiere Pro (Basics), Canva, Content Strategy", 20, y); y+=15;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(14); doc.setTextColor(0); doc.text("DECLARATION", 20, y); y+=8;
+                doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(50); doc.text("I hereby declare that the above-mentioned information is correct up to my knowledge and I bear the responsibility for the correctness of the above-mentioned particulars.", 20, y, {maxWidth: 170});
+                doc.save("Kartik_Chouhan_CV.pdf"); btn.innerHTML = '<i class="fas fa-check"></i>'; setTimeout(() => btn.innerHTML = originalIcon, 2000);
+            } catch(e) { btn.innerHTML = originalIcon; alert("Error generating PDF"); }
+        });
+
+        const timeEl = document.getElementById('userTime'); let hasAnimated = false; const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+        new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !hasAnimated) {
+                hasAnimated = true; let it = 0; const final = new Date().toLocaleTimeString();
+                const int = setInterval(() => {
+                    timeEl.innerText = final.split("").map((l, i) => i < it ? final[i] : chars[Math.floor(Math.random()*chars.length)]).join("");
+                    if (it >= final.length) { clearInterval(int); timeEl.style.color = "var(--accent)"; } it += 1/3;
+                }, 30);
+                setInterval(() => { timeEl.innerText = new Date().toLocaleTimeString(); }, 1000);
+            }
+        }).observe(document.getElementById('footerTrigger'));
+        // ================= CONTACT FORM AJAX SUBMISSION =================
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', async function(e) {
+                e.preventDefault(); // Prevents the website from reloading!
+                
+                const submitBtn = contactForm.querySelector('.btn-submit');
+                const originalText = submitBtn.innerText;
+                submitBtn.innerText = "Sending...";
+                submitBtn.disabled = true;
+
+                // Create the form payload dynamically
+                const formData = new FormData(contactForm);
+                
+                try {
+                    // Send the message in the background using FormSubmit AJAX endpoint
+                    const response = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        submitBtn.innerText = "Message Sent! ✓";
+                        submitBtn.style.background = "#10b981"; // Turns button green on success
+                        contactForm.reset(); // Clears the inputs
+                    } else {
+                        throw new Error('Submission failure');
+                    }
+                } catch (error) {
+                    submitBtn.innerText = "Error! Try Again";
+                    submitBtn.style.background = "#ef4444"; // Turns button red on error
+                    submitBtn.disabled = false;
+                }
+
+                // Reset the button appearance back to normal after 4 seconds
+                setTimeout(() => {
+                    submitBtn.innerText = originalText;
+                    submitBtn.style.background = ""; 
+                    submitBtn.disabled = false;
+                }, 4000);
+            });
+        }      
+        </script>
+</body>
+</html>
