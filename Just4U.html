@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#fff0f6">
+<title>A little universe for Anshu ✦</title>
+<style>
+:root{
+ --night:#fff0f6;--night2:#ffe3ee;--lav:#e8b7d0;--lav2:#d995b8;
+ --pink:#f6bfd5;--cream:#fff9f5;--gold:#f2c6a8;--muted:#916d80;
+ --glass:rgba(255,255,255,.72);--line:rgba(198,123,157,.30)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;color:#704b60;background:
+ radial-gradient(ellipse at 50% -20%,#fffafd 0%,transparent 52%),
+ radial-gradient(ellipse at 0% 30%,#fbd8e7 0%,transparent 34%),
+ radial-gradient(ellipse at 100% 58%,#f8d5e5 0%,transparent 38%),
+ linear-gradient(160deg,#fff5f8,#ffe7f0 52%,#fff8f3);
+ font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
+button,input{font:inherit}
+button{cursor:pointer}
+#stars{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;box-shadow:0 0 9px 2px #d8caff;animation:blink var(--speed) ease-in-out infinite alternate}
+@keyframes blink{to{opacity:.2;transform:scale(.45)}}
+#app{position:relative;z-index:1}
+.topbar{position:fixed;z-index:10;top:12px;left:0;right:0;display:flex;justify-content:center;pointer-events:none}
+.topbar-inner{pointer-events:auto;display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid #d99ab522;border-radius:99px;background:#fff9f5dd;backdrop-filter:blur(16px);box-shadow:0 8px 30px #08051655}
+.topbar button{border:0;border-radius:99px;padding:9px 13px;color:#80566b;background:transparent;font-size:12px}
+.topbar button:hover,.topbar button.active{background:#f6d8e5}
+main{width:min(920px,91%);margin:auto}
+section{padding:92px 0;scroll-margin-top:70px}
+.hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-top:95px}
+.kicker{font:10px/1.5 Arial,sans-serif;letter-spacing:.28em;text-transform:uppercase;color:#bd7897}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:clamp(54px,12vw,105px);font-weight:400;line-height:.85;letter-spacing:-.055em;margin:23px 0 18px;text-shadow:0 0 32px #d8bdff65}
+h1 span{display:block;font-style:italic;font-size:.7em;letter-spacing:.01em;color:#f0d9ef;margin-top:18px}
+.hero-sub{max-width:560px;color:#896b7b;font:15px/1.9 Arial,sans-serif}
+.crown{font-size:36px;color:var(--gold);text-shadow:0 0 25px #f3dba9a0;animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-10px) rotate(4deg)}}
+.orbit{position:relative;width:170px;height:170px;margin:25px auto 7px;border:1px solid #d99ab155;border-radius:50%;display:grid;place-items:center}
+.orbit:before,.orbit:after{content:"";position:absolute;border:1px solid #e8b9cc88;border-radius:50%;inset:13px;transform:rotate(-25deg) scaleX(1.5)}
+.orbit:after{transform:rotate(55deg) scaleX(1.5)}
+.orbit-core{font-size:47px;color:#c77f9f;filter:drop-shadow(0 0 20px #e7c8ff)}
+.scroll-cue{margin-top:38px;color:#b8aacd;font:10px Arial,sans-serif;letter-spacing:.22em}
+.scroll-cue span{display:block;font-size:20px;margin-top:10px;animation:float 2s infinite}
+.section-head{text-align:center;margin-bottom:35px}
+.section-head h2{font-size:clamp(37px,7vw,61px);font-weight:400;line-height:1.05;margin:12px 0;color:#86576f}
+.section-head p{max-width:590px;margin:0 auto;color:var(--muted);font:14px/1.8 Arial,sans-serif}
+.glass{background:linear-gradient(145deg,#ffffffd9,#fff7f9b8);border:1px solid var(--line);box-shadow:0 24px 65px #b77b9820;backdrop-filter:blur(15px);border-radius:26px}
+.public-note{max-width:760px;margin:auto;padding:clamp(24px,5vw,45px);text-align:center;position:relative;overflow:hidden}
+.public-note:before{content:"✦";position:absolute;top:16px;right:22px;color:var(--gold);font-size:20px}
+.public-note .script{font-style:italic;font-size:clamp(24px,5vw,34px);color:#b96f91;line-height:1.3}
+.public-note p{font:15px/2 Arial,sans-serif;color:#866779;margin:19px auto 0;max-width:630px}
+.little-line{font:10px Arial,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#e7cce5;margin-top:25px}
+.photo-card{max-width:570px;margin:0 auto;padding:14px;transform:rotate(-1deg);background:#f5eaf4;color:#453653;border-radius:8px;box-shadow:0 20px 65px #09061688}
+.photo-frame{height:330px;overflow:hidden;background:linear-gradient(145deg,#e4d8f7,#f7dced 55%,#f7e9c9);display:grid;place-items:center;position:relative}
+.photo-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-placeholder{padding:24px;text-align:center;color:#645578;font:13px/1.8 Arial,sans-serif}
+.photo-placeholder b{display:block;font:italic 25px Georgia,serif;margin-bottom:7px}
+.photo-caption{text-align:center;padding:14px 8px 7px;font:italic 20px Georgia,serif}
+.photo-hint{text-align:center;font:10px Arial,sans-serif;color:#756782;margin:13px 0 0}
+.things{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.thing{min-height:190px;padding:23px 20px;position:relative;overflow:hidden;transition:.25s}
+.thing:hover{transform:translateY(-5px);border-color:#e8d6ff66}
+.thing .emoji{font-size:26px}
+.thing h3{font-size:23px;font-weight:400;margin:14px 0 8px;color:#9a607a}
+.thing p{font:13px/1.75 Arial,sans-serif;color:#896b7b;margin:0}
+.ribbon{text-align:center;color:#b97896;font-style:italic;font-size:20px;margin:28px 0 0}
+.private-wrap{max-width:660px;margin:0 auto}
+.lock-card{padding:clamp(25px,5vw,42px);text-align:center;position:relative;overflow:hidden}
+.lock-icon{width:76px;height:76px;margin:0 auto 18px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#ffe1ec,#f4c5d9);color:#9a5e79;font-size:34px;box-shadow:0 0 35px #eebbd155}
+.lock-card h3{font-size:31px;font-weight:400;margin:0 0 10px}
+.lock-card>p{font:13px/1.8 Arial,sans-serif;color:#896b7b;max-width:430px;margin:0 auto 22px}
+.enter-row{display:flex;gap:9px;max-width:390px;margin:0 auto}
+.enter-row input{min-width:0;flex:1;border:1px solid #e0b5c7;border-radius:14px;background:#fffafd;color:#80566b;padding:14px 16px;outline:none;text-align:center;letter-spacing:.2em}
+.enter-row input:focus{border-color:#c77f9f}
+.enter-row button,.soft-btn{border:0;border-radius:14px;padding:13px 18px;color:#70475d;background:linear-gradient(120deg,#ffdce9,#f5c3d7);font-weight:bold}
+.error{min-height:20px;margin:10px 0 0;color:#b65c7e;font:12px Arial,sans-serif}
+.private-content{display:none;margin-top:25px;animation:reveal .8s ease}
+.private-content.unlocked{display:block}
+@keyframes reveal{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:none}}
+.private-letter{padding:clamp(24px,5vw,42px);text-align:left}
+.private-letter .to{font-style:italic;font-size:27px;color:#b96f91}
+.private-letter p{font:14px/2 Arial,sans-serif;color:#805f71;margin:18px 0}
+.private-letter .sign{font:italic 25px Georgia,serif;color:#b96f91;margin-top:27px;line-height:1.6}
+.private-memory{padding:22px;margin-top:13px;text-align:left}
+.private-memory small{font:10px Arial,sans-serif;letter-spacing:.16em;color:#bd7897;text-transform:uppercase}
+.private-memory p{font:13px/1.85 Arial,sans-serif;color:#866779;margin:10px 0 0}
+.end{min-height:78vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.end h2{font-size:clamp(43px,9vw,76px);font-weight:400;font-style:italic;line-height:1.05;color:#b96f91;margin:20px 0}
+.end p{max-width:520px;font:14px/1.9 Arial,sans-serif;color:#896b7b}
+.end .from{font-style:italic;font-size:20px;color:#b97896;line-height:1.7;margin-top:20px}
+footer{text-align:center;padding:25px 12px 35px;color:#b4869b;font:10px Arial,sans-serif;letter-spacing:.2em}
+.music{position:fixed;right:15px;bottom:15px;z-index:11;border:1px solid #ffffff2d;border-radius:99px;padding:11px 15px;background:#fff8fbeb;color:#875a72;font:12px Arial,sans-serif;backdrop-filter:blur(12px)}
+.music span{color:#b97896;margin-left:5px}
+.bubble{position:fixed;bottom:-30px;z-index:3;pointer-events:none;animation:rise linear forwards;opacity:.7}
+@keyframes rise{to{transform:translateY(-110vh) translateX(var(--drift)) rotate(40deg);opacity:0}}
+@media(max-width:680px){section{padding:75px 0}.things{grid-template-columns:1fr}.thing{min-height:0}.photo-frame{height:290px}.topbar-inner{gap:0}.topbar button{padding:9px 10px;font-size:11px}.enter-row{flex-direction:column}.enter-row button{padding:14px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Decorative details: lace-like borders, soft petals and a more layered storybook feel */
+.hero:before,.hero:after{content:"❀";position:absolute;color:#e5a8c0;font-size:clamp(28px,5vw,54px);opacity:.62;pointer-events:none}
+.hero:before{left:7%;top:24%;transform:rotate(-22deg)}
+.hero:after{right:8%;bottom:19%;transform:rotate(18deg)}
+.hero{position:relative}
+.orbit{box-shadow:0 0 0 10px #fff7fa88,0 0 0 11px #e7b5ca55,0 18px 55px #d99ab533}
+.orbit-core{color:#c77f9f;text-shadow:0 4px 18px #e8a9c8}
+.public-note{border-radius:32px;outline:1px solid #fff9fc;outline-offset:-9px;box-shadow:0 25px 70px #c27e9d26,0 5px 18px #fff9fc inset}
+.public-note:after{content:"❀  ✧  ❀";display:block;margin-top:24px;color:#d99ab5;letter-spacing:.7em;font-size:18px}
+.public-note .script{font-size:clamp(27px,5vw,39px);text-shadow:0 3px 18px #efc4d766}
+.section-head{position:relative}
+.section-head:after{content:"";display:block;width:66px;height:1px;margin:20px auto 0;background:linear-gradient(90deg,transparent,#d99ab5,transparent)}
+.photo-card{background:linear-gradient(145deg,#fffdfd,#f9dce8);border:1px solid #fff;box-shadow:0 25px 65px #bd7d9c30;transform:rotate(-1deg);border-radius:12px}
+.photo-frame{border-radius:6px;background:radial-gradient(circle at 50% 35%,#fff9fc,#f8d7e6 62%,#f2c5d8)}
+.photo-caption{color:#a76685}
+.thing{border-radius:24px;min-height:205px;background:linear-gradient(145deg,#fffdfedc,#fff4f8c9);box-shadow:0 16px 38px #bd7d9c16,inset 0 1px 0 #fff}
+.thing:after{content:"✧";position:absolute;right:17px;top:13px;color:#e3afc4;font-size:19px}
+.thing:hover{transform:translateY(-7px) rotate(-.5deg);box-shadow:0 22px 42px #bd7d9c27}
+.lock-card{border-radius:32px;box-shadow:0 24px 65px #bd7d9c24,inset 0 1px 0 #fff}
+.lock-card:before,.lock-card:after{content:"✿";position:absolute;color:#e4b1c7;opacity:.6;font-size:25px}
+.lock-card:before{left:19px;top:16px}.lock-card:after{right:19px;bottom:16px}
+.private-letter{border-radius:24px;background:linear-gradient(145deg,#fffefd,#fff5f8)}
+.private-memory{border-radius:22px;background:linear-gradient(145deg,#fffdfd,#ffedf4)}
+.end{position:relative}
+.end:before{content:"✧  ❀  ✧";color:#d99ab5;letter-spacing:.8em;font-size:18px;margin-bottom:10px}
+.end h2{text-shadow:0 8px 30px #e8b5cc55}
+footer{letter-spacing:.25em}
+
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="topbar"><div class="topbar-inner">
+ <button class="active" data-go="home">Home</button><button data-go="little-things">Little things</button><button data-go="secret">A private note</button>
+</div></div>
+<div id="app">
+<main>
+<section class="hero" id="home">
+ <div class="kicker">A small corner of the universe</div>
+ <div class="orbit"><div class="orbit-core">♕</div></div>
+ <div class="crown">✧</div>
+ <h1>For <span>Princess Anshu</span></h1>
+ <p class="hero-sub">Not every star needs to be the brightest. Some just make the night feel a little less lonely. This little universe is for you.</p>
+ <div class="scroll-cue">THERE'S A LITTLE SOMETHING FOR YOU<span>⌄</span></div>
+</section>
+
+<section id="gratitude">
+ <div class="section-head"><div class="kicker">Before anything else</div><h2>I'm glad you're here.</h2>
+ <p>Some people become a lovely part of our days without making a big announcement. They just show up, in their own little ways, and life feels different.</p></div>
+ <div class="public-note glass">
+  <div class="script">I'm really glad you exist in my little world, Anshu.</div>
+  <p>Thank you for being exactly who you are. Your presence has made ordinary days feel warmer, and your kindness has reached me in ways you may never fully realise. I am grateful for every laugh, every conversation, every small act of care, and for the simple fact that somewhere in this enormous world, our paths crossed. You make a difference just by being here. I hope life is gentle with you, gives you reasons to smile on difficult days, and returns to you the goodness you so naturally give to others.</p>
+  <div class="little-line">A little appreciation, with no occasion needed ✦</div>
+ </div>
+</section>
+
+<section id="portrait">
+ <div class="section-head"><div class="kicker">A little portrait corner</div><h2>The girl of this little universe</h2><p>A little space for a favourite memory.</p></div>
+ <div class="photo-card">
+  <div class="photo-frame">
+   <img id="anshuPhoto" src="anshubandru.jpg" alt="A photo chosen for Princess Anshu">
+   <div class="photo-placeholder" id="photoFallback" style="display:none"><b>A little moment, kept close ✧</b></div>
+  </div>
+  <div class="photo-caption">A face that belongs in a fairytale.</div>
+ </div>
+ <p class="photo-hint" id="photoHint" style="display:none"></p>
+</section>
+
+<section id="little-things">
+ <div class="section-head"><div class="kicker">A few things I hold close</div><h2>Little things. Big meaning.</h2><p>Some gestures are quiet, but they leave a lasting mark. These are a few I never want to take for granted.</p></div>
+ <div class="things">
+  <article class="thing glass" tabindex="0" role="button" aria-expanded="false">
+   <div class="emoji">☕</div><h3>The everyday care</h3><p>Some kindness arrives quietly, in the middle of an ordinary day.</p>
+  </article>
+  <article class="thing glass" tabindex="0" role="button" aria-expanded="false">
+   <div class="emoji">🌷</div><h3>The way you remember</h3><p>Being thought of, even in little ways, can make a day feel lighter.</p>
+  </article>
+  <article class="thing glass" tabindex="0" role="button" aria-expanded="false">
+   <div class="emoji">☾</div><h3>The conversations</h3><p>A few minutes turn into hours, and suddenly it's much later than we thought.</p>
+  </article>
+ </div>
+ <div class="ribbon">“Some memories don't need a photograph to stay.”</div>
+</section>
+
+<section id="secret">
+ <div class="section-head"><div class="kicker">A door only you know about</div><h2>Something just between us.</h2><p>The public part ends here. There's another little card, with words I wanted to keep for you.</p></div>
+ <div class="private-wrap">
+  <div class="lock-card glass" id="lockCard">
+   <div class="lock-icon" id="lockIcon">♧</div>
+   <div class="kicker">A personal note · private corner</div>
+   <h3 id="lockTitle">A little door, Anshu</h3>
+   <p id="lockDescription">If you feel like reading something more personal, tap below and enter the little key. Take your time. This part is written from my heart.</p>
+   <div class="enter-row" id="passwordRow">
+    <input id="password" type="password" inputmode="numeric" autocomplete="off" placeholder="Enter the little key" aria-label="Password">
+    <button id="unlock">Open my letter ✦</button>
+   </div>
+   <div class="error" id="error" aria-live="polite"></div>
+   <div class="private-content" id="privateContent">
+    <article class="private-letter glass">
+     <div class="to">Anshu,</div>
+     <p>I don't know if I say this enough, but I'm genuinely grateful that you came into my life. You have been part of so many ordinary days that I now remember fondly. Your time, your care and your little gestures have meant a lot to me.</p>
+     <p>I still remember our first WhatsApp video call on 22 August 2025, at 23:09. Who knew that one call would become so many late-night conversations, silly talks and memories that I would keep close? I still smile when I think about those days.</p>
+     <p>Thank you for bringing me lunch, for getting medicines for me when I wasn't well, for checking on me, and for all the things you did without making a big deal out of them. I noticed every bit of that care. I hope you know how much it mattered.</p>
+     <p>And your birthday gift to me — that wallet and the wish you made, that it would always stay full of money. I remember it with so much affection. It wasn't just a wallet; it was your thoughtfulness, wrapped in a simple little gift. I will always treasure that.</p>
+     <p>I love you, Anshu. I don't say that to ask you for anything or to make you feel responsible for my feelings. I just want to be honest about the affection and gratitude I carry. You are important to me, and I'm glad I got to know you.</p>
+     <p>I hope life is kind to you. I hope your family stays happy and healthy, your dreams find their way to you, and you always have reasons to laugh. Please remember to take care of yourself too. You deserve the same tenderness you so naturally give to others.</p>
+     <p>Whatever changes with time, I will always be thankful that our paths crossed. I'm glad you exist, Anshu. Truly.</p>
+     <div class="sign">Someone who will always wish the best for you.<br>With love — Kartik</div>
+    </article>
+    <div class="private-memory glass">
+     <small>A wish I keep for you</small>
+     <p>May you always feel loved, protected, appreciated and free to become everything you dream of being. I hope life is as kind to you as you have been to me.</p>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="end" id="ending">
+ <div class="crown">✧ ♕ ✧</div>
+ <div class="kicker">For the girl who made this page worth making</div>
+ <h2>Happy Princess Day,<br>Anshu.</h2>
+ <p>I hope today gives you one more reason to smile. And I hope you never forget that your presence, your kindness and simply being yourself have made a difference in someone's life.</p>
+ <div class="from">Always wishing good things for you.<br>With love, Kartik ♡</div>
+</section>
+</main>
+<footer>MADE WITH CARE · UNDER THE SAME SKY · ✦</footer>
+</div>
+<button class="music" id="musicBtn">♫ <span id="musicLabel">Play a little melody</span></button>
+<script>
+/* Starfield */
+const starBox=document.getElementById('stars');
+for(let i=0;i<105;i++){let s=document.createElement('i');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.setProperty('--speed',(1.5+Math.random()*4)+'s');s.style.animationDelay=(-Math.random()*5)+'s';starBox.appendChild(s)}
+/* Navigation */
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{document.getElementById(b.dataset.go).scrollIntoView({behavior:'smooth'});document.querySelectorAll('[data-go]').forEach(x=>x.classList.toggle('active',x===b))}));
+/* Interactive appreciation cards: flip to reveal a personal line */
+const cardLines=[
+ 'I remember how you have brought lunch for me, often without making a big deal out of it. It may be routine to you, but it has never felt insignificant to me. Thank you.',
+ 'When I was unwell, you helped me get medicines with your own money. I remember that care. I hope you receive the same thoughtfulness whenever you need it.',
+ 'The late-night conversations that somehow made hours feel like minutes. I still look back on those moments with a smile.'
+];
+document.querySelectorAll('.thing').forEach((card,i)=>{let opened=false;const reveal=()=>{opened=!opened;card.setAttribute('aria-expanded',opened);card.innerHTML=opened?'<div class="emoji">♡</div><h3>And I remember...</h3><p>'+cardLines[i]+'</p>':'<div class="emoji">'+['☕','🌷','☾'][i]+'</div><h3>'+['The everyday care','The way you remember','The conversations'][i]+'</h3><p>'+['Some kindness arrives quietly, in the middle of an ordinary day.','Being thought of, even in little ways, can make a day feel lighter.','A few minutes turn into hours, and suddenly it is much later than we thought.'][i]+'</p>'};card.addEventListener('click',reveal);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();reveal()}})});
+/* The photo hint is hidden whenever the repository image loads successfully. */
+const anshuPhoto=document.getElementById('anshuPhoto');
+const photoFallback=document.getElementById('photoFallback');
+const photoHint=document.getElementById('photoHint');
+anshuPhoto.addEventListener('load',()=>{photoFallback.style.display='none';photoHint.style.display='none';anshuPhoto.style.display='block'});
+anshuPhoto.addEventListener('error',()=>{anshuPhoto.style.display='none';photoFallback.style.display='grid';photoHint.style.display='block'});
+if(anshuPhoto.complete && anshuPhoto.naturalWidth>0){photoFallback.style.display='none';photoHint.style.display='none';}
+/* A playful password gate. This is not cryptographic protection: source code can be inspected. */
+const secret='250408';
+const input=document.getElementById('password'),error=document.getElementById('error');
+let loveRainStarted=false;
+function dropLove(){const items=['🌸','💗','💕','💋','🌷','🩷','💞'];const el=document.createElement('span');el.className='bubble';el.textContent=items[Math.floor(Math.random()*items.length)];el.style.left=Math.random()*100+'vw';el.style.fontSize=(15+Math.random()*17)+'px';el.style.setProperty('--drift',(Math.random()*130-65)+'px');el.style.animationDuration=(5+Math.random()*5)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),11000)}
+function startLoveRain(){if(loveRainStarted)return;loveRainStarted=true;for(let i=0;i<28;i++)setTimeout(dropLove,i*110);setInterval(dropLove,420)}
+function unlock(){if(input.value===secret){document.getElementById('privateContent').classList.add('unlocked');document.getElementById('passwordRow').style.display='none';document.getElementById('lockIcon').textContent='♡';document.getElementById('lockTitle').textContent='A little letter, just for you.';document.getElementById('lockDescription').textContent='These words have been waiting for you.';error.textContent='';startLoveRain();document.getElementById('privateContent').scrollIntoView({behavior:'smooth',block:'start'})}else{error.textContent='That key does not seem right. Try once more, Anshu.';input.value='';input.focus()}}
+document.getElementById('unlock').addEventListener('click',unlock);input.addEventListener('keydown',e=>{if(e.key==='Enter')unlock()});
+/* Floating hearts and stars */
+function floaty(){const el=document.createElement('span');el.className='bubble';el.textContent=['✦','♡','✧','❀'][Math.floor(Math.random()*4)];el.style.left=Math.random()*100+'vw';el.style.color=['#e8d5ff','#f5d5eb','#f5e6b8'][Math.floor(Math.random()*3)];el.style.fontSize=(10+Math.random()*15)+'px';el.style.setProperty('--drift',(Math.random()*90-45)+'px');el.style.animationDuration=(9+Math.random()*8)+'s';document.body.appendChild(el);setTimeout(()=>el.remove(),18000)}
+setInterval(floaty,1100);
+/* Original ambient melody made locally with Web Audio; no audio file or network request. */
+let ctx=null,master=null,playing=false,loop=null,n=0;
+const melody=[261.63,329.63,392,523.25,392,349.23,293.66,349.23,440,392,329.63,293.66];
+function tone(freq,t,dur,vol){const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.12);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(master);o.start(t);o.stop(t+dur+.04)}
+function tick(){if(!playing)return;const t=ctx.currentTime;tone(melody[n%melody.length],t,1.3,.035);if(n%3===0)tone(melody[(n+3)%melody.length]/2,t,2,.018);n++;loop=setTimeout(tick,900)}
+document.getElementById('musicBtn').addEventListener('click',async()=>{const label=document.getElementById('musicLabel');if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=.7;master.connect(ctx.destination)}if(!playing){await ctx.resume();playing=true;label.textContent='Pause melody';tick()}else{playing=false;clearTimeout(loop);await ctx.suspend();label.textContent='Play a little melody'}});
+</script>
+</body>
+</html>
